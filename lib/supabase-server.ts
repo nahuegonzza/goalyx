@@ -26,7 +26,7 @@ export function createServerSupabaseClient(cookieStore = cookies()) {
 
 export async function getServerSupabaseSession() {
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getSession();
+    const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error) {
     throw error;
@@ -39,8 +39,7 @@ export async function getServerSupabaseSession() {
 }
 
 export async function ensurePrismaUserForSession() {
-  const { session } = await getServerSupabaseSession();
-  const user = session?.user;
+    const { user } = await getServerSupabaseUser();
 
   if (!user?.id || !user.email) {
     return null;
