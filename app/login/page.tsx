@@ -23,14 +23,10 @@ export default function LoginPage() {
     password,
     });
 
-console.log("LOGIN DATA:", data);
-console.log("LOGIN ERROR:", error);
-
     if (error) {
-    setError(error.message);
-    } else if (!data.session) {
-    setError('No se pudo iniciar sesión (sin sesión)');
+    setError('Email o contraseña incorrectos');
     } else {
+    router.refresh();
     router.push('/');
     }
 
