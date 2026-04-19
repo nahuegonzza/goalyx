@@ -24,9 +24,11 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError('Email o contraseña incorrectos');
+    setError(error.message);
+    } else if (!data.session) {
+    setError('No se pudo iniciar sesión (sin sesión)');
     } else {
-      router.push('/');
+    router.push('/');
     }
 
     setLoading(false);
