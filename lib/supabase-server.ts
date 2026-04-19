@@ -5,12 +5,6 @@ import { prisma } from '@lib/prisma';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn(
-    'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
-  );
-}
-
 export function createServerSupabaseClient(cookieStore = cookies()) {
   return createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -26,16 +20,11 @@ export function createServerSupabaseClient(cookieStore = cookies()) {
   });
 }
 
-/**
- * 🔐 Obtener usuario autenticado (FORMA CORRECTA)
- */
+// ✅ NUEVA función basada en getUser()
 export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error) {
     throw error;
@@ -47,9 +36,7 @@ export async function getServerSupabaseUser() {
   };
 }
 
-/**
- * 👤 Sincroniza usuario con Prisma
- */
+// ✅ Prisma sync
 export async function ensurePrismaUserForSession() {
   const { user } = await getServerSupabaseUser();
 
@@ -71,9 +58,7 @@ export async function ensurePrismaUserForSession() {
   });
 }
 
-/**
- * 🆔 Obtener ID del usuario autenticado
- */
+// ✅ helper simple
 export async function getSupabaseUserId() {
   const { user } = await getServerSupabaseUser();
   return user?.id ?? null;
