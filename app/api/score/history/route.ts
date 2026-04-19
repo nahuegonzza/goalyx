@@ -2,13 +2,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 import { prisma } from '@lib/prisma';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import { moduleDefinitions } from '@modules';
 import { parseModuleConfig } from '@lib/modules';
 import type { GoalEntryWithGoal, ActiveModule } from '@types';
-
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
 
 function normalizeDateToStartOfDay(dateString: string) {
   const date = new Date(dateString);
@@ -28,9 +28,9 @@ function normalizeGoalType(type: string): GoalType {
   return type as GoalType;
 }
 
-async function getEntriesForRange(start: Date, end: Date) {
+async function getEntriesForRange(start: Date, end: Date, userId: string) {
   const entries = await prisma.goalEntry.findMany({
-    where: { userId: DEFAULT_USER, date: { gte: start, lte: end } },
+    where: { userId, date: { gte: start, lte: end } },
     include: { goal: true }
   });
 
@@ -49,9 +49,9 @@ async function getEntriesForRange(start: Date, end: Date) {
   })) as GoalEntryWithGoal[];
 }
 
-async function getEventsForRange(start: Date, end: Date) {
+async function getEventsForRange(start: Date, end: Date, userId: string) {
   const events = await prisma.event.findMany({
-    where: { userId: DEFAULT_USER, createdAt: { gte: start, lte: end } }
+    where: { userId, createdAt: { gte: start, lte: end } }
   });
 
   return events.map((event) => ({
@@ -61,9 +61,9 @@ async function getEventsForRange(start: Date, end: Date) {
   }));
 }
 
-async function getModuleEntriesForRange(start: Date, end: Date) {
+async function getModuleEntriesForRange(start: Date, end: Date, userId: string) {
   const entries = await prisma.moduleEntry.findMany({
-    where: { userId: DEFAULT_USER, date: { gte: start, lte: end } },
+    where: { userId, date: { gte: start, lte: end } },
     include: { module: true }
   });
 
@@ -82,6 +82,14 @@ async function getModuleEntriesForRange(start: Date, end: Date) {
 }
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
   const reference = normalizeDateToStartOfDay(dateParam ?? new Date().toISOString());
@@ -108,22 +116,22 @@ export async function GET(request: Request) {
   monthEnd.setHours(23, 59, 59, 999);
 
   const [todayEntries, previousDayEntries, weekEntries, monthEntries, todayEvents, previousDayEvents, weekEvents, monthEvents, todayModuleEntries, previousDayModuleEntries, weekModuleEntries, monthModuleEntries] = await Promise.all([
-    getEntriesForRange(currentStart, currentEnd),
-    getEntriesForRange(previousDay, previousDayEnd),
-    getEntriesForRange(weekStart, weekEnd),
-    getEntriesForRange(monthStart, monthEnd),
-    getEventsForRange(currentStart, currentEnd),
-    getEventsForRange(previousDay, previousDayEnd),
-    getEventsForRange(weekStart, weekEnd),
-    getEventsForRange(monthStart, monthEnd),
-    getModuleEntriesForRange(currentStart, currentEnd),
-    getModuleEntriesForRange(previousDay, previousDayEnd),
-    getModuleEntriesForRange(weekStart, weekEnd),
-    getModuleEntriesForRange(monthStart, monthEnd)
+    getEntriesForRange(currentStart, currentEnd, userId),
+    getEntriesForRange(previousDay, previousDayEnd, userId),
+    getEntriesForRange(weekStart, weekEnd, userId),
+    getEntriesForRange(monthStart, monthEnd, userId),
+    getEventsForRange(currentStart, currentEnd, userId),
+    getEventsForRange(previousDay, previousDayEnd, userId),
+    getEventsForRange(weekStart, weekEnd, userId),
+    getEventsForRange(monthStart, monthEnd, userId),
+    getModuleEntriesForRange(currentStart, currentEnd, userId),
+    getModuleEntriesForRange(previousDay, previousDayEnd, userId),
+    getModuleEntriesForRange(weekStart, weekEnd, userId),
+    getModuleEntriesForRange(monthStart, monthEnd, userId)
   ]);
 
   const dbModules = await prisma.module.findMany({
-    where: { userId: DEFAULT_USER, active: true }
+    where: { userId, active: true }
   });
 
   const activeModules: ActiveModule[] = dbModules.map((mod) => {

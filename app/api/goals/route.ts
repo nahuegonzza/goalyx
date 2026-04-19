@@ -4,8 +4,8 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalPayload } from '@types';
-
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 
 function normalizeGoalType(type: string) {
   if (type === 'HABIT') return 'BOOLEAN';
@@ -14,8 +14,13 @@ function normalizeGoalType(type: string) {
 }
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const goals = await prisma.goal.findMany({
-    where: { userId: DEFAULT_USER },
+    where: { userId: session.user.id },
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
   });
 
@@ -28,13 +33,18 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const payload = (await request.json()) as GoalPayload;
   const activatedAt = payload.activatedAt ? new Date(payload.activatedAt) : new Date();
 
   // Buscar si ya existe un objetivo con el mismo título exacto
   const existingGoal = await prisma.goal.findFirst({
     where: {
-      userId: DEFAULT_USER,
+      userId: session.user.id,
       title: payload.title
     }
   });
@@ -63,13 +73,13 @@ export async function POST(request: Request) {
 
   // Crear nuevo objetivo
   const lastGoal = await prisma.goal.findFirst({
-    where: { userId: DEFAULT_USER },
+    where: { userId: session.user.id },
     orderBy: { order: 'desc' }
   });
 
   const goal = await prisma.goal.create({
     data: {
-      userId: DEFAULT_USER,
+      userId: session.user.id,
       title: payload.title,
       description: payload.description,
       type: payload.type,

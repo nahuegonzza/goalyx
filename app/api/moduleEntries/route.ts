@@ -2,9 +2,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 import { prisma } from '@lib/prisma';
-
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -27,11 +27,19 @@ function normalizeDateToStartOfDay(dateString: string) {
 }
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
   const moduleSlug = url.searchParams.get('module');
 
-  let whereClause: any = { userId: DEFAULT_USER };
+  let whereClause: any = { userId };
 
   if (dateParam) {
     try {
@@ -47,7 +55,7 @@ export async function GET(request: Request) {
 
   if (moduleSlug) {
     const module = await prisma.module.findFirst({
-      where: { slug: moduleSlug, userId: DEFAULT_USER }
+      where: { slug: moduleSlug, userId }
     });
     if (module) {
       whereClause.moduleId = module.id;
@@ -70,6 +78,14 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   try {
     const body = await request.json();
     const { moduleId, date, data } = body;
@@ -92,7 +108,7 @@ export async function POST(request: Request) {
         updatedAt: new Date()
       },
       create: {
-        userId: DEFAULT_USER,
+        userId,
         moduleId,
         date: normalizedDate,
         data: JSON.stringify(data)

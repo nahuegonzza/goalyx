@@ -4,8 +4,8 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalEntryPayload } from '@types';
-
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -34,10 +34,15 @@ function normalizeGoalType(type: string) {
 }
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
 
-  let whereClause: any = { userId: DEFAULT_USER };
+  let whereClause: any = { userId: session.user.id };
 
   if (dateParam) {
     try {
@@ -71,6 +76,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const payload = (await request.json()) as GoalEntryPayload;
 
   if (!payload.goalId || typeof payload.goalId !== 'string') {
@@ -80,7 +90,7 @@ export async function POST(request: Request) {
   const entryDate = normalizeDateToStartOfDay(payload.date ?? new Date().toISOString());
 
   const goal = await prisma.goal.findUnique({ where: { id: payload.goalId } });
-  if (!goal) {
+  if (!goal || goal.userId !== session.user.id) {
     return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
   }
 
@@ -96,7 +106,7 @@ export async function POST(request: Request) {
   }
 
   const entryData: any = {
-    userId: DEFAULT_USER,
+    userId: session.user.id,
     goalId: payload.goalId,
     date: entryDate,
     valueFloat: isNumeric ? payload.value ?? 0 : null,

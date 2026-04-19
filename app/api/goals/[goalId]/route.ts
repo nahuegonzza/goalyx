@@ -4,15 +4,20 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalPayload } from '@types';
-
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { goalId } = params;
   const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
 
   const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== DEFAULT_USER) {
+  if (!goal || goal.userId !== session.user.id) {
     return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
   }
 
@@ -52,10 +57,15 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 }
 
 export async function DELETE(request: Request, { params }: { params: { goalId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { goalId } = params;
 
   const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== DEFAULT_USER) {
+  if (!goal || goal.userId !== session.user.id) {
     return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
   }
 

@@ -2,18 +2,26 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
-
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit') ?? 10);
   const date = url.searchParams.get('date');
   const type = url.searchParams.get('type');
 
-  const where: any = { userId: DEFAULT_USER };
+  const where: any = { userId };
   if (date) {
     if (date === 'today') {
       const today = new Date();
@@ -48,6 +56,14 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const payload = (await request.json()) as {
     type: string;
     value: number;
@@ -57,7 +73,7 @@ export async function POST(request: Request) {
   const moduleDefinition = moduleDefinitions.find((module) => module.slug === payload.moduleSlug);
 
   const eventData: any = {
-    userId: DEFAULT_USER,
+    userId,
     type: payload.type,
     value: payload.value,
     metadata: JSON.stringify(payload.metadata ?? {})
@@ -67,7 +83,7 @@ export async function POST(request: Request) {
     eventData.module = {
       connectOrCreate: {
         where: { slug: moduleDefinition.slug },
-        create: { slug: moduleDefinition.slug, name: moduleDefinition.name, description: moduleDefinition.description, userId: DEFAULT_USER }
+        create: { slug: moduleDefinition.slug, name: moduleDefinition.name, description: moduleDefinition.description, userId }
       }
     };
   }

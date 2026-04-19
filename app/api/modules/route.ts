@@ -2,12 +2,20 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@lib/auth';
 import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
-const DEFAULT_USER = process.env.DEFAULT_USER_ID ?? '00000000-0000-0000-0000-000000000000';
-
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   await Promise.all(
     moduleDefinitions.map((module) =>
       prisma.module.upsert({
@@ -16,7 +24,7 @@ export async function GET() {
           slug: module.slug,
           name: module.name,
           description: module.description,
-          userId: DEFAULT_USER,
+          userId,
           active: false
         },
         update: {
@@ -28,7 +36,7 @@ export async function GET() {
   );
 
   const modules = await prisma.module.findMany({
-    where: { userId: DEFAULT_USER },
+    where: { userId },
     orderBy: { name: 'asc' }
   });
 
@@ -41,6 +49,14 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const payload = await request.json() as { slug: string; active: boolean };
   const moduleDefinition = moduleDefinitions.find((module) => module.slug === payload.slug);
 
@@ -54,7 +70,7 @@ export async function PATCH(request: Request) {
       slug: payload.slug,
       name: moduleDefinition.name,
       description: moduleDefinition.description,
-      userId: DEFAULT_USER,
+      userId,
       active: payload.active
     },
     update: {
