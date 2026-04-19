@@ -23,6 +23,9 @@ export default function LoginPage() {
     password,
     });
 
+console.log("LOGIN DATA:", data);
+console.log("LOGIN ERROR:", error);
+
     if (error) {
     setError(error.message);
     } else if (!data.session) {
