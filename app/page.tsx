@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { ensurePrismaUserForSession, getServerSupabaseSession } from '@lib/supabase-server';
+import { ensurePrismaUserForSession, getServerSupabaseUser } from '@lib/supabase-server';
 
 export default async function Home() {
   const { user } = await getServerSupabaseUser();
@@ -16,7 +16,7 @@ export default async function Home() {
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
           <p className="mt-2 text-slate-600 dark:text-slate-400">
-            Bienvenido, {session.user?.email}!
+            Bienvenido, {user?.email}!
           </p>
         </div>
       </div>

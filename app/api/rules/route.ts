@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSupabaseSession } from '@lib/supabase-server';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import type { Rule } from '@types';
 
@@ -13,7 +13,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
   const rules = await prisma.rule.findMany({
     where: { userId },
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
   const payload = (await request.json()) as Rule;
   const rule = await prisma.rule.create({

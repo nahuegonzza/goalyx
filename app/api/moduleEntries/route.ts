@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSupabaseSession } from '@lib/supabase-server';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 
 function normalizeDateToStartOfDay(dateString: string) {
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
   try {
     const body = await request.json();

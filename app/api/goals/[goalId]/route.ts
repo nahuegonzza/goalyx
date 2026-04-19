@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalPayload } from '@types';
-import { getServerSupabaseSession } from '@lib/supabase-server';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
   const { user } = await getServerSupabaseUser();
@@ -16,7 +16,7 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
   const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
 
   const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== session.user.id) {
+  if (!goal || goal.userId !== user.id) {
     return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
   }
 
@@ -64,7 +64,7 @@ export async function DELETE(request: Request, { params }: { params: { goalId: s
   const { goalId } = params;
 
   const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== session.user.id) {
+  if (!goal || goal.userId !== user.id) {
     return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
   }
 

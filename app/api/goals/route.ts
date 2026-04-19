@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalPayload } from '@types';
-import { getServerSupabaseSession } from '@lib/supabase-server';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 
 function normalizeGoalType(type: string) {
   if (type === 'HABIT') return 'BOOLEAN';
@@ -19,7 +19,7 @@ export async function GET() {
   }
 
   const goals = await prisma.goal.findMany({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
   });
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   // Buscar si ya existe un objetivo con el mismo título exacto
   const existingGoal = await prisma.goal.findFirst({
     where: {
-      userId: session.user.id,
+      userId: user.id,
       title: payload.title
     }
   });
@@ -72,13 +72,13 @@ export async function POST(request: Request) {
 
   // Crear nuevo objetivo
   const lastGoal = await prisma.goal.findFirst({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
     orderBy: { order: 'desc' }
   });
 
   const goal = await prisma.goal.create({
     data: {
-      userId: session.user.id,
+      userId: user.id,
       title: payload.title,
       description: payload.description,
       type: payload.type,

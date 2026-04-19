@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalEntryPayload } from '@types';
-import { getServerSupabaseSession } from '@lib/supabase-server';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
 
-  let whereClause: any = { userId: session.user.id };
+  let whereClause: any = { userId: user.id };
 
   if (dateParam) {
     try {
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
   const entryDate = normalizeDateToStartOfDay(payload.date ?? new Date().toISOString());
 
   const goal = await prisma.goal.findUnique({ where: { id: payload.goalId } });
-  if (!goal || goal.userId !== session.user.id) {
+  if (!goal || goal.userId !== user.id) {
     return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
   }
 
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
   }
 
   const entryData: any = {
-    userId: session.user.id,
+    userId: user.id,
     goalId: payload.goalId,
     date: entryDate,
     valueFloat: isNumeric ? payload.value ?? 0 : null,
