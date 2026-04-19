@@ -41,7 +41,7 @@ export default function WaterDashboard({ module, date }: WaterDashboardProps) {
     const res = await fetch('/api/moduleEntries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ moduleId: module.id, date, value: 1 })
+      body: JSON.stringify({ moduleId: module.id, date, data: { value: 1 } })
     });
     if (res.ok) {
       loadEntries();
@@ -49,19 +49,7 @@ export default function WaterDashboard({ module, date }: WaterDashboardProps) {
   };
 
   const removeGlass = async () => {
-    if (totalGlasses > 0) {
-      // Simplificar: restar 1 del último entry o crear negativo, pero mejor buscar el último y reducir
-      const lastEntry = entries[entries.length - 1];
-      if (lastEntry) {
-        const newValue = Math.max(0, (lastEntry.valueFloat || 0) - 1);
-        await fetch(`/api/moduleEntries/${lastEntry.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: newValue })
-        });
-        loadEntries();
-      }
-    }
+    // TODO: Implement remove functionality
   };
 
   return (

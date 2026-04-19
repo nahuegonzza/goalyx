@@ -209,5 +209,5 @@ export default function Analytics() {
   const periodDirection = periodDiff >= 0 ? 'Mejor' : 'Peor';
   const title = viewMode === 'overview' ? 'Resumen global' : 'Por objetivo: ' + (activeGoal?.title ?? 'Selecciona un objetivo');
 
-  return null;
+  return <div>Analytics</div>;
 }
