@@ -186,13 +186,26 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    const msg = logError('UNEXPECTED_ERROR', error);
-    console.error(`[${timestamp}] [${requestId}] Unexpected error in registration endpoint`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : '';
+    
+    console.error('REGISTER ERROR FULL:', {
+      message: errorMessage,
+      stack: errorStack,
+      error,
+      timestamp,
+      requestId,
+      env: process.env.NODE_ENV,
+    });
     
     return NextResponse.json(
       {
-        error: 'Error inesperado del servidor. Por favor, intenta de nuevo más tarde.',
-        ...(process.env.NODE_ENV === 'development' && { debug: msg }),
+        success: false,
+        message: 'REGISTER_ERROR',
+        error: String(error),
+        errorMessage,
+        requestId,
+        timestamp,
       },
       { status: 500 }
     );
