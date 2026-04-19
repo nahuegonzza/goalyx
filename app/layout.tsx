@@ -1,0 +1,24 @@
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import './globals.css';
+import RootLayoutClient from './RootLayoutClient';
+
+export const metadata: Metadata = {
+  title: 'Objetives App',
+  description: 'Motor de hábitos, eventos y score diario con módulos extendibles.',
+  icons: {
+    icon: '/favicon.ico'
+  }
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="es">
+      <body className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
+        <RootLayoutClient>
+          {children}
+        </RootLayoutClient>
+      </body>
+    </html>
+  );
+}

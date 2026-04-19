@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  name      String?
+  password  String?
+  createdAt DateTime    @default(now())
+  goals     Goal[]
+  entries   GoalEntry[]
+  events    Event[]
+  rules     Rule[]
+  scores    Score[]
+  modules   Module[]
+  moduleEntries ModuleEntry[]
+}
+
+model Goal {
+  id            String        @id @default(uuid())
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  title         String
+  description   String?
+  type          String        @default("BOOLEAN")
+  status        String        @default("ACTIVE")
+  icon          String        @default("star")
+  color         String        @default("slate")
+  order         Int?          @default(0)
+  pointsIfTrue  Float?        @default(1)
+  pointsIfFalse Float?        @default(0)
+  pointsPerUnit Float?
+  isActive      Boolean       @default(true)
+  deactivatedAt DateTime?
+  activatedAt   DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  entries       GoalEntry[]
+  events        Event[]
+}
+
+model GoalEntry {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  goal         Goal     @relation(fields: [goalId], references: [id])
+  goalId       String
+  date         DateTime
+  valueFloat   Float?
+  valueBoolean Boolean?
+  createdAt    DateTime @default(now())
+
+  @@unique([goalId, date], name: "goal_date_unique")
+}
+
+model Event {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  goal       Goal?    @relation(fields: [goalId], references: [id])
+  goalId     String?
+  module     Module?  @relation(fields: [moduleId], references: [id])
+  moduleId   String?
+  type       String
+  value      Float
+  metadata   String   @default("{}")
+  createdAt  DateTime @default(now())
+}
+
+model Rule {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  target      String
+  condition   String
+  action      String
+  priority    Int      @default(0)
+  active      Boolean  @default(true)
+  config      String?
+  createdAt   DateTime @default(now())
+}
+
+model Score {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  date       DateTime
+  points     Float
+  createdAt  DateTime  @default(now())
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  name        String
+  slug        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  config      String   @default("{}")
+  createdAt   DateTime @default(now())
+  events      Event[]
+  entries     ModuleEntry[]
+}
+
+model ModuleEntry {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  module    Module   @relation(fields: [moduleId], references: [id])
+  moduleId  String
+  date      DateTime
+  data      String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([moduleId, date])
+}

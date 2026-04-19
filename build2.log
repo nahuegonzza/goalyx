@@ -1,0 +1,24 @@
+
+> objetives-app@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.5
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    · typedRoutes
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/api/goalEntries/route.ts:66:14
+Type error: Object literal may only specify known properties, and 'goalId_date' does not exist in type 'GoalEntryWhereUniqueInput'.
+
+[0m [90m 64 |[39m[0m
+[0m [90m 65 |[39m   [36mconst[39m entry [33m=[39m [36mawait[39m prisma[33m.[39mgoalEntry[33m.[39mupsert({[0m
+[0m[31m[1m>[22m[39m[90m 66 |[39m     where[33m:[39m { goalId_date[33m:[39m { goalId[33m:[39m payload[33m.[39mgoalId[33m,[39m date[33m:[39m entryDate } }[33m,[39m[0m
+[0m [90m    |[39m              [31m[1m^[22m[39m[0m
+[0m [90m 67 |[39m     update[33m:[39m entryData[33m,[39m[0m
+[0m [90m 68 |[39m     create[33m:[39m entryData[33m,[39m[0m
+[0m [90m 69 |[39m     include[33m:[39m { goal[33m:[39m [36mtrue[39m }[0m

@@ -1,0 +1,406 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import type { Goal, GoalEntryWithGoal, ScoreHistory, Event, DailyScore } from '@types';
+import { getLocalDateString, parseLocalDate, formatLocalDate } from '@lib/dateHelpers';
+import { isGoalActiveOnDate } from '@lib/goalHelpers';
+import { calculateDailyScore } from '@core/score/scoreCalculator';
+import CompactGoalItem from '@components/CompactGoalItem';
+import { moduleDefinitions } from '../modules';
+import { parseModuleConfig } from '../lib/modules';
+import type { ActiveModule } from '../lib/modules';
+
+function buildEntryPayload(goal: Goal, value: boolean | number | null, date: string) {
+  return goal.type === 'BOOLEAN'
+    ? { goalId: goal.id, date, valueBoolean: Boolean(value) }
+    : { goalId: goal.id, date, value: Number(value ?? 0) };
+}
+
+function getLocalDateStringFromEntry(dateString: string) {
+  if (!dateString.includes('T')) {
+    return formatLocalDate(parseLocalDate(dateString));
+  }
+  return formatLocalDate(new Date(dateString));
+}
+
+export default function GoalTracker() {
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [entries, setEntries] = useState<GoalEntryWithGoal[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [moduleEntries, setModuleEntries] = useState<any[]>([]);
+  const [activeModules, setActiveModules] = useState<ActiveModule[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
+  const [dailyScore, setDailyScore] = useState<DailyScore>({ points: 0, date: getLocalDateString(), note: '' });
+  const [scoreHistory, setScoreHistory] = useState<ScoreHistory | null>(null);
+
+  const today = useMemo(() => getLocalDateString(), []);
+
+  useEffect(() => {
+    (async () => {
+      await loadModules();
+      await loadData();
+      await loadScoreHistory();
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [goalsRes, entriesRes, eventsRes, moduleEntriesRes] = await Promise.all([
+        fetch('/api/goals'),
+        fetch('/api/goalEntries'),
+        fetch('/api/events'),
+        fetch('/api/moduleEntries')
+      ]);
+
+      // Check if responses are OK before parsing JSON
+      if (!goalsRes.ok) {
+        console.error('Failed to fetch goals:', goalsRes.status, goalsRes.statusText);
+        setMessage('Error al cargar objetivos');
+        setMessageType('error');
+        return;
+      }
+
+      if (!entriesRes.ok) {
+        console.error('Failed to fetch entries:', entriesRes.status, entriesRes.statusText);
+        setMessage('Error al cargar registros');
+        setMessageType('error');
+        return;
+      }
+
+      if (!eventsRes.ok) {
+        console.error('Failed to fetch events:', eventsRes.status, eventsRes.statusText);
+        setMessage('Error al cargar eventos');
+        setMessageType('error');
+        return;
+      }
+
+      const goalsText = await goalsRes.text();
+      const entriesText = await entriesRes.text();
+      const eventsText = await eventsRes.text();
+      const moduleEntriesText = await moduleEntriesRes.text();
+
+      if (!goalsText) {
+        console.error('Empty response from /api/goals');
+        setMessage('Respuesta vacía del servidor (objetivos)');
+        setMessageType('error');
+        return;
+      }
+
+      if (!entriesText) {
+        console.error('Empty response from /api/goalEntries');
+        setMessage('Respuesta vacía del servidor (registros)');
+        setMessageType('error');
+        return;
+      }
+
+      if (!eventsText) {
+        console.error('Empty response from /api/events');
+        setMessage('Respuesta vacía del servidor (eventos)');
+        setMessageType('error');
+        return;
+      }
+
+      if (!moduleEntriesText) {
+        console.error('Empty response from /api/moduleEntries');
+        setMessage('Respuesta vacía del servidor (entradas de módulos)');
+        setMessageType('error');
+        return;
+      }
+
+      const goalsData = JSON.parse(goalsText);
+      const entriesData = JSON.parse(entriesText);
+      const eventsData = JSON.parse(eventsText);
+      const moduleEntriesData = JSON.parse(moduleEntriesText);
+
+      const activeGoals = goalsData.filter((goal: Goal) => isGoalActiveOnDate(goal, today));
+      setGoals(activeGoals.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));
+      setEntries(entriesData);
+      setEvents(eventsData);
+      setModuleEntries(moduleEntriesData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setMessageType('error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadModules() {
+    try {
+      const res = await fetch('/api/modules');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const modules = await res.json();
+      const active = modules.filter((m: any) => m.active);
+      const withDefinitions = active.map((mod: any) => {
+        const definition = moduleDefinitions.find((d) => d.slug === mod.slug);
+        return {
+          ...mod,
+          config: parseModuleConfig(mod.config) || definition?.defaultConfig || {},
+          definition,
+        };
+      });
+      setActiveModules(withDefinitions);
+    } catch (error) {
+      console.error('Error loading modules', error);
+    }
+  }
+
+  async function loadScoreHistory() {
+    try {
+      const res = await fetch(`/api/score/history?date=${today}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      setScoreHistory(data);
+    } catch (error) {
+      console.error('Error loading score history:', error);
+    }
+  }
+
+  async function handleSaveEntry(goal: Goal, value: boolean | number) {
+    setSavingGoalId(goal.id);
+    setMessage('');
+    setEntries((prevEntries) => {
+      const existingIndex = prevEntries.findIndex((entry) =>
+        entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === today
+      );
+      const updatedEntry = {
+        id: existingIndex !== -1 ? prevEntries[existingIndex].id : `temp-${goal.id}`,
+        userId: goal.userId,
+        goalId: goal.id,
+        date: today,
+        createdAt: existingIndex !== -1 ? prevEntries[existingIndex].createdAt : new Date().toISOString(),
+        goal,
+        valueBoolean: goal.type === 'BOOLEAN' ? Boolean(value) : prevEntries[existingIndex]?.valueBoolean ?? null,
+        valueFloat: goal.type === 'NUMERIC' ? Number(value) : prevEntries[existingIndex]?.valueFloat ?? null
+      } as GoalEntryWithGoal;
+
+      if (existingIndex !== -1) {
+        return prevEntries.map((entry, index) => index === existingIndex ? updatedEntry : entry);
+      }
+
+      return [...prevEntries, updatedEntry];
+    });
+
+    try {
+      const payload = buildEntryPayload(goal, value, today);
+      const res = await fetch('/api/goalEntries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const updatedEntry = await res.json();
+        setEntries((prevEntries) => {
+          const existingIndex = prevEntries.findIndex((entry) =>
+            entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === today
+          );
+          if (existingIndex !== -1) {
+            return prevEntries.map((entry, index) =>
+              index === existingIndex ? updatedEntry : entry
+            );
+          }
+          return [...prevEntries, updatedEntry];
+        });
+        setMessage('✓ Registrado');
+        setMessageType('success');
+        await loadScoreHistory();
+      } else {
+        setMessage('Error al guardar');
+        setMessageType('error');
+        await loadData();
+      }
+    } catch (error) {
+      setMessage('Error de conexión');
+      setMessageType('error');
+      await loadData();
+    } finally {
+      setSavingGoalId(null);
+    }
+  }
+
+  const goalEntriesMap = useMemo(() => {
+    const todayEntries = entries.filter((e) => getLocalDateStringFromEntry(e.date) === today);
+    return new Map(todayEntries.map((entry) => [entry.goalId, entry]));
+  }, [entries, today]);
+
+  const currentEntries = useMemo(
+    () => entries.filter((e) => getLocalDateStringFromEntry(e.date) === today),
+    [entries, today]
+  );
+  const currentEvents = useMemo(
+    () => events.filter((e) => getLocalDateStringFromEntry(e.createdAt) === today),
+    [events, today]
+  );
+  const currentModuleEntries = useMemo(
+    () => moduleEntries.filter((e) => getLocalDateStringFromEntry(e.date) === today),
+    [moduleEntries, today]
+  );
+
+  useEffect(() => {
+    const currentScore = calculateDailyScore(currentEntries, currentEvents, currentModuleEntries, activeModules);
+    setDailyScore(currentScore);
+  }, [currentEntries, currentEvents, currentModuleEntries, activeModules]);
+
+  // Filtrar solo objetivos activos (tratando isActive como true si no está definido)
+  const activeGoals = goals.filter((g) => g.isActive !== false);
+  const booleanGoals = activeGoals.filter((g) => g.type === 'BOOLEAN');
+  const numericGoals = activeGoals.filter((g) => g.type === 'NUMERIC');
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+              Registro diario
+            </p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {today}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
+            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Hoy</p>
+              <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                {dailyScore.points.toFixed(1)}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Ayer</p>
+              <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
+                {!scoreHistory ? '–' : scoreHistory.previousDay.points.toFixed(1)}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Diferencia</p>
+              <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
+                {!scoreHistory
+                  ? '–'
+                  : `${(dailyScore.points - scoreHistory.previousDay.points).toFixed(1)}`}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">7 días avg</p>
+              <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
+                {!scoreHistory
+                  ? '–'
+                  : `${(scoreHistory.previousWeek.points / 7).toFixed(1)}`}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {message && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+              messageType === 'success'
+                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300'
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-12 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"
+              />
+            ))}
+          </div>
+        ) : goals.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-slate-500 dark:text-slate-400">
+              No hay objetivos. Crea algunos en{' '}
+              <a href="/goals" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                Objetivos
+              </a>
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {activeModules.length > 0 && (
+              <div>
+                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                  Módulos
+                </p>
+                <div className="space-y-2">
+                  {activeModules.map((module) => {
+                    const Component = module.definition?.Component;
+                    if (!Component) return null;
+                    return (
+                      <Component
+                        key={module.slug}
+                        config={module.config}
+                        module={module}
+                        onUpdate={() => loadScoreHistory()}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {booleanGoals.length > 0 && (
+              <div>
+                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                  Hábitos
+                </p>
+                <div className="space-y-2">
+                  {booleanGoals.map((goal) => (
+                    <CompactGoalItem
+                      key={goal.id}
+                      goal={goal}
+                      entry={goalEntriesMap.get(goal.id)}
+                      isLoading={savingGoalId === goal.id}
+                      onChange={handleSaveEntry}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {numericGoals.length > 0 && (
+              <div>
+                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                  Métricas
+                </p>
+                <div className="space-y-2">
+                  {numericGoals.map((goal) => (
+                    <CompactGoalItem
+                      key={goal.id}
+                      goal={goal}
+                      entry={goalEntriesMap.get(goal.id)}
+                      isLoading={savingGoalId === goal.id}
+                      onChange={handleSaveEntry}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
+          {dailyScore.note}
+        </p>
+      </div>
+    </div>
+  );
+}
