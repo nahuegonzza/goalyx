@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 
@@ -18,6 +19,19 @@ export default function Navigation() {
   const router = useRouter();
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
+  const [userName, setUserName] = useState<string>('');
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/user')
+        .then(res => res.json())
+        .then(data => {
+          const displayName = data.name || data.firstName || data.email;
+          setUserName(displayName);
+        })
+        .catch(() => setUserName(session.user.email || 'Usuario'));
+    }
+  }, [session]);
 
   const getLinkClasses = (href: string) => {
     const isActive = pathname === href;
@@ -41,7 +55,7 @@ export default function Navigation() {
           ))}
           {session?.user && (
             <div className="flex items-center gap-2 ml-4">
-              <span className="text-sm text-slate-700 dark:text-slate-200">{session.user.email}</span>
+              <span className="text-sm text-slate-700 dark:text-slate-200">{userName}</span>
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();

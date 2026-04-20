@@ -1,5 +1,13 @@
-export type GoalType = 'BOOLEAN' | 'NUMERIC';
-export type GoalStatus = 'ACTIVE' | 'COMPLETED' | 'PAUSED';
+export interface User {
+  id: string;
+  email: string;
+  name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  emailVerified?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Goal {
   id: string;

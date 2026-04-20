@@ -13,85 +13,92 @@ function normalizeGoalType(type: string) {
 }
 
 export async function GET() {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const { user } = await getServerSupabaseUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const goals = await prisma.goal.findMany({
+      where: { userId: user.id },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
+    });
+
+    const normalized = goals.map((goal) => ({
+      ...goal,
+      type: normalizeGoalType(goal.type)
+    }));
+
+    return NextResponse.json(normalized);
+  } catch (error) {
+    console.error('Error fetching goals:', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error fetching goals' }, { status: 500 });
   }
-
-  const goals = await prisma.goal.findMany({
-    where: { userId: user.id },
-    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
-  });
-
-  const normalized = goals.map((goal) => ({
-    ...goal,
-    type: normalizeGoalType(goal.type)
-  }));
-
-  return NextResponse.json(normalized);
 }
 
 export async function POST(request: Request) {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const payload = (await request.json()) as GoalPayload;
-  const activatedAt = payload.activatedAt ? new Date(payload.activatedAt) : new Date();
-
-  // Buscar si ya existe un objetivo con el mismo título exacto
-  const existingGoal = await prisma.goal.findFirst({
-    where: {
-      userId: user.id,
-      title: payload.title
+  try {
+    const { user } = await getServerSupabaseUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-  });
 
-  if (existingGoal) {
-    // Actualizar el objetivo existente
-    const updatedGoal = await prisma.goal.update({
-      where: { id: existingGoal.id },
+    const payload = (await request.json()) as GoalPayload;
+    const activatedAt = payload.activatedAt ? new Date(payload.activatedAt) : new Date();
+
+    const existingGoal = await prisma.goal.findFirst({
+      where: {
+        userId: user.id,
+        title: payload.title
+      }
+    });
+
+    if (existingGoal) {
+      const updatedGoal = await prisma.goal.update({
+        where: { id: existingGoal.id },
+        data: {
+          description: payload.description,
+          type: payload.type,
+          icon: payload.icon ?? 'star',
+          color: payload.color ?? 'slate',
+          order: payload.order ?? existingGoal.order,
+          pointsIfTrue: payload.pointsIfTrue,
+          pointsIfFalse: payload.pointsIfFalse,
+          pointsPerUnit: payload.pointsPerUnit,
+          isActive: true,
+          activatedAt,
+          deactivatedAt: null
+        }
+      });
+
+      return NextResponse.json(updatedGoal, { status: 200 });
+    }
+
+    const lastGoal = await prisma.goal.findFirst({
+      where: { userId: user.id },
+      orderBy: { order: 'desc' }
+    });
+
+    const goal = await prisma.goal.create({
       data: {
+        userId: user.id,
+        title: payload.title,
         description: payload.description,
         type: payload.type,
         icon: payload.icon ?? 'star',
         color: payload.color ?? 'slate',
-        order: payload.order ?? existingGoal.order,
+        order: payload.order ?? ((lastGoal?.order ?? -1) + 1),
         pointsIfTrue: payload.pointsIfTrue,
         pointsIfFalse: payload.pointsIfFalse,
         pointsPerUnit: payload.pointsPerUnit,
         isActive: true,
-        activatedAt,
-        deactivatedAt: null
+        activatedAt
       }
     });
 
-    return NextResponse.json(updatedGoal, { status: 200 });
+    return NextResponse.json(goal, { status: 201 });
+  } catch (error) {
+    console.error('Error creating goal:', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error creating goal' }, { status: 500 });
   }
-
-  // Crear nuevo objetivo
-  const lastGoal = await prisma.goal.findFirst({
-    where: { userId: user.id },
-    orderBy: { order: 'desc' }
-  });
-
-  const goal = await prisma.goal.create({
-    data: {
-      userId: user.id,
-      title: payload.title,
-      description: payload.description,
-      type: payload.type,
-      icon: payload.icon ?? 'star',
-      color: payload.color ?? 'slate',
-      order: payload.order ?? ((lastGoal?.order ?? -1) + 1),
-      pointsIfTrue: payload.pointsIfTrue,
-      pointsIfFalse: payload.pointsIfFalse,
-      pointsPerUnit: payload.pointsPerUnit,
-      isActive: true,
-      activatedAt
-    }
-  });
-
-  return NextResponse.json(goal, { status: 201 });
 }

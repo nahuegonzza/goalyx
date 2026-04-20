@@ -65,22 +65,25 @@ export default function GoalTracker() {
 
       // Check if responses are OK before parsing JSON
       if (!goalsRes.ok) {
-        console.error('Failed to fetch goals:', goalsRes.status, goalsRes.statusText);
-        setMessage('Error al cargar objetivos');
+        const body = await goalsRes.json().catch(() => null);
+        console.error('Failed to fetch goals:', goalsRes.status, goalsRes.statusText, body);
+        setMessage(body?.error || 'Error al cargar objetivos');
         setMessageType('error');
         return;
       }
 
       if (!entriesRes.ok) {
-        console.error('Failed to fetch entries:', entriesRes.status, entriesRes.statusText);
-        setMessage('Error al cargar registros');
+        const body = await entriesRes.json().catch(() => null);
+        console.error('Failed to fetch entries:', entriesRes.status, entriesRes.statusText, body);
+        setMessage(body?.error || 'Error al cargar registros');
         setMessageType('error');
         return;
       }
 
       if (!eventsRes.ok) {
-        console.error('Failed to fetch events:', eventsRes.status, eventsRes.statusText);
-        setMessage('Error al cargar eventos');
+        const body = await eventsRes.json().catch(() => null);
+        console.error('Failed to fetch events:', eventsRes.status, eventsRes.statusText, body);
+        setMessage(body?.error || 'Error al cargar eventos');
         setMessageType('error');
         return;
       }
@@ -140,7 +143,10 @@ export default function GoalTracker() {
   async function loadModules() {
     try {
       const res = await fetch('/api/modules');
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${res.status}`);
+      }
       const modules = await res.json();
       const active = modules.filter((m: any) => m.active);
       const withDefinitions = active.map((mod: any) => {
@@ -154,6 +160,8 @@ export default function GoalTracker() {
       setActiveModules(withDefinitions);
     } catch (error) {
       console.error('Error loading modules', error);
+      setMessage(error instanceof Error ? `Error cargando módulos: ${error.message}` : 'Error cargando módulos');
+      setMessageType('error');
     }
   }
 

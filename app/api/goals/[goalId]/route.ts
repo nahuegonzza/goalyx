@@ -7,83 +7,90 @@ import type { GoalPayload } from '@types';
 import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { goalId } = params;
-  const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
-
-  const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== user.id) {
-    return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
-  }
-
-  const updateData: any = {
-    title: payload.title,
-    description: payload.description,
-    type: payload.type,
-    icon: payload.icon,
-    color: payload.color,
-    order: payload.order,
-    pointsIfTrue: payload.pointsIfTrue,
-    pointsIfFalse: payload.pointsIfFalse,
-    pointsPerUnit: payload.pointsPerUnit
-  };
-
-  // Si se intenta cambiar isActive
-  if (typeof payload.isActive === 'boolean') {
-    updateData.isActive = payload.isActive;
-    if (payload.isActive === false) {
-      updateData.deactivatedAt = new Date();
-    } else if (payload.isActive === true) {
-      updateData.deactivatedAt = null;
-      updateData.activatedAt = new Date();
+  try {
+    const { user } = await getServerSupabaseUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { goalId } = params;
+    const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
+
+    const goal = await prisma.goal.findUnique({ where: { id: goalId } });
+    if (!goal || goal.userId !== user.id) {
+      return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
+    }
+
+    const updateData: any = {
+      title: payload.title,
+      description: payload.description,
+      type: payload.type,
+      icon: payload.icon,
+      color: payload.color,
+      order: payload.order,
+      pointsIfTrue: payload.pointsIfTrue,
+      pointsIfFalse: payload.pointsIfFalse,
+      pointsPerUnit: payload.pointsPerUnit
+    };
+
+    if (typeof payload.isActive === 'boolean') {
+      updateData.isActive = payload.isActive;
+      if (payload.isActive === false) {
+        updateData.deactivatedAt = new Date();
+      } else if (payload.isActive === true) {
+        updateData.deactivatedAt = null;
+        updateData.activatedAt = new Date();
+      }
+    }
+
+    if (payload.activatedAt) {
+      updateData.activatedAt = new Date(payload.activatedAt);
+    }
+
+    const updatedGoal = await prisma.goal.update({
+      where: { id: goalId },
+      data: updateData
+    });
+
+    return NextResponse.json(updatedGoal);
+  } catch (error) {
+    console.error('Error updating goal:', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error updating goal' }, { status: 500 });
   }
-
-  if (payload.activatedAt) {
-    updateData.activatedAt = new Date(payload.activatedAt);
-  }
-
-  const updatedGoal = await prisma.goal.update({
-    where: { id: goalId },
-    data: updateData
-  });
-
-  return NextResponse.json(updatedGoal);
 }
 
 export async function DELETE(request: Request, { params }: { params: { goalId: string } }) {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const { user } = await getServerSupabaseUser();
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { goalId } = params;
+
+    const goal = await prisma.goal.findUnique({ where: { id: goalId } });
+    if (!goal || goal.userId !== user.id) {
+      return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
+    }
+
+    if (goal.isActive !== false) {
+      await prisma.goal.update({
+        where: { id: goalId },
+        data: {
+          isActive: false,
+          deactivatedAt: new Date()
+        }
+      });
+      return NextResponse.json({ message: 'Objetivo desactivado' });
+    }
+
+    await prisma.goalEntry.deleteMany({ where: { goalId } });
+    await prisma.goal.delete({ where: { id: goalId } });
+
+    return NextResponse.json({ message: 'Objetivo eliminado permanentemente' });
+  } catch (error) {
+    console.error('Error deleting goal:', error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error deleting goal' }, { status: 500 });
   }
-
-  const { goalId } = params;
-
-  const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.userId !== user.id) {
-    return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
-  }
-
-  // Si está activo, hacer soft delete (marcar como inactivo)
-  if (goal.isActive !== false) {
-    await prisma.goal.update({
-      where: { id: goalId },
-      data: {
-        isActive: false,
-        deactivatedAt: new Date()
-      }
-    });
-    return NextResponse.json({ message: 'Objetivo desactivado' });
-  }
-
-  // Si ya está inactivo, hacer hard delete (eliminar permanentemente)
-  await prisma.goalEntry.deleteMany({ where: { goalId } });
-  await prisma.goal.delete({ where: { id: goalId } });
-
-  return NextResponse.json({ message: 'Objetivo eliminado permanentemente' });
 }
 

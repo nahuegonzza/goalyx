@@ -1,9 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { prisma } from '@lib/prisma';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 export function createServerSupabaseClient(cookieStore = cookies()) {
   return createServerClient(supabaseUrl, supabaseKey, {
@@ -16,6 +18,19 @@ export function createServerSupabaseClient(cookieStore = cookies()) {
           cookieStore.set(name, value, options);
         });
       },
+    },
+  });
+}
+
+export function createServiceRoleSupabaseClient() {
+  if (!supabaseServiceRoleKey) {
+    throw new Error('Missing Supabase service role key. Set SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY in the environment.');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      persistSession: false,
+      detectSessionInUrl: false,
     },
   });
 }

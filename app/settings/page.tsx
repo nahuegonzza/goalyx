@@ -9,19 +9,54 @@ import type { Module } from '@types';
 export default function SettingsPage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [userLoading, setUserLoading] = useState(true);
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [profileStatus, setProfileStatus] = useState('');
+  const [profileType, setProfileType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     async function loadModules() {
       try {
         const res = await fetch('/api/modules');
+        if (!res.ok) throw new Error('Error loading modules');
         const data = await res.json();
         setModules(data);
+      } catch (error) {
+        console.error('Error loading modules:', error);
       } finally {
         setLoading(false);
       }
     }
 
+    async function loadUser() {
+      try {
+        const res = await fetch('/api/user');
+        if (!res.ok) throw new Error('Error loading user');
+        const data = await res.json();
+        setUser(data);
+        setProfileForm({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      } catch (error) {
+        console.error('Error loading user:', error);
+      } finally {
+        setUserLoading(false);
+      }
+    }
+
     loadModules();
+    loadUser();
   }, []);
 
   const [exportLoading, setExportLoading] = useState(false);
@@ -38,8 +73,7 @@ export default function SettingsPage() {
       ]);
 
       if (!goalsRes.ok || !entriesRes.ok || !eventsRes.ok || !modulesRes.ok || !moduleEntriesRes.ok) {
-        alert('Error al exportar datos');
-        return;
+        throw new Error('Error al exportar datos');
       }
 
       const data = {
@@ -62,7 +96,7 @@ export default function SettingsPage() {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export error:', error);
-      alert('Error al exportar datos');
+      alert('Error al exportar datos: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setExportLoading(false);
     }
@@ -77,9 +111,71 @@ export default function SettingsPage() {
       });
       if (res.ok) {
         setModules(modules.map(m => m.id === moduleId ? { ...m, active } : m));
+      } else {
+        throw new Error('Error toggling module');
       }
     } catch (error) {
       console.error('Error toggling module:', error);
+      alert('Error al cambiar el módulo');
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileStatus('');
+    try {
+      const res = await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName
+        })
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Error updating profile');
+      }
+      setProfileStatus('Perfil actualizado correctamente');
+      setProfileType('success');
+      // Reload user
+      const updatedUser = await res.json();
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setProfileStatus(error instanceof Error ? error.message : 'Error updating profile');
+      setProfileType('error');
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileStatus('');
+    if (profileForm.newPassword !== profileForm.confirmPassword) {
+      setProfileStatus('Las contraseñas no coinciden');
+      setProfileType('error');
+      return;
+    }
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: profileForm.currentPassword,
+          newPassword: profileForm.newPassword
+        })
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Error changing password');
+      }
+      setProfileStatus('Contraseña cambiada correctamente');
+      setProfileType('success');
+      setProfileForm({ ...profileForm, currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setProfileStatus(error instanceof Error ? error.message : 'Error changing password');
+      setProfileType('error');
     }
   };
 
@@ -103,6 +199,101 @@ export default function SettingsPage() {
               </div>
               <ThemeToggle />
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Perfil</h2>
+            {userLoading ? (
+              <p className="text-slate-500 dark:text-slate-400">Cargando...</p>
+            ) : user ? (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={user.email}
+                    disabled
+                    className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-300 cursor-not-allowed"
+                  />
+                </div>
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre</label>
+                      <input
+                        type="text"
+                        value={profileForm.firstName}
+                        onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                        placeholder="Tu nombre"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Apellido</label>
+                      <input
+                        type="text"
+                        value={profileForm.lastName}
+                        onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                        placeholder="Tu apellido"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+                  >
+                    Actualizar Perfil
+                  </button>
+                </form>
+                <form onSubmit={handleChangePassword} className="space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4">
+                  <h3 className="text-md font-semibold text-slate-900 dark:text-white">Cambiar Contraseña</h3>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña Actual</label>
+                    <input
+                      type="password"
+                      value={profileForm.currentPassword}
+                      onChange={(e) => setProfileForm({ ...profileForm, currentPassword: e.target.value })}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nueva Contraseña</label>
+                    <input
+                      type="password"
+                      value={profileForm.newPassword}
+                      onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirmar Nueva Contraseña</label>
+                    <input
+                      type="password"
+                      value={profileForm.confirmPassword}
+                      onChange={(e) => setProfileForm({ ...profileForm, confirmPassword: e.target.value })}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-semibold transition"
+                  >
+                    Cambiar Contraseña
+                  </button>
+                </form>
+                {profileStatus && (
+                  <p className={`text-sm font-medium ${profileType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {profileStatus}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-slate-500 dark:text-slate-400">Error cargando perfil</p>
+            )}
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">

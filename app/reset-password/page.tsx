@@ -1,59 +1,58 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 
-function getRegisterMessage(data: any, errorMessage: string) {
-  if (errorMessage) return errorMessage;
-  if (data?.user && !data.user.email_confirmed_at) {
-    return 'Registro exitoso. Revisa tu correo para verificar tu cuenta.';
-  }
-  if (data?.session) {
-    return 'Registro exitoso. Has iniciado sesión correctamente.';
-  }
-  return 'Registro exitoso. Revisa tu correo para verificar tu cuenta.';
-}
-
-export default function RegisterPage() {
-  const [email, setEmail] = useState('');
+export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [status, setStatus] = useState('');
-  const [statusType, setStatusType] = useState<'success' | 'error'>('success');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Verificar si hay un token de reset en la URL
+    const accessToken = searchParams.get('access_token');
+    const refreshToken = searchParams.get('refresh_token');
+
+    if (accessToken && refreshToken) {
+      const supabase = createBrowserSupabaseClient();
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setStatus('');
+    setError('');
+    setSuccess('');
 
     if (password !== confirmPassword) {
-      setStatus('Las contraseñas no coinciden');
-      setStatusType('error');
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
       setLoading(false);
       return;
     }
 
     const supabase = createBrowserSupabaseClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-    });
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setStatus(error.message);
-      setStatusType('error');
+      setError(error.message);
     } else {
-      const message = getRegisterMessage(data, 'Registro exitoso. Revisa tu correo para verificar tu cuenta.');
-      setStatus(message);
-      setStatusType('success');
-      if (data?.session) {
-        router.refresh();
-        router.push('/');
-      }
+      setSuccess('Contraseña actualizada correctamente. Redirigiendo...');
+      setTimeout(() => router.push('/'), 2000);
     }
 
     setLoading(false);
@@ -63,28 +62,13 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-slate-900 rounded-lg shadow-lg p-8 border border-slate-800">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white">Crear Cuenta</h2>
-          <p className="mt-2 text-slate-400">Regístrate para comenzar</p>
+          <h2 className="text-3xl font-bold text-white">Restablecer Contraseña</h2>
+          <p className="mt-2 text-slate-400">Ingresa tu nueva contraseña</p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-              Contraseña
+              Nueva Contraseña
             </label>
             <input
               id="password"
@@ -113,9 +97,15 @@ export default function RegisterPage() {
             />
           </div>
 
-          {status && (
-            <div className={`text-sm text-center rounded-md p-3 ${statusType === 'success' ? 'bg-emerald-900/20 text-emerald-200 border border-emerald-700' : 'bg-red-900/20 text-red-200 border border-red-700'}`}>
-              {status}
+          {error && (
+            <div className="text-red-400 text-sm text-center bg-red-900/20 border border-red-800 rounded-md p-3">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="text-green-400 text-sm text-center bg-green-900/20 border border-green-800 rounded-md p-3">
+              {success}
             </div>
           )}
 
@@ -125,14 +115,8 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+              {loading ? 'Actualizando...' : 'Actualizar Contraseña'}
             </button>
-          </div>
-
-          <div className="text-center">
-            <Link href="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
-              ¿Ya tienes cuenta? Inicia sesión
-            </Link>
           </div>
         </form>
       </div>

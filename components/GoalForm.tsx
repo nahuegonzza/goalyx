@@ -35,23 +35,32 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('Guardando objetivo...');
+    setStatusType('success');
 
-    const response = await fetch('/api/goals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
 
-    if (response.ok) {
-      setForm(initialState);
-      setStatus('✓ Objetivo creado con éxito');
-      setStatusType('success');
-      setShowIconPicker(false);
-      setShowColorPicker(false);
-      setTimeout(() => setStatus(''), 3000);
-      onSuccess?.();
-    } else {
-      setStatus('✗ No se pudo crear el objetivo');
+      if (response.ok) {
+        setForm(initialState);
+        setStatus('✓ Objetivo creado con éxito');
+        setStatusType('success');
+        setShowIconPicker(false);
+        setShowColorPicker(false);
+        setTimeout(() => setStatus(''), 3000);
+        onSuccess?.();
+        return;
+      }
+
+      const body = await response.json().catch(() => null);
+      const message = body?.error || body?.message || '✗ No se pudo crear el objetivo';
+      setStatus(message);
+      setStatusType('error');
+    } catch (error) {
+      setStatus(error instanceof Error ? `Error: ${error.message}` : 'Error desconocido');
       setStatusType('error');
     }
   }

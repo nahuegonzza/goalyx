@@ -15,6 +15,8 @@ export default function GoalManager() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusType, setStatusType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     loadGoals();
@@ -22,13 +24,19 @@ export default function GoalManager() {
 
   async function loadGoals() {
     setLoading(true);
+    setStatusMessage('');
     try {
       const res = await fetch('/api/goals');
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       setGoals(data);
     } catch (error) {
       console.error('Error loading goals:', error);
+      setStatusMessage(error instanceof Error ? `Error cargando objetivos: ${error.message}` : 'Error cargando objetivos');
+      setStatusType('error');
     } finally {
       setLoading(false);
     }
@@ -50,38 +58,91 @@ export default function GoalManager() {
       activatedAt: editForm.activatedAt
     };
 
-    await fetch(`/api/goals/${goalId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    try {
+      const response = await fetch(`/api/goals/${goalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-    setEditingGoalId(null);
-    setEditForm({});
-    loadGoals();
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${response.status}`);
+      }
+
+      setStatusMessage('Objetivo actualizado correctamente');
+      setStatusType('success');
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      setStatusMessage(error instanceof Error ? `Error actualizando objetivo: ${error.message}` : 'Error actualizando objetivo');
+      setStatusType('error');
+    } finally {
+      setEditingGoalId(null);
+      setEditForm({});
+      loadGoals();
+    }
   }
 
   async function handleDeleteGoal(goalId: string) {
-    await fetch(`/api/goals/${goalId}`, { method: 'DELETE' });
-    loadGoals();
+    try {
+      const response = await fetch(`/api/goals/${goalId}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${response.status}`);
+      }
+      setStatusMessage('Objetivo eliminado correctamente');
+      setStatusType('success');
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      setStatusMessage(error instanceof Error ? `Error eliminando objetivo: ${error.message}` : 'Error eliminando objetivo');
+      setStatusType('error');
+    } finally {
+      loadGoals();
+    }
   }
 
   async function handleDeactivateGoal(goalId: string) {
-    await fetch(`/api/goals/${goalId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive: false })
-    });
-    loadGoals();
+    try {
+      const response = await fetch(`/api/goals/${goalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: false })
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${response.status}`);
+      }
+      setStatusMessage('Objetivo desactivado correctamente');
+      setStatusType('success');
+    } catch (error) {
+      console.error('Error deactivating goal:', error);
+      setStatusMessage(error instanceof Error ? `Error desactivando objetivo: ${error.message}` : 'Error desactivando objetivo');
+      setStatusType('error');
+    } finally {
+      loadGoals();
+    }
   }
 
   async function handleReactivateGoal(goalId: string) {
-    await fetch(`/api/goals/${goalId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive: true })
-    });
-    loadGoals();
+    try {
+      const response = await fetch(`/api/goals/${goalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: true })
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${response.status}`);
+      }
+      setStatusMessage('Objetivo reactivado correctamente');
+      setStatusType('success');
+    } catch (error) {
+      console.error('Error reactivating goal:', error);
+      setStatusMessage(error instanceof Error ? `Error reactivando objetivo: ${error.message}` : 'Error reactivando objetivo');
+      setStatusType('error');
+    } finally {
+      loadGoals();
+    }
   }
 
   async function moveGoal(goalId: string, direction: 'up' | 'down') {
@@ -100,19 +161,36 @@ export default function GoalManager() {
 
     if (!nextGoal) return;
 
-    await fetch(`/api/goals/${goalId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: nextGoal.order })
-    });
+    try {
+      const updateResponse = await fetch(`/api/goals/${goalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: nextGoal.order })
+      });
+      if (!updateResponse.ok) {
+        const body = await updateResponse.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${updateResponse.status}`);
+      }
 
-    await fetch(`/api/goals/${nextGoal.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: currentGoal.order })
-    });
+      const swapResponse = await fetch(`/api/goals/${nextGoal.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: currentGoal.order })
+      });
+      if (!swapResponse.ok) {
+        const body = await swapResponse.json().catch(() => null);
+        throw new Error(body?.error || `HTTP error! status: ${swapResponse.status}`);
+      }
 
-    loadGoals();
+      setStatusMessage('Orden de objetivos actualizado');
+      setStatusType('success');
+    } catch (error) {
+      console.error('Error moving goal:', error);
+      setStatusMessage(error instanceof Error ? `Error al mover objetivo: ${error.message}` : 'Error al mover objetivo');
+      setStatusType('error');
+    } finally {
+      loadGoals();
+    }
   }
 
   const sortedGoals = [...goals].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -121,9 +199,16 @@ export default function GoalManager() {
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-            Todos los Objetivos
-          </h2>
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+              Todos los Objetivos
+            </h2>
+            {statusMessage && (
+              <p className={`mt-2 text-sm font-medium ${statusType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                {statusMessage}
+              </p>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
