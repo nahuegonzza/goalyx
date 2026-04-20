@@ -194,6 +194,11 @@ export default function Analytics() {
     });
   }, [moduleEntries, fromDate, toDate]);
 
+const allDates = useMemo(() => {
+  if (!fromDate || !toDate) return [];
+  return getDatesInRange(fromDate, toDate);
+}, [fromDate, toDate]);
+
   const dailyScores = useMemo(() => {
     return allDates.map(date => {
       const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === date);
@@ -216,7 +221,7 @@ export default function Analytics() {
     });
   }, [allDates, filteredEntries, filteredModuleEntries, activeModules]);
 
-  const totalPoints = useMemo(() => dailyScores.reduce((sum, item) => sum + item.points, 0), [dailyScores]);
+  const totalPoints = useMemo(() => dailyScores.reduce((sum: number, item: { points: number }) => sum + item.points, 0), [dailyScores]);
   const averagePoints = useMemo(() => (allDates.length ? totalPoints / allDates.length : 0), [dailyScores, totalPoints, allDates]);
   const maxPoints = useMemo(() => (dailyScores.filter(s => s.hasData).length ? Math.max(...dailyScores.filter(s => s.hasData).map((item) => item.points)) : 0), [dailyScores]);
   const minPoints = useMemo(() => (dailyScores.filter(s => s.hasData).length ? Math.min(...dailyScores.filter(s => s.hasData).map((item) => item.points)) : 0), [dailyScores]);
