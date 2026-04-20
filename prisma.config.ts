@@ -8,6 +8,6 @@ export default defineConfig({
   },
   datasource: {
     url: env("DATABASE_URL"), // Pooler URL for runtime
-    directUrl: env("DIRECT_DATABASE_URL"), // Direct URL for migrations
+    directUrl: process.env.DIRECT_DATABASE_URL ?? undefined, // Optional direct URL for migrations
   },
 });
