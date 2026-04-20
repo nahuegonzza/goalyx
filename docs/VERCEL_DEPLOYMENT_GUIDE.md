@@ -38,7 +38,7 @@ En Vercel dashboard → Settings → Environment Variables, agrega estas variabl
 
 | Variable | Valor | Ejemplo |
 |----------|-------|---------|
-| `DATABASE_URL` | Tu PostgreSQL connection string | `postgresql://user:pass@db.internal.vercel.app:5432/objetives_app` |
+| `DATABASE_URL` | Tu PostgreSQL connection string | `postgresql://user:pass@db.internal.vercel.app:5432/objetives_app?sslmode=require` |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL de tu proyecto Supabase | `https://xxxx.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key de Supabase | `sb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 | `NODE_ENV` | `production` | `production` |
