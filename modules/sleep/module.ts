@@ -14,9 +14,11 @@ export const sleepModule: ModuleDefinition = {
     penaltyPerHour: 1, // for manual mode
   },
   calculateScore: (entries: ModuleEntry[], config: Record<string, unknown>) => {
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().slice(0, 10);
+    
     const todayEntry = entries.find(e => {
-      const entryDate = new Date(e.date).toDateString();
-      const today = new Date().toDateString();
+      const entryDate = e.date.slice(0, 10); // Extract YYYY-MM-DD from ISO string
       return entryDate === today;
     });
     if (!todayEntry) return 0;
@@ -31,7 +33,7 @@ export const sleepModule: ModuleDefinition = {
     const diff = Math.abs(hours - idealHours);
     const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
 
-    return maxPoints - penalty;
+    return Math.max(0, maxPoints - penalty); // Ensure score doesn't go negative
   },
   Component: SleepDashboard,
   HistoryComponent: SleepHistory,

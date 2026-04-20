@@ -75,6 +75,8 @@ function getCurrentYearRange() {
 export default function Analytics() {
   const [entries, setEntries] = useState<GoalEntryWithGoal[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [moduleEntries, setModuleEntries] = useState<any[]>([]);
+  const [activeModules, setActiveModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRange, setSelectedRange] = useState<'week' | 'month' | 'year' | 'custom'>('month');
   const [selectedGoalId, setSelectedGoalId] = useState('all');
@@ -101,12 +103,15 @@ export default function Analytics() {
   useEffect(() => {
     loadGoals();
     loadEntries();
+    loadModuleEntries();
+    loadModules();
   }, []);
 
   async function loadEntries() {
     setLoading(true);
     try {
-      const res = await fetch('/api/goalEntries');
+      // Load all entries for analytics (no date filter)
+      const res = await fetch('/api/goalEntries?all=true');
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setEntries(data);
@@ -114,6 +119,37 @@ export default function Analytics() {
       console.error('Error loading entries:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadModuleEntries() {
+    try {
+      const res = await fetch('/api/moduleEntries');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      setModuleEntries(data);
+    } catch (error) {
+      console.error('Error loading module entries:', error);
+    }
+  }
+
+  async function loadModules() {
+    try {
+      const res = await fetch('/api/modules');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const modules = await res.json();
+      const active = modules.filter((m: any) => m.active);
+      const withDefinitions = active.map((mod: any) => {
+        const definition = moduleDefinitions.find(d => d.slug === mod.slug);
+        return {
+          ...mod,
+          config: mod.config || definition?.defaultConfig || {},
+          definition,
+        };
+      });
+      setActiveModules(withDefinitions);
+    } catch (error) {
+      console.error('Error loading modules:', error);
     }
   }
 
@@ -150,16 +186,34 @@ export default function Analytics() {
     });
   }, [entries, fromDate, toDate, selectedGoalId, viewMode]);
 
-  const allDates = useMemo(() => getDatesInRange(fromDate, toDate), [fromDate, toDate]);
+  const filteredModuleEntries = useMemo(() => {
+    return moduleEntries.filter((entry) => {
+      const entryDate = entry.date.slice(0, 10); // Extract YYYY-MM-DD from ISO string
+      return entryDate >= fromDate && entryDate <= toDate;
+    });
+  }, [moduleEntries, fromDate, toDate]);
 
   const dailyScores = useMemo(() => {
     return allDates.map(date => {
       const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === date);
-      const points = dayEntries.reduce((sum, entry) => sum + getEntryPoints(entry), 0);
-      const hasData = dayEntries.length > 0;
-      return { date, points, displayDate: date.split('-').reverse().join('/'), hasData };
+      const goalPoints = dayEntries.reduce((sum, entry) => sum + getEntryPoints(entry), 0);
+      
+      // Calculate module points for this date
+      let modulePoints = 0;
+      for (const module of activeModules) {
+        if (module.definition?.calculateScore) {
+          const moduleDayEntries = filteredModuleEntries.filter((e) => 
+            e.date.slice(0, 10) === date && e.moduleId === module.id
+          );
+          modulePoints += module.definition.calculateScore(moduleDayEntries, module.config);
+        }
+      }
+      
+      const totalPoints = goalPoints + modulePoints;
+      const hasData = dayEntries.length > 0 || modulePoints !== 0;
+      return { date, points: totalPoints, displayDate: date.split('-').reverse().join('/'), hasData };
     });
-  }, [allDates, filteredEntries]);
+  }, [allDates, filteredEntries, filteredModuleEntries, activeModules]);
 
   const totalPoints = useMemo(() => dailyScores.reduce((sum, item) => sum + item.points, 0), [dailyScores]);
   const averagePoints = useMemo(() => (allDates.length ? totalPoints / allDates.length : 0), [dailyScores, totalPoints, allDates]);
@@ -200,11 +254,26 @@ export default function Analytics() {
       return inRange && goalMatch && isGoalActiveOnDate(entry.goal, entryDate);
     });
 
-    return previousEntries.reduce((sum, entry) => {
+    const previousModuleEntries = moduleEntries.filter((entry) => {
+      const entryDate = entry.date.slice(0, 10);
+      return entryDate >= prevStartKey && entryDate <= prevEndKey;
+    });
+
+    let goalPoints = previousEntries.reduce((sum, entry) => {
       const points = getEntryPoints(entry);
       return sum + points;
     }, 0);
-  }, [entries, fromDate, selectedGoalId, selectedRange, viewMode]);
+
+    let modulePoints = 0;
+    for (const module of activeModules) {
+      if (module.definition?.calculateScore) {
+        const modulePrevEntries = previousModuleEntries.filter((e) => e.moduleId === module.id);
+        modulePoints += module.definition.calculateScore(modulePrevEntries, module.config);
+      }
+    }
+
+    return goalPoints + modulePoints;
+  }, [entries, moduleEntries, fromDate, selectedGoalId, selectedRange, viewMode, activeModules]);
 
   const periodDiff = totalPoints - previousPeriodPoints;
   const periodDirection = periodDiff >= 0 ? 'Mejor' : 'Peor';

@@ -47,10 +47,12 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
+  const allParam = url.searchParams.get('all');
 
   let whereClause: any = { userId: userId };
   // Por defecto, solo cargar entradas de los últimos 30 días para mejorar performance
-  if (!dateParam) {
+  // Pero si se pide 'all=true', cargar todas las entradas
+  if (!dateParam && (!allParam || allParam !== 'true')) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setUTCDate(thirtyDaysAgo.getUTCDate() - 30);
     whereClause.date = { gte: thirtyDaysAgo };
