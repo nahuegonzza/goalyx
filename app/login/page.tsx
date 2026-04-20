@@ -18,9 +18,14 @@ function getLoginErrorMessage(defaultMessage: string, fallbackMessage: string) {
 }
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
-  
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -60,18 +65,21 @@ export default function LoginPage() {
       setError('No fue posible iniciar sesión. Intenta nuevamente.');
     }
 
+    setLoading(false);
+  };
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     const supabase = createBrowserSupabaseClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim().toLowerCase(), {
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
-    if (error) {
-      setError(error.message);
+    if (resetError) {
+      setError(resetError.message);
     } else {
       setError('Se ha enviado un enlace de restablecimiento a tu correo electrónico.');
       setShowForgotPassword(false);
@@ -87,73 +95,73 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold text-white">Iniciar Sesión</h2>
           <p className="mt-2 text-slate-400">Accede a tu cuenta</p>
         </div>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
 
-          {error && (
-            <div className="text-red-400 text-sm text-center bg-red-900/20 border border-red-800 rounded-md p-3">
-              {error}
+        {!showForgotPassword ? (
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="tu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-          )}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Iniciando...' : 'Iniciar Sesión'}
-            </button>
-          </div>
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-900/20 border border-red-800 rounded-md p-3">
+                {error}
+              </div>
+            )}
 
-          <div className="text-center">
-            <Link href="/register" className="text-blue-400 hover:text-blue-300 transition-colors">
-              ¿No tienes cuenta? Regístrate
-            </Link>
-          </div>
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+              </button>
+            </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowForgotPassword(true)}
-              className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
-            >
-              ¿Olvidaste tu contraseña?
-            </button>
-          </div>
-        </form>
-      </div>
-        <div className={`mt-6 p-4 bg-slate-800 border border-slate-700 rounded-md ${showForgotPassword ? '' : 'hidden'}`}>
-          <h3 className="text-lg font-medium text-white mb-4">Restablecer contraseña</h3>
+            <div className="text-center">
+              <Link href="/register" className="text-blue-400 hover:text-blue-300 transition-colors">
+                ¿No tienes cuenta? Regístrate
+              </Link>
+            </div>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+          </form>
+        ) : (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div>
               <label htmlFor="resetEmail" className="block text-sm font-medium text-slate-300 mb-2">
@@ -170,6 +178,13 @@ export default function LoginPage() {
                 onChange={(e) => setResetEmail(e.target.value)}
               />
             </div>
+
+            {error && (
+              <div className="text-sm text-center bg-blue-900/20 border border-blue-800 rounded-md p-3">
+                <p className="text-blue-300">{error}</p>
+              </div>
+            )}
+
             <div className="flex space-x-2">
               <button
                 type="submit"
@@ -180,14 +195,18 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowForgotPassword(false)}
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setError('');
+                  setResetEmail('');
+                }}
                 className="flex-1 flex justify-center py-2 px-4 border border-slate-600 rounded-md shadow-sm text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
               >
                 Cancelar
               </button>
             </div>
           </form>
-        </div>
+        )}
       </div>
     </div>
   );

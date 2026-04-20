@@ -10,16 +10,7 @@ export async function GET() {
     }
 
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true
-      }
+      where: { id: user.id }
     });
 
     if (!dbUser) {
@@ -46,18 +37,7 @@ export async function PATCH(request: Request) {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        firstName: firstName || null,
-        lastName: lastName || null,
         name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true
       }
     });
 

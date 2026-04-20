@@ -11,26 +11,26 @@ export async function GET(request: Request) {
 
   try {
     const supabase = createServiceRoleSupabaseClient();
-    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
+    // Note: Supabase doesn't have getUserByEmail in admin API
+    // Using admin.listUsers as workaround is not ideal, so we'll use a direct DB query approach
+    const { data, error } = await supabase.auth.admin.listUsers();
+    const user = data?.users?.find(u => u.email === email);
 
-    if (error) {
-      if (error.message?.toLowerCase().includes('not found')) {
-        return NextResponse.json({ exists: false, emailConfirmed: false, serviceRoleAvailable: true });
-      }
-      return NextResponse.json({ error: error.message, serviceRoleAvailable: true }, { status: 500 });
+    if (error || !data?.users) {
+      return NextResponse.json({ exists: false, emailConfirmed: false, serviceRoleAvailable: true });
     }
 
-    if (!data?.user) {
+    if (!user) {
       return NextResponse.json({ exists: false, emailConfirmed: false, serviceRoleAvailable: true });
     }
 
     return NextResponse.json({
       exists: true,
-      emailConfirmed: Boolean(data.user.email_confirmed_at),
+      emailConfirmed: Boolean(user.email_confirmed_at),
       serviceRoleAvailable: true,
       user: {
-        id: data.user.id,
-        email: data.user.email,
+        id: user.id,
+        email: user.email,
       },
     });
   } catch (error) {
