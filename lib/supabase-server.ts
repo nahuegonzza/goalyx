@@ -35,7 +35,7 @@ export function createServiceRoleSupabaseClient() {
   });
 }
 
-// ✅ NUEVA función basada en getUser() con fallback
+// ✅ NUEVA función basada en getUser() con fallback mejorado
 export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
 
@@ -43,27 +43,54 @@ export async function getServerSupabaseUser() {
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
-      console.log('User session not found, using service role fallback');
-      // Fallback: crear usuario con service role si está disponible
+      console.log('User session not found, checking for service role fallback');
+      
+      // Fallback: usar service role si está disponible
+      if (supabaseServiceRoleKey) {
+        console.log('Service role key found, enabling fallback mode');
+        return {
+          user: null,
+          supabase: createServiceRoleSupabaseClient(),
+          isServiceRole: true,
+          serviceRoleAvailable: true
+        };
+      }
+
+      // No hay usuario ni service role
       return {
         user: null,
-        supabase: createServiceRoleSupabaseClient(),
-        isServiceRole: true
+        supabase: null,
+        isServiceRole: false,
+        serviceRoleAvailable: false
       };
     }
 
     return {
       user,
       supabase,
-      isServiceRole: false
+      isServiceRole: false,
+      serviceRoleAvailable: supabaseServiceRoleKey ? true : false
     };
   } catch (error) {
-    console.log('Auth error, using service role fallback:', error);
-    // Fallback completo
+    console.log('Auth error:', error);
+    
+    // En caso de error, intentar service role si está disponible
+    if (supabaseServiceRoleKey) {
+      console.log('Falling back to service role after auth error');
+      return {
+        user: null,
+        supabase: createServiceRoleSupabaseClient(),
+        isServiceRole: true,
+        serviceRoleAvailable: true
+      };
+    }
+
+    // Error sin fallback disponible
     return {
       user: null,
-      supabase: createServiceRoleSupabaseClient(),
-      isServiceRole: true
+      supabase: null,
+      isServiceRole: false,
+      serviceRoleAvailable: false
     };
   }
 }

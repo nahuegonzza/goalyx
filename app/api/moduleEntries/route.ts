@@ -26,11 +26,19 @@ function normalizeDateToStartOfDay(dateString: string) {
 }
 
 export async function GET(request: Request) {
-  const { user, isServiceRole } = await getServerSupabaseUser();
+  const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
-  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  let userId: string | undefined;
+  if (user?.id) {
+    userId = user.id;
+  } else if (isServiceRole && serviceRoleAvailable) {
+    userId = process.env.DEFAULT_USER_ID;
+  } else {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const url = new URL(request.url);
@@ -76,11 +84,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { user, isServiceRole } = await getServerSupabaseUser();
+  const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
-  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  let userId: string | undefined;
+  if (user?.id) {
+    userId = user.id;
+  } else if (isServiceRole && serviceRoleAvailable) {
+    userId = process.env.DEFAULT_USER_ID;
+  } else {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
