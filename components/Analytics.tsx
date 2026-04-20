@@ -386,26 +386,62 @@ const allDates = useMemo(() => {
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <polyline
               fill="none"
-              stroke="rgb(59 130 246)"
-              strokeWidth="2"
-              points={chartPoints}
+              stroke="rgb(34, 197, 94)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              points={dailyScores
+                .map((item) => {
+                  const start = parseLocalDate(fromDate);
+                  const end = parseLocalDate(toDate);
+                  const totalMs = end.getTime() - start.getTime();
+
+                  const dateMs = parseLocalDate(item.date).getTime();
+
+                  // 👉 X con padding 10% (10 → 90)
+                  const x =
+                    totalMs === 0
+                      ? 50
+                      : 10 + ((dateMs - start.getTime()) / totalMs) * 80;
+
+                  const range = maxPoints - minPoints || 1;
+                  const points = item.hasData ? item.points : 0;
+
+                  // 👉 Y con padding 10% (invertido porque SVG)
+                  const y =
+                    90 - ((points - minPoints) / range) * 80;
+
+                  return `${x},${y}`;
+                })
+                .join(' ')}
             />
+
             {dailyScores.map((score, index) => {
               if (!score.hasData) return null;
+
               const start = parseLocalDate(fromDate);
               const end = parseLocalDate(toDate);
               const totalMs = end.getTime() - start.getTime();
               const dateMs = parseLocalDate(score.date).getTime();
-              const x = totalMs === 0 ? 50 : ((dateMs - start.getTime()) / totalMs) * 100;
+
+              // 👉 X con padding 10%
+              const x =
+                totalMs === 0
+                  ? 50
+                  : 10 + ((dateMs - start.getTime()) / totalMs) * 80;
+
               const range = maxPoints - minPoints || 1;
-              const y = 90 - ((score.points - minPoints) / range) * 80;
+
+              // 👉 Y con padding 10%
+              const y =
+                90 - ((score.points - minPoints) / range) * 80;
+
               return (
                 <circle
                   key={index}
                   cx={x}
                   cy={y}
                   r="1.5"
-                  fill="rgb(59 130 246)"
+                  fill="rgb(11, 128, 54)"
                 />
               );
             })}
