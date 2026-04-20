@@ -7,13 +7,12 @@ import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
 export async function GET() {
-  const { user } = await getServerSupabaseUser();
+  const { user, isServiceRole } = await getServerSupabaseUser();
 
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
   }
-
-  const userId = user.id;
 
   await Promise.all(
     moduleDefinitions.map((module) =>
@@ -48,13 +47,12 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const { user } = await getServerSupabaseUser();
+  const { user, isServiceRole } = await getServerSupabaseUser();
 
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
   }
-
-  const userId = user.id;
 
   const payload = await request.json() as { slug: string; active: boolean };
   const moduleDefinition = moduleDefinitions.find((module) => module.slug === payload.slug);

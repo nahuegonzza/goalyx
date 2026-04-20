@@ -4,13 +4,15 @@ import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function GET() {
   try {
-    const { user } = await getServerSupabaseUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user, isServiceRole } = await getServerSupabaseUser();
+    
+    const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
     }
 
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: userId }
     });
 
     if (!dbUser) {
@@ -26,16 +28,18 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const { user } = await getServerSupabaseUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user, isServiceRole } = await getServerSupabaseUser();
+    
+    const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
     }
 
     const body = await request.json();
     const { firstName, lastName } = body;
 
     const updatedUser = await prisma.user.update({
-      where: { id: user.id },
+      where: { id: userId },
       data: {
         name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null
       }

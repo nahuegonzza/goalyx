@@ -8,16 +8,18 @@ import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
   try {
-    const { user } = await getServerSupabaseUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user, isServiceRole } = await getServerSupabaseUser();
+    
+    const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
     }
 
     const { goalId } = params;
     const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
 
     const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-    if (!goal || goal.userId !== user.id) {
+    if (!goal || goal.userId !== userId) {
       return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
     }
 
@@ -61,15 +63,17 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 
 export async function DELETE(request: Request, { params }: { params: { goalId: string } }) {
   try {
-    const { user } = await getServerSupabaseUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user, isServiceRole } = await getServerSupabaseUser();
+    
+    const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
     }
 
     const { goalId } = params;
 
     const goal = await prisma.goal.findUnique({ where: { id: goalId } });
-    if (!goal || goal.userId !== user.id) {
+    if (!goal || goal.userId !== userId) {
       return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
     }
 

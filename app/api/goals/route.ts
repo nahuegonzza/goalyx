@@ -63,9 +63,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { user } = await getServerSupabaseUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user, isServiceRole } = await getServerSupabaseUser();
+    
+    const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
     }
 
     const payload = (await request.json()) as GoalPayload;
@@ -74,7 +76,7 @@ export async function POST(request: Request) {
     const existingGoal = await withRetry(() =>
       prisma.goal.findFirst({
         where: {
-          userId: user.id,
+          userId: userId,
           title: payload.title
         }
       })
@@ -105,7 +107,7 @@ export async function POST(request: Request) {
 
     const lastGoal = await withRetry(() =>
       prisma.goal.findFirst({
-        where: { userId: user.id },
+        where: { userId: userId },
         orderBy: { order: 'desc' }
       })
     );
@@ -113,7 +115,7 @@ export async function POST(request: Request) {
     const goal = await withRetry(() =>
       prisma.goal.create({
         data: {
-          userId: user.id,
+          userId: userId,
           title: payload.title,
           description: payload.description,
           type: payload.type,

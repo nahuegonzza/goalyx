@@ -33,15 +33,17 @@ function normalizeGoalType(type: string) {
 }
 
 export async function GET(request: Request) {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, isServiceRole } = await getServerSupabaseUser();
+  
+  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
   }
 
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
 
-  let whereClause: any = { userId: user.id };
+  let whereClause: any = { userId: userId };
 
   if (dateParam) {
     try {
@@ -75,9 +77,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { user } = await getServerSupabaseUser();
-  if (!user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, isServiceRole } = await getServerSupabaseUser();
+  
+  const userId = isServiceRole ? process.env.DEFAULT_USER_ID : user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized or DEFAULT_USER_ID not set' }, { status: 401 });
   }
 
   const payload = (await request.json()) as GoalEntryPayload;
@@ -89,7 +93,7 @@ export async function POST(request: Request) {
   const entryDate = normalizeDateToStartOfDay(payload.date ?? new Date().toISOString());
 
   const goal = await prisma.goal.findUnique({ where: { id: payload.goalId } });
-  if (!goal || goal.userId !== user.id) {
+  if (!goal || goal.userId !== userId) {
     return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
   }
 
@@ -105,7 +109,7 @@ export async function POST(request: Request) {
   }
 
   const entryData: any = {
-    userId: user.id,
+    userId: userId,
     goalId: payload.goalId,
     date: entryDate,
     valueFloat: isNumeric ? payload.value ?? 0 : null,
