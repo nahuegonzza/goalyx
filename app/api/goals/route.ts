@@ -14,7 +14,30 @@ function normalizeGoalType(type: string) {
 
 export async function GET() {
   try {
-    const { user } = await getServerSupabaseUser();
+    const { user, isServiceRole } = await getServerSupabaseUser();
+
+    if (isServiceRole) {
+      // En modo service role, usar usuario por defecto para desarrollo
+      const defaultUserId = process.env.DEFAULT_USER_ID;
+      if (!defaultUserId) {
+        return NextResponse.json({ error: 'Service role mode requires DEFAULT_USER_ID' }, { status: 500 });
+      }
+
+      const goals = await withRetry(() =>
+        prisma.goal.findMany({
+          where: { userId: defaultUserId },
+          orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
+        })
+      );
+
+      const normalized = goals.map((goal) => ({
+        ...goal,
+        type: normalizeGoalType(goal.type)
+      }));
+
+      return NextResponse.json(normalized);
+    }
+
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

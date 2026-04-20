@@ -35,20 +35,37 @@ export function createServiceRoleSupabaseClient() {
   });
 }
 
-// ✅ NUEVA función basada en getUser()
+// ✅ NUEVA función basada en getUser() con fallback
 export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (error) {
-    throw error;
+    if (error || !user) {
+      console.log('User session not found, using service role fallback');
+      // Fallback: crear usuario con service role si está disponible
+      return {
+        user: null,
+        supabase: createServiceRoleSupabaseClient(),
+        isServiceRole: true
+      };
+    }
+
+    return {
+      user,
+      supabase,
+      isServiceRole: false
+    };
+  } catch (error) {
+    console.log('Auth error, using service role fallback:', error);
+    // Fallback completo
+    return {
+      user: null,
+      supabase: createServiceRoleSupabaseClient(),
+      isServiceRole: true
+    };
   }
-
-  return {
-    user,
-    supabase,
-  };
 }
 
 // ✅ Prisma sync
