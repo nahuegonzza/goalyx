@@ -23,8 +23,20 @@ export function normalizeDatabaseUrl(url?: string) {
   // Remove accidental trailing semicolon or whitespace
   trimmedUrl = trimmedUrl.replace(/;$/, '').trim();
 
-  if (/(supabase\.co|pooler\.supabase\.com)/.test(trimmedUrl) && !/[?&]sslmode=/.test(trimmedUrl)) {
-    return trimmedUrl.includes('?') ? `${trimmedUrl}&sslmode=require` : `${trimmedUrl}?sslmode=require`;
+  // Ensure SSL and pgbouncer for pooler connections
+  if (/pooler\.supabase\.com/.test(trimmedUrl)) {
+    const params = new URLSearchParams();
+    params.set('sslmode', 'require');
+    params.set('pgbouncer', 'true');
+    const separator = trimmedUrl.includes('?') ? '&' : '?';
+    return `${trimmedUrl}${separator}${params.toString()}`;
+  }
+
+  // Regular Supabase direct connection
+  if (/supabase\.co/.test(trimmedUrl) && !/[?&]sslmode=/.test(trimmedUrl)) {
+    return trimmedUrl.includes('?') 
+      ? `${trimmedUrl}&sslmode=require` 
+      : `${trimmedUrl}?sslmode=require`;
   }
 
   return trimmedUrl;
@@ -47,13 +59,13 @@ function getPrismaClient() {
   // Configurar pool de PostgreSQL con opciones para conexiones móviles
   const poolConfig: PoolConfig = {
     connectionString: normalizedDatabaseUrl,
-    // Configuraciones para mejor manejo de conexiones móviles
-    connectionTimeoutMillis: 10000, // 10 segundos para conectar
-    query_timeout: 15000, // 15 segundos para queries
-    idleTimeoutMillis: 30000, // Cerrar conexiones idle después de 30s
-    max: 5, // Máximo 5 conexiones
-    min: 0, // Mínimo 0 conexiones
+    connectionTimeoutMillis: 5000, // Reduced from 10s
+    query_timeout: 10000, // Reduced from 15s
+    idleTimeoutMillis: 10000, // Reduced from 30s (critical!)
+    max: 3, // Reduced from 5
+    min: 0,
     allowExitOnIdle: true,
+    statement_timeout: 10000,
   };
 
   const prisma = new PrismaClient({
@@ -78,8 +90,8 @@ export const prisma = getPrismaClient();
 // Función helper para retry automático en caso de errores de conexión
 export async function withRetry<T>(
   operation: () => Promise<T>,
-  maxRetries: number = 2,
-  delay: number = 1000
+  maxRetries: number = 3,
+  delay: number = 500
 ): Promise<T> {
   let lastError: Error;
 
