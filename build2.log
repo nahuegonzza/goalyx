@@ -22,3 +22,4 @@ Type error: Object literal may only specify known properties, and 'goalId_date' 
 [0m [90m 67 |[39m     update[33m:[39m entryData[33m,[39m[0m
 [0m [90m 68 |[39m     create[33m:[39m entryData[33m,[39m[0m
 [0m [90m 69 |[39m     include[33m:[39m { goal[33m:[39m [36mtrue[39m }[0m
+
