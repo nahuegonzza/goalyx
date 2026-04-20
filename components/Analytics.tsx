@@ -279,5 +279,170 @@ export default function Analytics() {
   const periodDirection = periodDiff >= 0 ? 'Mejor' : 'Peor';
   const title = viewMode === 'overview' ? 'Resumen global' : 'Por objetivo: ' + (activeGoal?.title ?? 'Selecciona un objetivo');
 
-  return <div>Analytics</div>;
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            {RANGE_LABELS[selectedRange]} • {fromDate} a {toDate}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <select
+            value={selectedRange}
+            onChange={(e) => setSelectedRange(e.target.value as any)}
+            className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            <option value="week">Semana</option>
+            <option value="month">Mes</option>
+            <option value="year">Año</option>
+            <option value="custom">Personalizado</option>
+          </select>
+          <select
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value as any)}
+            className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            <option value="overview">Vista general</option>
+            <option value="goal">Por objetivo</option>
+          </select>
+        </div>
+      </div>
+
+      {selectedRange === 'custom' && (
+        <div className="flex gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Desde</label>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Hasta</label>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            />
+          </div>
+        </div>
+      )}
+
+      {viewMode === 'goal' && (
+        <div>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Objetivo</label>
+          <select
+            value={selectedGoalId}
+            onChange={(e) => setSelectedGoalId(e.target.value)}
+            className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            <option value="all">Todos los objetivos</option>
+            {availableGoals.map((goal) => (
+              <option key={goal.id} value={goal.id}>{goal.title}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">Total</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalPoints.toFixed(1)}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">Promedio diario</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{averagePoints.toFixed(1)}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">Máximo</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{maxPoints.toFixed(1)}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">Vs período anterior</p>
+          <p className={`text-2xl font-bold ${periodDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+            {periodDiff >= 0 ? '+' : ''}{periodDiff.toFixed(1)}
+          </p>
+          <p className="text-xs text-slate-500">{periodDirection}</p>
+        </div>
+      </div>
+
+      {/* Chart */}
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
+        <div className="h-64">
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <polyline
+              fill="none"
+              stroke="rgb(59 130 246)"
+              strokeWidth="2"
+              points={chartPoints}
+            />
+            {dailyScores.map((score, index) => {
+              if (!score.hasData) return null;
+              const start = parseLocalDate(fromDate);
+              const end = parseLocalDate(toDate);
+              const totalMs = end.getTime() - start.getTime();
+              const dateMs = parseLocalDate(score.date).getTime();
+              const x = totalMs === 0 ? 50 : ((dateMs - start.getTime()) / totalMs) * 100;
+              const range = maxPoints - minPoints || 1;
+              const y = 90 - ((score.points - minPoints) / range) * 80;
+              return (
+                <circle
+                  key={index}
+                  cx={x}
+                  cy={y}
+                  r="1.5"
+                  fill="rgb(59 130 246)"
+                />
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+
+      {/* Data Table */}
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Datos diarios</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-50 dark:bg-slate-700">
+              <tr>
+                <th className="px-4 py-2 text-left text-sm font-medium text-slate-700 dark:text-slate-300">Fecha</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-slate-700 dark:text-slate-300">Puntos</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-slate-700 dark:text-slate-300">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dailyScores.map((score) => (
+                <tr key={score.date} className="border-t border-slate-200 dark:border-slate-700">
+                  <td className="px-4 py-2 text-sm text-slate-900 dark:text-white">{score.displayDate}</td>
+                  <td className="px-4 py-2 text-sm text-slate-900 dark:text-white">{score.points.toFixed(1)}</td>
+                  <td className="px-4 py-2 text-sm">
+                    {score.hasData ? (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
+                        Con datos
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
+                        Sin datos
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
