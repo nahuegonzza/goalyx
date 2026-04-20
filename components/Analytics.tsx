@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Goal, GoalEntryWithGoal } from '@types';
 import { parseLocalDate, formatLocalDate, getLocalDateString } from '@lib/dateHelpers';
 import { doesGoalOverlapRange, isGoalActiveOnDate } from '@lib/goalHelpers';
+import { moduleDefinitions } from '../modules';
 
 function getLocalDateStringFromEntry(dateString: string) {
   if (!dateString.includes('T')) {
