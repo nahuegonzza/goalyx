@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = global as typeof globalThis & {
   prisma?: PrismaClient;
@@ -39,14 +40,18 @@ function getPrismaClient() {
     throw new Error('Missing DATABASE_URL environment variable.');
   }
 
+  process.env.DATABASE_URL = normalizedDatabaseUrl;
+  console.log('[Prisma] Initializing client with URL:', normalizedDatabaseUrl.substring(0, 50) + '...');
+
   const prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: normalizedDatabaseUrl,
-      },
-    },
+    adapter: new PrismaPg(normalizedDatabaseUrl),
     errorFormat: 'pretty',
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+
+  // Add connection event handlers
+  prisma.$on('error', (e) => {
+    console.error('[Prisma Error]', e);
   });
 
   if (process.env.NODE_ENV !== 'production') {
