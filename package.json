@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node ./scripts/prisma-migrate-deploy-if-direct-url.js && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
+    "migrate": "prisma migrate deploy",
     "postinstall": "prisma generate"
   },
   "prisma": {
