@@ -4,7 +4,7 @@ import './globals.css';
 import RootLayoutClient from './RootLayoutClient';
 
 export const metadata: Metadata = {
-  title: 'Objetives App',
+  title: 'Goalyx',
   description: 'Motor de hábitos, eventos y score diario con módulos extendibles.',
   icons: {
     icon: '/favicon.ico',

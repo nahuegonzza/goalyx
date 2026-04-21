@@ -1,4 +1,4 @@
-const CACHE_NAME = 'objetives-app-cache-v1';
+const CACHE_NAME = 'goalyx-app-cache-v1';
 const ASSETS = ['/', '/manifest.json', '/robots.txt'];
 
 self.addEventListener('install', (event) => {

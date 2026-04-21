@@ -1,6 +1,6 @@
-# Objetives App
+# Goalyx
 
-Aplicación inicial para seguimiento personal de hábitos, eventos, reglas de puntuación y score diario.
+Aplicación de seguimiento personal de hábitos, eventos, reglas de puntuación y score diario.
 
 ## Arquitectura
 

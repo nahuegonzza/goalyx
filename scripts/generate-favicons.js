@@ -33,8 +33,8 @@ fs.writeFileSync(path.join(root, 'favicon.ico'), ico);
 fs.writeFileSync(path.join(pub, 'favicon.ico'), ico);
 
 const manifest = {
-  name: 'Objetives App',
-  short_name: 'Objetives',
+  name: 'Goalyx',
+  short_name: 'Goalyx',
   description: 'Sistema de seguimiento personal de hábitos, eventos y puntajes diarios.',
   start_url: '/',
   display: 'standalone',

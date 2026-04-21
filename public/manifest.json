@@ -1,6 +1,6 @@
 {
-  "name": "Objetives App",
-  "short_name": "Objetives",
+  "name": "Goalyx",
+  "short_name": "Goalyx",
   "description": "Sistema de seguimiento personal de hábitos, eventos y puntajes diarios.",
   "start_url": "/",
   "display": "standalone",

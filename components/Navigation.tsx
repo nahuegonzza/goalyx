@@ -43,10 +43,15 @@ export default function Navigation() {
   return (
     <nav className="mb-8 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Core central</p>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
-        </div>
+        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 text-white font-bold text-lg">
+            🎯
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx</p>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
+          </div>
+        </Link>
         <div className="flex flex-wrap items-center gap-2">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
