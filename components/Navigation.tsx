@@ -44,8 +44,8 @@ export default function Navigation() {
     <nav className="mb-8 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 text-white font-bold text-lg">
-            🎯
+          <div className="flex items-center justify-center w-10 h-10">
+            <img src="/image-no-border-2000x2000.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx</p>
