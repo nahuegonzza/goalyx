@@ -166,6 +166,20 @@ export default function GoalTracker() {
     }
   }
 
+  async function loadModuleEntries() {
+    try {
+      const res = await fetch('/api/moduleEntries');
+      if (!res.ok) {
+        console.error('Failed to fetch moduleEntries');
+        return;
+      }
+      const moduleEntriesData = await res.json();
+      setModuleEntries(moduleEntriesData);
+    } catch (error) {
+      console.error('Error loading moduleEntries:', error);
+    }
+  }
+
   async function loadScoreHistory() {
     try {
       const res = await fetch(`/api/score/history?date=${today}`);
@@ -360,7 +374,7 @@ export default function GoalTracker() {
                         key={module.slug}
                         config={module.config}
                         module={module}
-                        onUpdate={() => loadScoreHistory()}
+                        onUpdate={() => loadModuleEntries()}
                       />
                     );
                   })}

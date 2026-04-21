@@ -51,10 +51,12 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     const penaltyMode = (config.penaltyMode as string) || 'automatic';
     const penaltyPerHour = (config.penaltyPerHour as number) || 1;
 
+    if (hours === 0) return 0; // Si no hay horas registradas, 0 puntos directamente
+
     const diff = Math.abs(hours - idealHours);
     const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
 
-    return maxPoints - penalty;
+    return Math.max(0, maxPoints - penalty); // Ensure score doesn't go negative
   };
 
   useEffect(() => {

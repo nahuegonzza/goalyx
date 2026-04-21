@@ -25,6 +25,8 @@ export const sleepModule: ModuleDefinition = {
 
     const data = JSON.parse(todayEntry.data);
     const hours = Number(data.hours || 0);
+    if (hours === 0) return 0; // Si no hay horas registradas, 0 puntos directamente
+
     const idealHours = (config.idealHours as number) || 8;
     const maxPoints = (config.maxPoints as number) || 2;
     const penaltyMode = (config.penaltyMode as string) || 'automatic';
