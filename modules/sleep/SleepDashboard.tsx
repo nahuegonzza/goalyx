@@ -99,7 +99,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">🌙 Sueño</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para sumar puntos.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para registrar tu rendimiento.</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-slate-500 dark:text-slate-400">Duración</p>
