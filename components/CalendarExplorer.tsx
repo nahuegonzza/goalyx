@@ -484,6 +484,25 @@ export default function CalendarExplorer() {
                 </div>
               </div>
 
+              {activeModules.length > 0 && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
+                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Módulos</p>
+                  <div className="space-y-2">
+                    {activeModules.map((module) => {
+                      const Component = module.definition?.Component;
+                      if (!Component) return null;
+                      return (
+                        <Component
+                          key={module.slug}
+                          config={module.config}
+                          module={module}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Objetivos</p>
@@ -600,25 +619,6 @@ export default function CalendarExplorer() {
                   })}
                 </div>
               </div>
-
-              {activeModules.length > 0 && (
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Módulos</p>
-                  <div className="space-y-2">
-                    {activeModules.map((module) => {
-                      const Component = module.definition?.Component;
-                      if (!Component) return null;
-                      return (
-                        <Component
-                          key={module.slug}
-                          config={module.config}
-                          module={module}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
