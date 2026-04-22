@@ -384,8 +384,14 @@ export default function Analytics() {
       {/* Chart */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4 px-6">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
-        <div className="h-64 w-full -mx-5 flex justify-center items-center">
-          <svg viewBox="0 0 280 100" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+        
+        {/* Contenedor corregido: Se eliminó -mx-5 y se asegura el centrado */}
+        <div className="h-64 w-full flex justify-center items-center">
+          <svg 
+            viewBox="0 0 280 100" 
+            className="w-full h-full" 
+            preserveAspectRatio="xMidYMid meet"
+          >
             <polyline
               fill="none"
               stroke="rgb(34, 197, 94)"
@@ -396,21 +402,21 @@ export default function Analytics() {
                   const start = parseLocalDate(fromDate);
                   const end = parseLocalDate(toDate);
                   const totalMs = end.getTime() - start.getTime();
-
                   const dateMs = parseLocalDate(item.date).getTime();
 
-                  // 👉 X ocupa todo el ancho disponible (0 → 280)
-                  const x =
-                    totalMs === 0
-                      ? 140
-                      : 0 + ((dateMs - start.getTime()) / totalMs) * 280;
+                  // 👉 Ajuste de centrado: Padding de 10 unidades a los lados
+                  const paddingX = 10;
+                  const availableWidth = 280 - (paddingX * 2);
+
+                  const x = totalMs === 0
+                    ? 140
+                    : paddingX + ((dateMs - start.getTime()) / totalMs) * availableWidth;
 
                   const range = maxPoints - minPoints || 1;
                   const points = item.hasData ? item.points : 0;
 
-                  // 👉 Y con padding 10% (invertido porque SVG)
-                  const y =
-                    90 - ((points - minPoints) / range) * 80;
+                  // 👉 Y con margen del 10% arriba y abajo
+                  const y = 90 - ((points - minPoints) / range) * 80;
 
                   return `${x},${y}`;
                 })
@@ -425,19 +431,18 @@ export default function Analytics() {
               const totalMs = end.getTime() - start.getTime();
               const dateMs = parseLocalDate(score.date).getTime();
 
-              // 👉 X ocupa todo el ancho disponible (0 → 280)
-              const x =
-                totalMs === 0
-                  ? 140
-                  : 0 + ((dateMs - start.getTime()) / totalMs) * 280;
+              // 👉 Mismo ajuste de centrado para los círculos
+              const paddingX = 10;
+              const availableWidth = 280 - (paddingX * 2);
+
+              const x = totalMs === 0
+                ? 140
+                : paddingX + ((dateMs - start.getTime()) / totalMs) * availableWidth;
 
               const range = maxPoints - minPoints || 1;
+              const y = 90 - ((score.points - minPoints) / range) * 80;
 
-              // 👉 Y con padding 10%
-              const y =
-                90 - ((score.points - minPoints) / range) * 80;
-
-              // Get entries for this day
+              // Lógica de Tooltips (se mantiene igual)
               const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === score.date);
               const dayModuleEntries = filteredModuleEntries.filter((e) => e.date.slice(0, 10) === score.date);
               let modulePoints = 0;
@@ -466,8 +471,9 @@ export default function Analytics() {
                   key={index}
                   cx={x}
                   cy={y}
-                  r="2"
+                  r="2.5" // Un poquito más grande para facilitar el hover
                   fill="rgb(11, 128, 54)"
+                  className="cursor-pointer"
                   onMouseEnter={(e) => setTooltip({ visible: true, x: e.clientX, y: e.clientY, content: tooltipLines.join('\n') })}
                   onMouseLeave={() => setTooltip({ visible: false, x: 0, y: 0, content: '' })}
                 />
