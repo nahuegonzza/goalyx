@@ -561,7 +561,7 @@ export default function CalendarExplorer() {
                   </button>
                 </div>
                 {!goalsCollapsed && (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-2">
                     {visibleGoals.map((goal) => {
                       const entry = entriesByGoalId.get(goal.id);
                       const colors = getBackgroundColors(goal.color);
@@ -580,17 +580,27 @@ export default function CalendarExplorer() {
                         >
                           <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
                             <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
-                                {goal.title}
-                              </h3>
-                              <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
-                                {entry ? (
-                                  goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
-                                ) : (
-                                  'No registrado'
-                                )}
-                              </p>
+                            <div className="min-w-0 flex-1 flex items-center">
+                              <div className="flex-1">
+                                <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
+                                  {goal.title}
+                                </h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
+                                  {entry ? (
+                                    goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
+                                  ) : (
+                                    'No registrado'
+                                  )}
+                                </p>
+                              </div>
+                              {!isEditingDay && (
+                                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                                  <span className="text-xs font-semibold text-slate-900 dark:text-white">
+                                    {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
+                                  </span>
+                                  <span className="inline-flex h-2 w-2 rounded-full bg-current" />
+                                </div>
+                              )}
                             </div>
                           </div>
                           {isEditingDay ? (
@@ -632,17 +642,7 @@ export default function CalendarExplorer() {
                                 </div>
                               )}
                             </div>
-                          ) : (
-                            <div className="flex items-center justify-between gap-2">
-                              <div />
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                  {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
-                                </span>
-                                <span className="inline-flex h-2 w-2 rounded-full bg-current" />
-                              </div>
-                            </div>
-                          )}
+                          ) : null}
                         </div>
                       );
                     })}
