@@ -53,7 +53,7 @@ export default function Navigation() {
             <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx{userName ? ` - ${userName}` : ''}</p>
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
           </div>
         </Link>
@@ -63,20 +63,6 @@ export default function Navigation() {
               <img src={item.icon} alt={item.label} className={getIconClasses(item.href)} />
             </Link>
           ))}
-          {session?.user && (
-            <div className="flex items-center gap-2 ml-4">
-              <span className="text-sm text-slate-700 dark:text-slate-200">{userName}</span>
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut();
-                  router.push('/login');
-                }}
-                className="rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
-              >
-                Logout
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </nav>
