@@ -84,6 +84,7 @@ export default function Analytics() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState(getLocalDateString());
   const [viewMode, setViewMode] = useState<'overview' | 'goal'>('overview');
+  const [tooltip, setTooltip] = useState<{ visible: boolean; x: number; y: number; content: string }>({ visible: false, x: 0, y: 0, content: '' });
 
   useEffect(() => {
     if (selectedRange === 'week') {
@@ -466,14 +467,36 @@ const allDates = useMemo(() => {
                   cy={y}
                   r="3"
                   fill="rgb(11, 128, 54)"
-                >
-                  <title>{tooltipLines.join('\n')}</title>
-                </circle>
+                  onMouseEnter={(e) => setTooltip({ visible: true, x: e.clientX, y: e.clientY, content: tooltipLines.join('\n') })}
+                  onMouseLeave={() => setTooltip({ visible: false, x: tooltip.x, y: tooltip.y, content: tooltip.content })}
+                />
               );
             })}
           </svg>
         </div>
-      </div>
+
+        {tooltip.visible && (
+          <div
+            style={{
+              position: 'fixed',
+              left: tooltip.x + 10,
+              top: tooltip.y + 10,
+              background: 'white',
+              color: 'black',
+              border: '1px solid #ccc',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              borderRadius: '8px',
+              padding: '12px',
+              fontSize: '14px',
+              maxWidth: '280px',
+              whiteSpace: 'pre-line',
+              zIndex: 1000,
+              pointerEvents: 'none'
+            }}
+          >
+            {tooltip.content}
+          </div>
+        )}
 
       {/* Data Table */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
@@ -514,3 +537,6 @@ const allDates = useMemo(() => {
     </div>
   );
 }
+
+
+
