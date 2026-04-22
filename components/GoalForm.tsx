@@ -19,7 +19,7 @@ const initialState: GoalFormData = {
   description: '',
   type: 'BOOLEAN',
   icon: 'star',
-  color: 'slate',
+  color: 'white',
   pointsIfTrue: 1,
   pointsIfFalse: 0,
   pointsPerUnit: 1
@@ -31,6 +31,8 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showRgbPicker, setShowRgbPicker] = useState(false);
+  const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -143,42 +145,134 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
             <div 
               className="w-6 h-6 rounded-full border-2"
               style={{
-                backgroundColor: COLOR_OPTIONS.find(opt => opt.key === form.color)?.bgColor || COLOR_OPTIONS[0].bgColor,
-                borderColor: COLOR_OPTIONS.find(opt => opt.key === form.color)?.borderColor || COLOR_OPTIONS[0].borderColor
+                backgroundColor: COLOR_OPTIONS.find(opt => opt.key === form.color)?.bgColor || form.color || '#ffffff',
+                borderColor: COLOR_OPTIONS.find(opt => opt.key === form.color)?.borderColor || form.color || '#e5e5e5'
               }}
             />
-            <span>{(form.color ? form.color.charAt(0).toUpperCase() + form.color.slice(1) : 'Slate')}</span>
+            <span>{(form.color && COLOR_OPTIONS.find(opt => opt.key === form.color) ? form.color.charAt(0).toUpperCase() + form.color.slice(1) : form.color ? 'Custom' : 'White')}</span>
           </button>
           {showColorPicker && (
-            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-6 gap-3 z-20 max-h-48 overflow-y-auto">
-              {COLOR_OPTIONS.map((opt) => (
+            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-4 z-20">
+              <div className="grid grid-cols-6 gap-3">
+                {COLOR_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      setForm({ ...form, color: opt.key });
+                      setShowColorPicker(false);
+                      setShowRgbPicker(false);
+                    }}
+                    className="w-8 h-8 rounded-full border-2 transition-all hover:scale-110 focus:outline-none"
+                    style={{
+                      backgroundColor: opt.bgColor,
+                      borderColor: opt.borderColor,
+                      boxShadow: form.color === opt.key ? `0 0 0 3px rgb(16 185 129 / 0.5)` : 'none',
+                      opacity: form.color === opt.key ? 1 : 0.7
+                    }}
+                    title={opt.label}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLButtonElement;
+                      target.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLButtonElement;
+                      if (form.color !== opt.key) {
+                        target.style.opacity = '0.7';
+                      }
+                    }}
+                  />
+                ))}
                 <button
-                  key={opt.key}
                   type="button"
-                  onClick={() => {
-                    setForm({ ...form, color: opt.key });
-                    setShowColorPicker(false);
-                  }}
-                  className="w-8 h-8 rounded-full border-2 transition-all hover:scale-110 focus:outline-none"
+                  onClick={() => setShowRgbPicker(!showRgbPicker)}
+                  className="w-8 h-8 rounded-full border-2 border-slate-400 dark:border-slate-500 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400 hover:scale-110 transition-all focus:outline-none"
+                  title="RGB Personalizado"
                   style={{
-                    backgroundColor: opt.bgColor,
-                    borderColor: opt.borderColor,
-                    boxShadow: form.color === opt.key ? `0 0 0 3px rgb(16 185 129 / 0.5)` : 'none',
-                    opacity: form.color === opt.key ? 1 : 0.7
+                    boxShadow: showRgbPicker ? `0 0 0 3px rgb(16 185 129 / 0.5)` : 'none'
                   }}
-                  title={opt.label}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLButtonElement;
-                    target.style.opacity = '1';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLButtonElement;
-                    if (form.color !== opt.key) {
-                      target.style.opacity = '0.7';
-                    }
-                  }}
-                />
-              ))}
+                >
+                  RGB
+                </button>
+              </div>
+              
+              {showRgbPicker && (
+                <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-600 rounded border border-slate-300 dark:border-slate-500">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Rojo</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="255"
+                        value={rgbColor.r}
+                        onChange={(e) => {
+                          const newRgb = { ...rgbColor, r: parseInt(e.target.value) };
+                          setRgbColor(newRgb);
+                        }}
+                        className="w-full"
+                      />
+                      <span className="text-xs text-slate-600 dark:text-slate-400">{rgbColor.r}</span>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Verde</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="255"
+                        value={rgbColor.g}
+                        onChange={(e) => {
+                          const newRgb = { ...rgbColor, g: parseInt(e.target.value) };
+                          setRgbColor(newRgb);
+                        }}
+                        className="w-full"
+                      />
+                      <span className="text-xs text-slate-600 dark:text-slate-400">{rgbColor.g}</span>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Azul</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="255"
+                        value={rgbColor.b}
+                        onChange={(e) => {
+                          const newRgb = { ...rgbColor, b: parseInt(e.target.value) };
+                          setRgbColor(newRgb);
+                        }}
+                        className="w-full"
+                      />
+                      <span className="text-xs text-slate-600 dark:text-slate-400">{rgbColor.b}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <div 
+                        className="flex-1 h-8 rounded border-2 border-slate-300 dark:border-slate-500"
+                        style={{
+                          backgroundColor: `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})`
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const hexColor = `#${[rgbColor.r, rgbColor.g, rgbColor.b]
+                            .map(x => {
+                              const hex = x.toString(16);
+                              return hex.length === 1 ? '0' + hex : hex;
+                            })
+                            .join('')
+                            .toUpperCase()}`;
+                          setForm({ ...form, color: hexColor });
+                          setShowColorPicker(false);
+                          setShowRgbPicker(false);
+                        }}
+                        className="px-3 py-1 text-xs font-medium bg-emerald-600 text-white rounded hover:bg-emerald-700 transition"
+                      >
+                        Aplicar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

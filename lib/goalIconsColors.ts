@@ -72,6 +72,7 @@ export const ICON_OPTIONS = Object.entries(GOAL_ICONS).map(([key, emoji]) => ({
 
 export const COLOR_OPTIONS = [
   { key: 'white', label: 'White', bgColor: '#ffffff', borderColor: '#e5e5e5' },
+  { key: 'slate', label: 'Slate', bgColor: '#64748b', borderColor: '#475569' },
   { key: 'gray-light', label: 'Light Gray', bgColor: '#e5e5e5', borderColor: '#d1d5db' },
   { key: 'gray', label: 'Gray', bgColor: '#9ca3af', borderColor: '#6b7280' },
   { key: 'gray-dark', label: 'Dark Gray', bgColor: '#4b5563', borderColor: '#1f2937' },
@@ -84,24 +85,39 @@ export const COLOR_OPTIONS = [
   { key: 'lime', label: 'Lime', bgColor: '#84cc16', borderColor: '#d9f97f' },
   { key: 'green', label: 'Green', bgColor: '#22c55e', borderColor: '#bbf7d0' },
   { key: 'emerald', label: 'Emerald', bgColor: '#10b981', borderColor: '#a7f3d0' },
+  { key: 'mint', label: 'Mint', bgColor: '#06d6a0', borderColor: '#00b377' },
   { key: 'teal', label: 'Teal', bgColor: '#14b8a6', borderColor: '#99f6e4' },
   { key: 'cyan', label: 'Cyan', bgColor: '#06b6d4', borderColor: '#a5f3fc' },
   { key: 'sky', label: 'Sky', bgColor: '#0ea5e9', borderColor: '#bae6fd' },
   { key: 'blue', label: 'Blue', bgColor: '#3b82f6', borderColor: '#bfdbfe' },
   { key: 'indigo', label: 'Indigo', bgColor: '#6366f1', borderColor: '#c7d2fe' },
+  { key: 'navy', label: 'Navy', bgColor: '#001f3f', borderColor: '#003d66' },
   { key: 'violet', label: 'Violet', bgColor: '#8b5cf6', borderColor: '#ddd6fe' },
   { key: 'purple', label: 'Purple', bgColor: '#a855f7', borderColor: '#e9d5ff' },
   { key: 'magenta', label: 'Magenta', bgColor: '#d946ef', borderColor: '#f0d9ff' },
   { key: 'fuchsia', label: 'Fuchsia', bgColor: '#ec4899', borderColor: '#fbcfe8' },
   { key: 'pink', label: 'Pink', bgColor: '#f472b6', borderColor: '#fbcfe8' },
   { key: 'rose', label: 'Rose', bgColor: '#f43f5e', borderColor: '#fda4af' },
+  { key: 'burgundy', label: 'Burgundy', bgColor: '#800020', borderColor: '#b0032f' },
+  { key: 'olive', label: 'Olive', bgColor: '#6b8e23', borderColor: '#556b2f' },
 ];
 
 // Helper function to get background colors for both light and dark modes
 // Returns both light and dark mode background colors
 export function getBackgroundColors(colorKey: string | undefined): { light: string; dark: string; lightBorder: string; darkBorder: string } {
+  // Handle custom RGB colors
+  if (colorKey && isCustomColor(colorKey)) {
+    return {
+      light: colorKey,
+      dark: colorKey,
+      lightBorder: colorKey,
+      darkBorder: colorKey,
+    };
+  }
+
   const lightMap: Record<string, string> = {
     'white': '#fafafa',
+    'slate': '#f1f5f9',
     'gray-light': '#f3f4f6',
     'gray': '#e5e7eb',
     'gray-dark': '#6b7280',
@@ -114,21 +130,26 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'lime': '#f7fee7',
     'green': '#f0fdf4',
     'emerald': '#f0fdf4',
+    'mint': '#f0fdf4',
     'teal': '#f0fdfa',
     'cyan': '#ecf9ff',
     'sky': '#f0f9ff',
     'blue': '#eff6ff',
     'indigo': '#eef2ff',
+    'navy': '#f0f9ff',
     'violet': '#f5f3ff',
     'purple': '#faf5ff',
     'magenta': '#fdf4ff',
     'fuchsia': '#fdf2f8',
     'pink': '#fdf2f8',
     'rose': '#fff5f6',
+    'burgundy': '#fef2f2',
+    'olive': '#fef9f3',
   };
 
   const darkMap: Record<string, string> = {
     'white': '#1f2937',
+    'slate': '#1e293b',
     'gray-light': '#374151',
     'gray': '#4b5563',
     'gray-dark': '#1f2937',
@@ -141,21 +162,26 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'lime': '#365314',
     'green': '#15803d',
     'emerald': '#065f46',
+    'mint': '#064e3b',
     'teal': '#134e4a',
     'cyan': '#06425c',
     'sky': '#0c2d48',
     'blue': '#0c2340',
     'indigo': '#1e1b4b',
+    'navy': '#001929',
     'violet': '#2e1065',
     'purple': '#3f0f5c',
     'magenta': '#6b1b47',
     'fuchsia': '#500724',
     'pink': '#500724',
     'rose': '#500724',
+    'burgundy': '#3d0011',
+    'olive': '#1f2f0f',
   };
 
   const lightBorderMap: Record<string, string> = {
     'white': '#e5e5e5',
+    'slate': '#cbd5e1',
     'gray-light': '#d1d5db',
     'gray': '#9ca3af',
     'gray-dark': '#6b7280',
@@ -168,21 +194,26 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'lime': '#d9f97f',
     'green': '#bbf7d0',
     'emerald': '#a7f3d0',
+    'mint': '#7ee8c2',
     'teal': '#99f6e4',
     'cyan': '#a5f3fc',
     'sky': '#bae6fd',
     'blue': '#bfdbfe',
     'indigo': '#c7d2fe',
+    'navy': '#a5d6ff',
     'violet': '#ddd6fe',
     'purple': '#e9d5ff',
     'magenta': '#f0d9ff',
     'fuchsia': '#fbcfe8',
     'pink': '#fbcfe8',
     'rose': '#fda4af',
+    'burgundy': '#fecaca',
+    'olive': '#dcf2be',
   };
 
   const darkBorderMap: Record<string, string> = {
     'white': '#4b5563',
+    'slate': '#475569',
     'gray-light': '#6b7280',
     'gray': '#9ca3af',
     'gray-dark': '#d1d5db',
@@ -195,17 +226,21 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'lime': '#4ade80',
     'green': '#22c55e',
     'emerald': '#10b981',
+    'mint': '#06d6a0',
     'teal': '#14b8a6',
     'cyan': '#06b6d4',
     'sky': '#0ea5e9',
     'blue': '#3b82f6',
     'indigo': '#6366f1',
+    'navy': '#1e40af',
     'violet': '#8b5cf6',
     'purple': '#a855f7',
     'magenta': '#d946ef',
     'fuchsia': '#ec4899',
     'pink': '#f472b6',
     'rose': '#f43f5e',
+    'burgundy': '#991b1b',
+    'olive': '#6b8e23',
   };
 
   const key = colorKey || 'gray';
@@ -220,4 +255,50 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
 // Legacy function - kept for backwards compatibility
 export function getLightBackgroundColor(colorKey: string | undefined): string {
   return getBackgroundColors(colorKey).light;
+}
+
+// Check if a color is a custom RGB color
+export function isCustomColor(color: string | undefined): boolean {
+  if (!color) return false;
+  return /^#[0-9A-F]{6}$/i.test(color) || /^rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)$/i.test(color);
+}
+
+// Get color option from predefined or custom
+export function getColorOption(colorKey: string | undefined) {
+  if (!colorKey) {
+    return COLOR_OPTIONS[0]; // white is default
+  }
+
+  const predefined = COLOR_OPTIONS.find(opt => opt.key === colorKey);
+  if (predefined) return predefined;
+
+  // Custom color
+  if (isCustomColor(colorKey)) {
+    return {
+      key: colorKey,
+      label: 'Custom',
+      bgColor: colorKey,
+      borderColor: colorKey,
+    };
+  }
+
+  return COLOR_OPTIONS[0];
+}
+
+// Convert hex to RGB
+export function hexToRgb(hex: string): string | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return null;
+  const r = parseInt(result[1], 16);
+  const g = parseInt(result[2], 16);
+  const b = parseInt(result[3], 16);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Convert RGB to hex
+export function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('').toUpperCase();
 }
