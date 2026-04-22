@@ -384,7 +384,7 @@ export default function Analytics() {
       {/* Chart */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4 px-6">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
-        <div className="h-64 w-full -mx-6 flex justify-center items-center">
+        <div className="h-64 w-full -mx-5 flex justify-center items-center">
           <svg viewBox="0 0 280 100" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
             <polyline
               fill="none"
