@@ -42,7 +42,7 @@ export default function Navigation() {
     const isActive = pathname === href;
     return isActive
       ? 'rounded-2xl border-2 border-emerald-600 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200'
-      : 'rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
+      : 'rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
   };
 
   return (
