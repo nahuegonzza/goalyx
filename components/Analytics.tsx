@@ -383,7 +383,7 @@ const allDates = useMemo(() => {
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4 px-6">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
         <div className="h-64 w-full -mx-6">
-          <svg viewBox="0 0 140 100" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
+          <svg viewBox="0 0 280 100" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
             <polyline
               fill="none"
               stroke="rgb(34, 197, 94)"
@@ -397,11 +397,11 @@ const allDates = useMemo(() => {
 
                   const dateMs = parseLocalDate(item.date).getTime();
 
-                  // 👉 X ocupa todo el ancho disponible (5 → 135)
+                  // 👉 X ocupa todo el ancho disponible (0 → 280)
                   const x =
                     totalMs === 0
-                      ? 70
-                      : 5 + ((dateMs - start.getTime()) / totalMs) * 130;
+                      ? 140
+                      : 0 + ((dateMs - start.getTime()) / totalMs) * 280;
 
                   const range = maxPoints - minPoints || 1;
                   const points = item.hasData ? item.points : 0;
@@ -423,11 +423,11 @@ const allDates = useMemo(() => {
               const totalMs = end.getTime() - start.getTime();
               const dateMs = parseLocalDate(score.date).getTime();
 
-              // 👉 X ocupa todo el ancho disponible (5 → 135)
+              // 👉 X ocupa todo el ancho disponible (0 → 280)
               const x =
                 totalMs === 0
-                  ? 70
-                  : 5 + ((dateMs - start.getTime()) / totalMs) * 130;
+                  ? 140
+                  : 0 + ((dateMs - start.getTime()) / totalMs) * 280;
 
               const range = maxPoints - minPoints || 1;
 
