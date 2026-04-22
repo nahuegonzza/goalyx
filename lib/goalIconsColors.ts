@@ -71,35 +71,45 @@ export const ICON_OPTIONS = Object.entries(GOAL_ICONS).map(([key, emoji]) => ({
 }));
 
 export const COLOR_OPTIONS = [
+  // ⚪ Neutros (de blanco a negro)
   { key: 'white', label: 'White', bgColor: '#ffffff', borderColor: '#e5e5e5' },
-  { key: 'slate', label: 'Slate', bgColor: '#64748b', borderColor: '#475569' },
   { key: 'gray-light', label: 'Light Gray', bgColor: '#e5e5e5', borderColor: '#d1d5db' },
   { key: 'gray', label: 'Gray', bgColor: '#9ca3af', borderColor: '#6b7280' },
+  { key: 'slate', label: 'Slate', bgColor: '#64748b', borderColor: '#475569' },
   { key: 'gray-dark', label: 'Dark Gray', bgColor: '#4b5563', borderColor: '#1f2937' },
   { key: 'black', label: 'Black', bgColor: '#000000', borderColor: '#404040' },
-  { key: 'red', label: 'Red', bgColor: '#ef4444', borderColor: '#fca5a5' },
+
+  // 🔥 Cálidos (rojo → naranja → amarillo)
   { key: 'coral', label: 'Coral', bgColor: '#ff6b6b', borderColor: '#ffa5a5' },
+  { key: 'red', label: 'Red', bgColor: '#ef4444', borderColor: '#fca5a5' },
+  { key: 'rose', label: 'Rose', bgColor: '#f43f5e', borderColor: '#fda4af' },
+  { key: 'burgundy', label: 'Burgundy', bgColor: '#800020', borderColor: '#b0032f' },
+
   { key: 'orange', label: 'Orange', bgColor: '#f97316', borderColor: '#fed7aa' },
   { key: 'amber', label: 'Amber', bgColor: '#f59e0b', borderColor: '#fde68a' },
   { key: 'yellow', label: 'Yellow', bgColor: '#eab308', borderColor: '#fef08a' },
+
+  // 🌿 Verdes
+  { key: 'olive', label: 'Olive', bgColor: '#6b8e23', borderColor: '#556b2f' },
   { key: 'lime', label: 'Lime', bgColor: '#84cc16', borderColor: '#d9f97f' },
   { key: 'green', label: 'Green', bgColor: '#22c55e', borderColor: '#bbf7d0' },
   { key: 'emerald', label: 'Emerald', bgColor: '#10b981', borderColor: '#a7f3d0' },
   { key: 'mint', label: 'Mint', bgColor: '#06d6a0', borderColor: '#00b377' },
+
+  // 🌊 Fríos (verde-azulado → azul)
   { key: 'teal', label: 'Teal', bgColor: '#14b8a6', borderColor: '#99f6e4' },
   { key: 'cyan', label: 'Cyan', bgColor: '#06b6d4', borderColor: '#a5f3fc' },
   { key: 'sky', label: 'Sky', bgColor: '#0ea5e9', borderColor: '#bae6fd' },
   { key: 'blue', label: 'Blue', bgColor: '#3b82f6', borderColor: '#bfdbfe' },
   { key: 'indigo', label: 'Indigo', bgColor: '#6366f1', borderColor: '#c7d2fe' },
   { key: 'navy', label: 'Navy', bgColor: '#001f3f', borderColor: '#003d66' },
+
+  // 🟣 Púrpuras → rosas → vuelta al rojo
   { key: 'violet', label: 'Violet', bgColor: '#8b5cf6', borderColor: '#ddd6fe' },
   { key: 'purple', label: 'Purple', bgColor: '#a855f7', borderColor: '#e9d5ff' },
   { key: 'magenta', label: 'Magenta', bgColor: '#d946ef', borderColor: '#f0d9ff' },
   { key: 'fuchsia', label: 'Fuchsia', bgColor: '#ec4899', borderColor: '#fbcfe8' },
   { key: 'pink', label: 'Pink', bgColor: '#f472b6', borderColor: '#fbcfe8' },
-  { key: 'rose', label: 'Rose', bgColor: '#f43f5e', borderColor: '#fda4af' },
-  { key: 'burgundy', label: 'Burgundy', bgColor: '#800020', borderColor: '#b0032f' },
-  { key: 'olive', label: 'Olive', bgColor: '#6b8e23', borderColor: '#556b2f' },
 ];
 
 // Helper function to get background colors for both light and dark modes
