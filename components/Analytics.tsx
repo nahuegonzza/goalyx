@@ -383,7 +383,7 @@ const allDates = useMemo(() => {
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4 px-6">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
         <div className="h-64 w-full -mx-6">
-          <svg viewBox="0 0 140 100" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+          <svg viewBox="0 0 140 100" className="w-full h-full" preserveAspectRatio="none">
             <polyline
               fill="none"
               stroke="rgb(34, 197, 94)"
