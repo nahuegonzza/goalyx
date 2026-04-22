@@ -20,7 +20,6 @@ function getEntryPoints(entry: GoalEntryWithGoal) {
     : Number(entry.valueFloat ?? 0) * Number(entry.goal.pointsPerUnit ?? 1);
 }
 
-
 const RANGE_LABELS = {
   week: 'Semana actual',
   month: 'Mes actual',
@@ -84,7 +83,6 @@ export default function Analytics() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState(getLocalDateString());
   const [viewMode, setViewMode] = useState<'overview' | 'goal'>('overview');
-  const [tooltip, setTooltip] = useState<{ visible: boolean; x: number; y: number; content: string }>({ visible: false, x: 0, y: 0, content: '' });
 
   useEffect(() => {
     if (selectedRange === 'week') {
@@ -195,27 +193,27 @@ export default function Analytics() {
     });
   }, [moduleEntries, fromDate, toDate]);
 
-const allDates = useMemo(() => {
-  if (!fromDate || !toDate) return [];
-  return getDatesInRange(fromDate, toDate);
-}, [fromDate, toDate]);
+  const allDates = useMemo(() => {
+    if (!fromDate || !toDate) return [];
+    return getDatesInRange(fromDate, toDate);
+  }, [fromDate, toDate]);
 
   const dailyScores = useMemo(() => {
     return allDates.map(date => {
       const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === date);
       const goalPoints = dayEntries.reduce((sum, entry) => sum + getEntryPoints(entry), 0);
-      
+
       // Calculate module points for this date
       let modulePoints = 0;
       for (const module of activeModules) {
         if (module.definition?.calculateScore) {
-          const moduleDayEntries = filteredModuleEntries.filter((e) => 
+          const moduleDayEntries = filteredModuleEntries.filter((e) =>
             e.date.slice(0, 10) === date && e.moduleId === module.id
           );
           modulePoints += module.definition.calculateScore(moduleDayEntries, module.config);
         }
       }
-      
+
       const totalPoints = goalPoints + modulePoints;
       const hasData = dayEntries.length > 0 || modulePoints !== 0;
       return { date, points: totalPoints, displayDate: date.split('-').reverse().join('/'), hasData };
@@ -349,6 +347,7 @@ const allDates = useMemo(() => {
             onChange={(e) => setSelectedGoalId(e.target.value)}
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           >
+            <option value="all">Todos los objetivos</option>
             <option value="all">-</option>
             {availableGoals.map((goal) => (
               <option key={goal.id} value={goal.id}>{goal.title}</option>
@@ -465,38 +464,16 @@ const allDates = useMemo(() => {
                   key={index}
                   cx={x}
                   cy={y}
-                  r="3"
+                  r="2"
                   fill="rgb(11, 128, 54)"
-                  onMouseEnter={(e) => setTooltip({ visible: true, x: e.clientX, y: e.clientY, content: tooltipLines.join('\n') })}
-                  onMouseLeave={() => setTooltip({ visible: false, x: tooltip.x, y: tooltip.y, content: tooltip.content })}
-                />
+                >
+                  <title>{tooltipLines.join('\n')}</title>
+                </circle>
               );
             })}
           </svg>
         </div>
-
-        {tooltip.visible && (
-          <div
-            style={{
-              position: 'fixed',
-              left: tooltip.x + 10,
-              top: tooltip.y + 10,
-              background: 'white',
-              color: 'black',
-              border: '1px solid #ccc',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              borderRadius: '8px',
-              padding: '12px',
-              fontSize: '14px',
-              maxWidth: '280px',
-              whiteSpace: 'pre-line',
-              zIndex: 1000,
-              pointerEvents: 'none'
-            }}
-          >
-            {tooltip.content}
-          </div>
-        )}
+      </div>
 
       {/* Data Table */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
@@ -537,6 +514,3 @@ const allDates = useMemo(() => {
     </div>
   );
 }
-
-
-
