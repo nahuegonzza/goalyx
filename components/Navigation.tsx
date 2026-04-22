@@ -45,7 +45,7 @@ export default function Navigation() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <div className="flex items-center justify-center w-10 h-10">
-            <img src="/image-no-border-2000x2000.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
+            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx</p>
