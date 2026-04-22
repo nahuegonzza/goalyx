@@ -7,11 +7,11 @@ import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 
 const navItems: { href: string; icon: string; label: string }[] = [
-  { href: '/', icon: '🏠', label: 'Inicio' },
-  { href: '/goals', icon: '🎯', label: 'Objetivos' },
-  { href: '/calendar', icon: '📅', label: 'Calendario' },
-  { href: '/analytics', icon: '📊', label: 'Analítica' },
-  { href: '/settings', icon: '⚙️', label: 'Ajustes' }
+  { href: '/', icon: '/navbar_icons/index_icon.png', label: 'Inicio' },
+  { href: '/goals', icon: '/navbar_icons/goals_icon.png', label: 'Objetivos' },
+  { href: '/calendar', icon: '/navbar_icons/calendar_icon.png', label: 'Calendario' },
+  { href: '/analytics', icon: '/navbar_icons/analytics_icon.png', label: 'Analítica' },
+  { href: '/settings', icon: '/navbar_icons/settings_icon.png', label: 'Ajustes' }
 ];
 
 export default function Navigation() {
@@ -33,10 +33,15 @@ export default function Navigation() {
     }
   }, [session]);
 
+  const getIconClasses = (href: string) => {
+    const isActive = pathname === href;
+    return isActive ? 'w-6 h-6 brightness-110' : 'w-6 h-6';
+  };
+
   const getLinkClasses = (href: string) => {
     const isActive = pathname === href;
     return isActive
-      ? 'rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-emerald-200/50'
+      ? 'rounded-2xl border-2 border-emerald-600 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200'
       : 'rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
   };
 
@@ -44,7 +49,7 @@ export default function Navigation() {
     <nav className="mb-8 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="flex items-center justify-center w-10 h-10">
+          <div className="flex items-center justify-center w-10 h-10"
             <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
           </div>
           <div>
@@ -55,7 +60,7 @@ export default function Navigation() {
         <div className="flex flex-wrap items-center gap-2">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
-              <span aria-hidden="true">{item.icon}</span>
+              <img src={item.icon} alt={item.label} className={getIconClasses(item.href)} />
             </Link>
           ))}
           {session?.user && (
