@@ -353,16 +353,14 @@ export default function GoalManager() {
           </p>
         ) : (
           <div className="space-y-4">
-            {sortedGoals.filter(g => {
-              // Tratar isActive como true si no está definido (para compatibilidad con datos existentes)
+            {(showInactive ? sortedGoals.filter(g => {
               const isActive = g.isActive !== false;
-              return showInactive ? !isActive : isActive;
-            }).map((goal) => {
+              return !isActive;
+            }) : getVisuallyOrderedGoals()).map((goal) => {
               const icon = getGoalIcon(goal.icon);
               const isEditing = editingGoalId === goal.id;
               const isActiveGoal = goal.isActive !== false;
               const isDragging = draggedGoalId === goal.id;
-              const isDragOver = dragOverGoalId === goal.id;
               const colorOption = getColorOption(goal.color);
 
               return (
@@ -375,7 +373,7 @@ export default function GoalManager() {
                   onDragLeave={() => !showInactive && isActiveGoal && !isEditing && handleDragLeave(goal.id)}
                   onDrop={(event) => !showInactive && isActiveGoal && !isEditing && handleDrop(event, goal.id)}
                   onDragEnd={handleDragEnd}
-                  className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all ${isDragging ? 'opacity-80 border-emerald-400 shadow-lg' : ''} ${isDragOver ? 'border-emerald-300 bg-emerald-50/50' : ''}`}
+                  className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all ${isDragging ? 'opacity-80 border-emerald-400 shadow-lg' : ''}`}
                 >
                   {isEditing ? (
                     <div className="space-y-4">
@@ -653,50 +651,23 @@ export default function GoalManager() {
                     </div>
                   ) : (
                     <>
-                      {dragOverGoalId === goal.id && dragOverPosition === 'before' && (
-                        <div className="mb-2 h-0.5 bg-emerald-400 rounded-full" />
-                      )}
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-3 min-w-0">
-                      <div className="relative">
-                        <span className="text-3xl">{icon}</span>
-                        <div 
-                          className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                          style={{
-                            backgroundColor: colorOption?.bgColor || '#9ca3af',
-                          }}
-                          title={goal.color}
-                        />
-                      </div>
-                      <div className="min-w-0">
-                          <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            {goal.type === 'BOOLEAN'
-                              ? `V: ${goal.pointsIfTrue ?? 1}, F: ${goal.pointsIfFalse ?? 0}`
-                              : `${goal.pointsPerUnit ?? 1} pts/u`}
-                          </p>
-                          {goal.deactivatedAt && (
-                            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                              Desactivado: {new Date(goal.deactivatedAt).toLocaleDateString('es-ES')}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <button
-                          title="Editar"
-                          type="button"
-                          onClick={() => {
-                            setEditingGoalId(goal.id);
-                            setEditForm(goal);
-                          }}
-                          className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                        >
-                          ✏️
-                        </button>
-                        {!showInactive ? (
-                          <>
+                        {!showInactive && isActiveGoal && (
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                              <span className="text-lg">↕️</span>
+                            </div>
+                            <button
+                              title="Editar"
+                              type="button"
+                              onClick={() => {
+                                setEditingGoalId(goal.id);
+                                setEditForm(goal);
+                              }}
+                              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                            >
+                              ✏️
+                            </button>
                             <button
                               title="Desactivar"
                               type="button"
@@ -705,9 +676,36 @@ export default function GoalManager() {
                             >
                               ⊘
                             </button>
-                          </>
-                        ) : (
-                          <>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="relative">
+                            <span className="text-3xl">{icon}</span>
+                            <div 
+                              className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
+                              style={{
+                                backgroundColor: colorOption?.bgColor || '#9ca3af',
+                              }}
+                              title={goal.color}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              {goal.type === 'BOOLEAN'
+                                ? `V: ${goal.pointsIfTrue ?? 1}, F: ${goal.pointsIfFalse ?? 0}`
+                                : `${goal.pointsPerUnit ?? 1} pts/u`}
+                            </p>
+                            {goal.deactivatedAt && (
+                              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                Desactivado: {new Date(goal.deactivatedAt).toLocaleDateString('es-ES')}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        {showInactive && (
+                          <div className="flex items-center gap-2 flex-wrap">
                             <button
                               title="Reactivar"
                               type="button"
@@ -728,18 +726,9 @@ export default function GoalManager() {
                             >
                               🗑️
                             </button>
-                          </>
+                          </div>
                         )}
                       </div>
-                      {!showInactive && isActiveGoal && (
-                        <div className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                          <span className="text-lg">⋮⋮</span>
-                        </div>
-                      )}
-                    </div>
-                      {dragOverGoalId === goal.id && dragOverPosition === 'after' && (
-                        <div className="mt-2 h-0.5 bg-emerald-400 rounded-full" />
-                      )}
                     </>
                   )}
                 </div>
