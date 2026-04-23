@@ -85,11 +85,10 @@ export async function PATCH(request: Request) {
           update: data,
           create: {
             id: userId,
-            email,
+            email: email!,
             firstName: data.firstName,
             lastName: data.lastName,
             name: data.name,
-            birthDate: data.birthDate ?? null,
           },
         })
       : await prisma.user.update({
