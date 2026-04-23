@@ -193,6 +193,29 @@ export default function GoalManager() {
     });
   }
 
+  function getVisuallyOrderedGoals() {
+    if (!draggedGoalId || !dragOverGoalId || draggedGoalId === dragOverGoalId) {
+      return getOrderedActiveGoals();
+    }
+
+    const orderedGoals = getOrderedActiveGoals();
+    const draggedIndex = orderedGoals.findIndex((goal) => goal.id === draggedGoalId);
+    const targetIndex = orderedGoals.findIndex((goal) => goal.id === dragOverGoalId);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      return orderedGoals;
+    }
+
+    const nextGoals = [...orderedGoals];
+    const [movedGoal] = nextGoals.splice(draggedIndex, 1);
+    const finalIndex = draggedIndex < targetIndex 
+      ? (dragOverPosition === 'before' ? targetIndex - 1 : targetIndex)
+      : (dragOverPosition === 'before' ? targetIndex : targetIndex + 1);
+    nextGoals.splice(finalIndex, 0, movedGoal);
+
+    return nextGoals;
+  }
+
   function handleDragStart(event: DragEvent<HTMLDivElement>, goalId: string) {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', goalId);
@@ -296,9 +319,6 @@ export default function GoalManager() {
             >
               <span>{showCreateForm ? 'Cancelar' : 'Nuevo objetivo'}</span>
             </button>
-            <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
-              {showInactive ? 'Inactivos' : 'Orden'}
-            </span>
             <button
               type="button"
               onClick={() => setShowInactive(!showInactive)}
@@ -308,7 +328,7 @@ export default function GoalManager() {
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
               }`}
             >
-              {showInactive ? '← Volver' : 'Ver Desactivados →'}
+              {showInactive ? '← Ver Activos' : 'Ver Desactivados →'}
             </button>
           </div>
         </div>
