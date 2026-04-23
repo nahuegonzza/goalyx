@@ -295,6 +295,7 @@ export default function GoalTracker() {
             {today}
           </h2>
         </div>
+        <br />
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">

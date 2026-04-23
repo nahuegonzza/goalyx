@@ -7,7 +7,9 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
   return (
     <ThemeProvider>
       <ServiceWorkerRegister />
-      {children}
+      <div className="min-h-screen pb-24 sm:pb-0">
+        {children}
+      </div>
     </ThemeProvider>
   );
 }

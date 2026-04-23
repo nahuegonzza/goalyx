@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -16,7 +16,6 @@ const navItems: { href: string; icon: string; label: string }[] = [
 
 export default function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
   const [userName, setUserName] = useState<string>('');
@@ -45,26 +44,72 @@ export default function Navigation() {
       : 'rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
   };
 
+  const [homeItem, ...otherItems] = navItems;
+  const leftItems = otherItems.slice(0, 2);
+  const rightItems = otherItems.slice(2);
+
   return (
-    <nav className="mb-8 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="flex items-center justify-center w-12 h-12">
-            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
+    <>
+      <nav className="hidden sm:block mb-8 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
+            <div className="flex items-center justify-center w-12 h-12">
+              <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx{userName ? ` - ${userName}` : ''}</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
+            </div>
+          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
+                <img src={item.icon} alt={item.label} className={getIconClasses(item.href)} />
+              </Link>
+            ))}
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx{userName ? ` - ${userName}` : ''}</p>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
-          </div>
-        </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
-              <img src={item.icon} alt={item.label} className={getIconClasses(item.href)} />
-            </Link>
-          ))}
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-xl">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2">
+            {leftItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}
+              >
+                <img src={item.icon} alt={item.label} className="w-6 h-6" />
+              </Link>
+            ))}
+          </div>
+
+          <div className="relative -mt-4">
+            <Link
+              href={homeItem.href}
+              title={homeItem.label}
+              className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-xl ${pathname === homeItem.href ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'} transition hover:bg-slate-200 dark:hover:bg-slate-700`}
+            >
+              <img src={homeItem.icon} alt={homeItem.label} className="w-6 h-6" />
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {rightItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}
+              >
+                <img src={item.icon} alt={item.label} className="w-6 h-6" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
