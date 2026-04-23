@@ -72,27 +72,27 @@ export default function Navigation() {
       </nav>
 
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-xl">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 px-4 py-3">
           <div className="flex items-center gap-2">
             {leftItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className="w-6 h-6" />
+                <img src={item.icon} alt={item.label} className={`${pathname === item.href ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>
 
-          <div className="relative -mt-4">
+          <div className="relative -mt-4 flex items-center justify-center">
             <Link
               href={homeItem.href}
               title={homeItem.label}
-              className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-xl ${pathname === homeItem.href ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'} transition hover:bg-slate-200 dark:hover:bg-slate-700`}
+              className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-xl ${pathname === homeItem.href ? 'bg-slate-900 text-white ring-2 ring-emerald-400/30 shadow-emerald-500/20 scale-105' : 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-200'} transition-transform duration-200 hover:scale-105 hover:bg-slate-800 dark:hover:bg-slate-700`}
             >
-              <img src={homeItem.icon} alt={homeItem.label} className="w-6 h-6" />
+              <img src={homeItem.icon} alt={homeItem.label} className={`${pathname === homeItem.href ? 'w-7 h-7' : 'w-6 h-6'}`} />
             </Link>
           </div>
 
@@ -102,9 +102,9 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className="w-6 h-6" />
+                <img src={item.icon} alt={item.label} className={`${pathname === item.href ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>
