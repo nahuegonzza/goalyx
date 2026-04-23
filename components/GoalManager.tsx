@@ -20,6 +20,7 @@ export default function GoalManager() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [draggedGoalId, setDraggedGoalId] = useState<string | null>(null);
   const [dragOverGoalId, setDragOverGoalId] = useState<string | null>(null);
+  const [dragOverPosition, setDragOverPosition] = useState<'before' | 'after' | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
 
@@ -200,39 +201,58 @@ export default function GoalManager() {
 
   function handleDragOver(event: DragEvent<HTMLDivElement>, goalId: string) {
     event.preventDefault();
-    if (goalId !== dragOverGoalId) {
+    
+    const rect = event.currentTarget.getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+    const position = event.clientY < midpoint ? 'before' : 'after';
+    
+    if (goalId !== dragOverGoalId || dragOverPosition !== position) {
       setDragOverGoalId(goalId);
+      setDragOverPosition(position);
     }
   }
 
   function handleDragLeave(goalId: string) {
     if (dragOverGoalId === goalId) {
       setDragOverGoalId(null);
+      setDragOverPosition(null);
     }
   }
 
   async function handleDrop(event: DragEvent<HTMLDivElement>, goalId: string) {
     event.preventDefault();
     const draggedId = event.dataTransfer.getData('text/plain');
-    if (!draggedId || draggedId === goalId) {
+    if (!draggedId) {
       setDraggedGoalId(null);
       setDragOverGoalId(null);
+      setDragOverPosition(null);
       return;
     }
 
     const orderedGoals = getOrderedActiveGoals();
     const draggedIndex = orderedGoals.findIndex((goal) => goal.id === draggedId);
     const targetIndex = orderedGoals.findIndex((goal) => goal.id === goalId);
+    
     if (draggedIndex === -1 || targetIndex === -1) {
       setDraggedGoalId(null);
       setDragOverGoalId(null);
+      setDragOverPosition(null);
+      return;
+    }
+
+    if (draggedIndex === targetIndex) {
+      setDraggedGoalId(null);
+      setDragOverGoalId(null);
+      setDragOverPosition(null);
       return;
     }
 
     const nextGoals = [...orderedGoals];
     const [movedGoal] = nextGoals.splice(draggedIndex, 1);
-    const insertIndex = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    nextGoals.splice(insertIndex, 0, movedGoal);
+    const finalIndex = draggedIndex < targetIndex 
+      ? (dragOverPosition === 'before' ? targetIndex - 1 : targetIndex)
+      : (dragOverPosition === 'before' ? targetIndex : targetIndex + 1);
+    nextGoals.splice(finalIndex, 0, movedGoal);
 
     await persistOrderedGoals(nextGoals);
   }
@@ -240,6 +260,7 @@ export default function GoalManager() {
   function handleDragEnd() {
     setDraggedGoalId(null);
     setDragOverGoalId(null);
+    setDragOverPosition(null);
   }
 
   const sortedGoals = [...goals].sort((a, b) => {
@@ -611,13 +632,12 @@ export default function GoalManager() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-3 min-w-0">
-                      {!showInactive && isActiveGoal && (
-                        <div className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                          <span className="text-lg">⋮⋮</span>
-                        </div>
+                    <>
+                      {dragOverGoalId === goal.id && dragOverPosition === 'before' && (
+                        <div className="mb-2 h-0.5 bg-emerald-400 rounded-full" />
                       )}
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
                       <div className="relative">
                         <span className="text-3xl">{icon}</span>
                         <div 
@@ -691,7 +711,16 @@ export default function GoalManager() {
                           </>
                         )}
                       </div>
+                      {!showInactive && isActiveGoal && (
+                        <div className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                          <span className="text-lg">⋮⋮</span>
+                        </div>
+                      )}
                     </div>
+                      {dragOverGoalId === goal.id && dragOverPosition === 'after' && (
+                        <div className="mt-2 h-0.5 bg-emerald-400 rounded-full" />
+                      )}
+                    </>
                   )}
                 </div>
               );
