@@ -561,9 +561,14 @@ export default function CalendarExplorer() {
                   </button>
                 </div>
                 {!goalsCollapsed && (
-                  <div className="space-y-2">
-                    {visibleGoals.length > 0 ? (
-                      visibleGoals.map((goal) => {
+                  <div className="space-y-6">
+                    {visibleGoals.filter(g => g.type === 'BOOLEAN').length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 font-semibold">
+                          Hábitos
+                        </p>
+                        <div className="space-y-2">
+                          {visibleGoals.filter(g => g.type === 'BOOLEAN').map((goal) => {
                         const entry = entriesByGoalId.get(goal.id);
                         const colors = getBackgroundColors(goal.color);
                         const editValues = dayEdits[goal.id];
