@@ -74,9 +74,7 @@ export default function Navigation() {
       <nav className="sm:hidden fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-center py-3">
           <div className="flex items-center justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-xl bg-white dark:bg-slate-900">
-              <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-8 h-8" />
-            </div>
+            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
           </div>
         </div>
       </nav>
@@ -100,9 +98,9 @@ export default function Navigation() {
             <Link
               href={homeItem.href}
               title={homeItem.label}
-              className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-xl ${pathname === homeItem.href ? 'bg-slate-900 text-white ring-2 ring-emerald-400/30 shadow-emerald-500/20 scale-105 dark:bg-slate-900 dark:text-white' : 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white'} transition-transform duration-200 hover:scale-105 hover:bg-slate-800 dark:hover:bg-slate-700`}
+              className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-slate-300 dark:border-slate-600 shadow-xl ${pathname === homeItem.href ? 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white' : 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white'} transition-transform duration-200 hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-700`}
             >
-              <img src={homeItem.icon} alt={homeItem.label} className={`${pathname === homeItem.href ? 'w-7 h-7' : 'w-6 h-6'} ${pathname === homeItem.href ? '' : 'dark:invert'}`} />
+              <img src={homeItem.icon} alt={homeItem.label} className={`${pathname === homeItem.href ? 'w-7 h-7 filter dark:filter-none' : 'w-6 h-6 filter dark:filter-none'}`} />
             </Link>
           </div>
 
