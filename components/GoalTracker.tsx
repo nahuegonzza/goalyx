@@ -325,6 +325,7 @@ export default function GoalTracker() {
   const activeGoals = goals.filter((g) => g.isActive !== false);
   const booleanGoals = activeGoals.filter((g) => g.type === 'BOOLEAN');
   const numericGoals = activeGoals.filter((g) => g.type === 'NUMERIC');
+  const showStreakCard = false;
 
   return (
     <div className="space-y-6">
@@ -338,30 +339,32 @@ export default function GoalTracker() {
           </h2>
         </div>
         <br />
-        <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Racha</p>
-              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{currentStreak} días</p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Mejor racha: {longestStreak} días</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
-                alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
-                className="h-16 w-16 rounded-full"
-              />
+        {showStreakCard && (
+          <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                  {todayStreakFulfilled ? 'Cumplida hoy' : 'Incompleta hoy'}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Solo los registros desde Inicio cuentan para la racha.
-                </p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Racha</p>
+                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{currentStreak} días</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Mejor racha: {longestStreak} días</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <img
+                  src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+                  alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+                  className="h-16 w-16 rounded-full"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {todayStreakFulfilled ? 'Cumplida hoy' : 'Incompleta hoy'}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Solo los registros desde Inicio cuentan para la racha.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
