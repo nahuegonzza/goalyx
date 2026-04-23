@@ -50,15 +50,15 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="hidden sm:block mb-6 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <nav className="hidden sm:block mb-4 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="flex items-center justify-center w-10 h-10">
+            <div className="flex items-center justify-center w-8 h-8">
               <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx{userName ? ` - ${userName}` : ''}</p>
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
+              <h2 className="text-xs font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
             </div>
           </Link>
           <div className="flex flex-wrap items-center gap-1">

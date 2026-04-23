@@ -28,6 +28,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Perfil</h1>
           <Link href="/settings" className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
@@ -101,6 +102,7 @@ export default function ProfilePage() {
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">12 días</span>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
