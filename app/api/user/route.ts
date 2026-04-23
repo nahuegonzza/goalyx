@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
-import { getServerSupabaseUser } from '@lib/supabase-server';
+import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 
 export async function GET() {
   try {
@@ -19,9 +19,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const dbUser = await prisma.user.findUnique({
+    let dbUser = await prisma.user.findUnique({
       where: { id: userId }
     });
+
+    if (!dbUser && user) {
+      dbUser = await ensurePrismaUserForSession();
+    }
 
     if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -70,10 +74,23 @@ export async function PATCH(request: Request) {
       data.birthDate = null;
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data,
-    });
+    const updatedUser = user
+      ? await prisma.user.upsert({
+          where: { id: userId },
+          update: data,
+          create: {
+            id: userId,
+            email: user.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            name: data.name,
+            birthDate: data.birthDate ?? null,
+          },
+        })
+      : await prisma.user.update({
+          where: { id: userId },
+          data,
+        });
 
     return NextResponse.json(updatedUser);
   } catch (error) {

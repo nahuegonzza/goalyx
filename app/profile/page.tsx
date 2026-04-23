@@ -23,6 +23,14 @@ export default function ProfilePage() {
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
     return age;
   };
+
+  const getDisplayName = (user: any) => {
+    if (!user) return 'Cargando...';
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    if (fullName) return fullName;
+    return user.name || session?.user?.email || 'Usuario';
+  };
+
   const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
 
   useEffect(() => {
@@ -70,10 +78,10 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Información Personal</h2>
               <div className="space-y-2">
                 <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Nombre:</span> {userData?.firstName || userData?.name ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}`.trim() : 'Cargando...'}
+                  <span className="font-medium">Nombre:</span> {getDisplayName(userData)}
                 </p>
                 <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Email:</span> {userData?.email || ''}
+                  <span className="font-medium">Email:</span> {userData?.email || session?.user?.email || 'No disponible'}
                 </p>
                 <p className="text-slate-600 dark:text-slate-400">
                   <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
