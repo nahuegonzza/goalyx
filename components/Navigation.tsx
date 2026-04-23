@@ -11,7 +11,7 @@ const navItems: { href: string; icon: string; label: string }[] = [
   { href: '/goals', icon: '/navbar_icons/goals_icon.png', label: 'Objetivos' },
   { href: '/calendar', icon: '/navbar_icons/calendar_icon.png', label: 'Calendario' },
   { href: '/analytics', icon: '/navbar_icons/analytics_icon.png', label: 'Analítica' },
-  { href: '/settings', icon: '/navbar_icons/settings_icon.png', label: 'Ajustes' }
+  { href: '/profile', icon: '/navbar_icons/user_icon.png', label: 'Perfil' }
 ];
 
 export default function Navigation() {
@@ -45,8 +45,8 @@ export default function Navigation() {
   };
 
   const [homeItem, ...otherItems] = navItems;
-  const leftItems = otherItems.slice(0, 2);
-  const rightItems = otherItems.slice(2);
+  const leftItems = [otherItems[1], otherItems[0]]; // calendar, goals
+  const rightItems = otherItems.slice(2); // analytics, profile
 
   return (
     <>
