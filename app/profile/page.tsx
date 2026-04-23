@@ -5,12 +5,14 @@ import Link from 'next/link';
 import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
+import { getLocalDateString } from '@lib/dateHelpers';
 
 export default function ProfilePage() {
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
   const [userData, setUserData] = useState<any>(null);
   const [stats, setStats] = useState<any>({ goalsCompleted: 0, totalScore: 0, streak: 0 });
+  const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
 
   useEffect(() => {
     if (session?.user) {
@@ -21,8 +23,22 @@ export default function ProfilePage() {
 
       // Placeholder stats
       setStats({ goalsCompleted: 42, totalScore: 1250, streak: 7 });
+
+      fetch(`/api/streaks?date=${streakInfo.today}`)
+        .then((res) => res.ok ? res.json() : Promise.reject())
+        .then((data) => {
+          setStreakInfo((prev) => ({
+            ...prev,
+            currentStreak: Number(data.currentStreak ?? 0),
+            longestStreak: Number(data.longestStreak ?? 0),
+            todayFulfilled: Boolean(data.todayFulfilled)
+          }));
+        })
+        .catch((error) => {
+          console.error('Error loading profile streak info:', error);
+        });
     }
-  }, [session]);
+  }, [session, streakInfo.today]);
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
@@ -57,7 +73,7 @@ export default function ProfilePage() {
             {/* Estadísticas */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Estadísticas</h2>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.goalsCompleted}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Objetivos Completados</p>
@@ -67,8 +83,12 @@ export default function ProfilePage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400">Puntuación Total</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.streak}</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{streakInfo.currentStreak}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Racha Actual</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{streakInfo.longestStreak}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Mejor Racha</p>
                 </div>
               </div>
             </div>
@@ -88,17 +108,32 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Rachas con Amigos */}
+            {/* Racha diaria */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Rachas con Amigos</h2>
-              <p className="text-slate-500 dark:text-slate-400">Próximamente: Compite y motiva a tus amigos.</p>
-              <div className="mt-4 space-y-2">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Racha diaria</h2>
+              <p className="text-slate-500 dark:text-slate-400">La racha solo se cumple cuando se registra un ítem desde Inicio.</p>
+              <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <img src="/navbar_icons/streak_off.png" alt="Racha" className="w-8 h-8 rounded-full" />
-                    <span className="font-medium text-slate-900 dark:text-white">Racha Compartida</span>
+                    <img
+                      src={streakInfo.todayFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+                      alt={streakInfo.todayFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">
+                        {streakInfo.todayFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+                      </p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Se activa solo con registros hechos desde Inicio.
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">12 días</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{streakInfo.currentStreak} días</span>
+                </div>
+                <div className="rounded-2xl bg-slate-50 dark:bg-slate-800 p-3 text-sm text-slate-600 dark:text-slate-300">
+                  <p className="font-semibold">Mejor racha registrada:</p>
+                  <p>{streakInfo.longestStreak} días</p>
                 </div>
               </div>
             </div>

@@ -102,6 +102,13 @@ export interface DailyScore {
   note: string;
 }
 
+export interface StreakInfo {
+  currentStreak: number;
+  longestStreak: number;
+  todayFulfilled: boolean;
+  today: string;
+}
+
 export interface ScoreHistory {
   current: DailyScore;
   previousDay: DailyScore;

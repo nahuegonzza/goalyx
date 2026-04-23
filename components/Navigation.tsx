@@ -19,6 +19,7 @@ export default function Navigation() {
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
   const [userName, setUserName] = useState<string>('');
+  const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
 
   useEffect(() => {
     if (session?.user) {
@@ -30,6 +31,30 @@ export default function Navigation() {
         })
         .catch(() => setUserName(session.user.email || 'Usuario'));
     }
+  }, [session]);
+
+  async function loadStreakInfo() {
+    if (!session?.user) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/streaks');
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setTodayStreakFulfilled(Boolean(data.todayFulfilled));
+    } catch (error) {
+      console.error('Error loading streak info:', error);
+    }
+  }
+
+  useEffect(() => {
+    loadStreakInfo();
+    const handleStreakUpdate = () => loadStreakInfo();
+    window.addEventListener('streak-updated', handleStreakUpdate);
+    return () => window.removeEventListener('streak-updated', handleStreakUpdate);
   }, [session]);
 
   const isActivePath = (href: string) => {
@@ -79,9 +104,17 @@ export default function Navigation() {
       </nav>
 
       <nav className="sm:hidden fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-center py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-between py-3 px-4">
           <div className="flex items-center justify-center">
             <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
+          </div>
+          <div className="flex items-center gap-2">
+            <img
+              src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+              alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+              className="w-10 h-10 rounded-full"
+            />
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">Racha</span>
           </div>
         </div>
       </nav>

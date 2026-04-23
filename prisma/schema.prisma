@@ -23,6 +23,7 @@ model User {
   scores    Score[]
   modules   Module[]
   moduleEntries ModuleEntry[]
+  streakDays StreakDay[]
   accounts  Account[]
   sessions  Session[]
 }
@@ -97,6 +98,17 @@ model Score {
   date       DateTime
   points     Float
   createdAt  DateTime  @default(now())
+}
+
+model StreakDay {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  date      DateTime
+  source    String   @default("home")
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date], name: "user_date_streak_unique")
 }
 
 model Module {

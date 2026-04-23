@@ -36,6 +36,9 @@ export default function GoalTracker() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
   const [dailyScore, setDailyScore] = useState<DailyScore>({ points: 0, date: getLocalDateString(), note: '' });
   const [scoreHistory, setScoreHistory] = useState<ScoreHistory | null>(null);
+  const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
 
   const today = useMemo(() => getLocalDateString(), []);
 
@@ -44,6 +47,7 @@ export default function GoalTracker() {
       await loadModules();
       await loadData();
       await loadScoreHistory();
+      await loadStreakInfo();
     })();
   }, []);
 
@@ -191,6 +195,43 @@ export default function GoalTracker() {
     }
   }
 
+  async function loadStreakInfo() {
+    try {
+      const res = await fetch(`/api/streaks?date=${today}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setTodayStreakFulfilled(Boolean(data.todayFulfilled));
+      setCurrentStreak(Number(data.currentStreak ?? 0));
+      setLongestStreak(Number(data.longestStreak ?? 0));
+    } catch (error) {
+      console.error('Error loading streak info:', error);
+    }
+  }
+
+  async function markTodayStreak() {
+    try {
+      const res = await fetch('/api/streaks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: today })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setTodayStreakFulfilled(Boolean(data.todayFulfilled));
+      setCurrentStreak(Number(data.currentStreak ?? 0));
+      setLongestStreak(Number(data.longestStreak ?? 0));
+      window.dispatchEvent(new Event('streak-updated'));
+    } catch (error) {
+      console.error('Error marking today streak:', error);
+    }
+  }
+
   async function handleSaveEntry(goal: Goal, value: boolean | number) {
     setSavingGoalId(goal.id);
     setMessage('');
@@ -239,6 +280,7 @@ export default function GoalTracker() {
         });
         setMessage('✓ Registrado');
         setMessageType('success');
+        await markTodayStreak();
         // Forzar recarga completa para asegurar actualización del score
         await loadData();
         await loadScoreHistory();
@@ -296,6 +338,30 @@ export default function GoalTracker() {
           </h2>
         </div>
         <br />
+        <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Racha</p>
+              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{currentStreak} días</p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Mejor racha: {longestStreak} días</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <img
+                src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+                alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+                className="h-16 w-16 rounded-full"
+              />
+              <div>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  {todayStreakFulfilled ? 'Cumplida hoy' : 'Incompleta hoy'}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Solo los registros desde Inicio cuentan para la racha.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
@@ -367,7 +433,10 @@ export default function GoalTracker() {
                         config={module.config}
                         module={module}
                         isEditing={true}
-                        onUpdate={() => loadModuleEntries()}
+                        onUpdate={() => {
+                          loadModuleEntries();
+                          markTodayStreak();
+                        }}
                         date={today}
                       />
                     );
