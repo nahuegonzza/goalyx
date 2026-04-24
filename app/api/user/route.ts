@@ -119,11 +119,20 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { firstName, lastName, birthDate, username } = body;
 
+    console.log('📨 PATCH: Datos recibidos:', {
+      firstName,
+      lastName,
+      birthDate,
+      username
+    });
+
     const data: any = {
       firstName: firstName?.trim() || null,
       lastName: lastName?.trim() || null,
       name: firstName?.trim() && lastName?.trim() ? `${firstName.trim()} ${lastName.trim()}` : firstName?.trim() || lastName?.trim() || null,
     };
+
+    console.log('📦 PATCH: Data preparado para guardar:', data);
 
     // Handle username update
     if (username !== undefined) {
@@ -189,6 +198,14 @@ export async function PATCH(request: Request) {
           where: { id: userId },
           data,
         });
+
+    console.log('💾 PATCH: Usuario actualizado en BD:', {
+      id: updatedUser.id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      name: updatedUser.name,
+      username: updatedUser.username
+    });
 
     return NextResponse.json(updatedUser);
   } catch (error) {
