@@ -24,7 +24,9 @@ function isGoalActiveOnWeekDay(goal: Goal, dateString: string): boolean {
     return true;
   }
   // Obtener el día de la semana (0=domingo, 6=sábado)
-  const date = new Date(dateString);
+  // Usar split para evitar problemas de timezone con Date.parse()
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
   const dayOfWeek = date.getDay();
   return goal.weekDays.includes(dayOfWeek);
 }
