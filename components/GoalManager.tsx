@@ -422,7 +422,7 @@ export default function GoalManager() {
                             <button
                               type="button"
                               onClick={() => setShowIconPicker(!showIconPicker)}
-                              className="w-auto min-w-[120px] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                               {getGoalIcon(editForm.icon ?? 'star')}
                             </button>
@@ -781,7 +781,7 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-auto min-w-[120px] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>
@@ -1143,7 +1143,7 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-auto min-w-[120px] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>

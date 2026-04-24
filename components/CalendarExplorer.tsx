@@ -652,7 +652,7 @@ export default function CalendarExplorer() {
                                           const next = Math.max(0, current - 1);
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
+                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
                                         title="Disminuir"
                                       >
                                         −
@@ -669,7 +669,7 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="flex h-7 w-10 items-center justify-center rounded-md border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                                         placeholder="0"
                                       />
                                       <button
@@ -679,7 +679,7 @@ export default function CalendarExplorer() {
                                           const next = current + 1;
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
+                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
                                         title="Aumentar"
                                       >
                                         +
@@ -769,7 +769,7 @@ export default function CalendarExplorer() {
                                           const next = Math.max(0, current - 1);
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
+                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
                                         title="Disminuir"
                                       >
                                         −
@@ -786,7 +786,7 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="flex h-7 w-10 items-center justify-center rounded-md border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                                         placeholder="0"
                                       />
                                       <button
@@ -796,7 +796,7 @@ export default function CalendarExplorer() {
                                           const next = current + 1;
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
+                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
                                         title="Aumentar"
                                       >
                                         +
