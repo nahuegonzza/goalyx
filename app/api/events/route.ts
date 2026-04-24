@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSupabaseUser } from '@lib/supabase-server';
+import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
@@ -75,6 +75,11 @@ export async function POST(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Ensure Prisma user exists
+  if (user) {
+    await ensurePrismaUserForSession();
   }
 
   const payload = (await request.json()) as {

@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
-import { getServerSupabaseUser } from '@lib/supabase-server';
+import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -113,6 +113,11 @@ export async function POST(request: Request) {
     userId = process.env.DEFAULT_USER_ID;
   } else {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Ensure Prisma user exists
+  if (user) {
+    await ensurePrismaUserForSession();
   }
 
   const body = await request.json();

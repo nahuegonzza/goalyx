@@ -25,6 +25,9 @@ export async function GET() {
 
     if (!dbUser && user) {
       dbUser = await ensurePrismaUserForSession();
+    } else if (dbUser && user) {
+      // Ensure user data is up to date
+      dbUser = await ensurePrismaUserForSession();
     }
 
     if (!dbUser) {

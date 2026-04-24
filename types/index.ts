@@ -30,6 +30,7 @@ export interface Goal {
   deactivatedAt?: string | null;
   activatedAt: string;
   createdAt: string;
+  scheduledDays?: string | null;
 }
 
 export interface GoalPayload {

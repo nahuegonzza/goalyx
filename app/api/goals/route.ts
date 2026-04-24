@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma, withRetry } from '@lib/prisma';
 import type { GoalPayload } from '@types';
-import { getServerSupabaseUser } from '@lib/supabase-server';
+import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 
 function normalizeGoalType(type: string) {
   if (type === 'HABIT') return 'BOOLEAN';
@@ -64,6 +64,11 @@ export async function POST(request: Request) {
     // Additional check for TypeScript type narrowing
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Ensure Prisma user exists
+    if (user) {
+      await ensurePrismaUserForSession();
     }
 
     const payload = (await request.json()) as GoalPayload;
