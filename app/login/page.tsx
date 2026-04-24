@@ -40,7 +40,7 @@ export default function LoginPage() {
     if (!isEmail) {
       // It's a username, try to find the associated email
       try {
-        const response = await fetch(`/api/auth/get-email-by-username?username=${encodeURIComponent(input)}`);
+        const response = await fetch(`/api/auth/getEmailByUsername?username=${encodeURIComponent(input)}`);
         if (response.ok) {
           const data = await response.json();
           emailToUse = data.email;
