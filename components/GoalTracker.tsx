@@ -282,12 +282,12 @@ export default function GoalTracker() {
         setMessage('✓ Registrado');
         setMessageType('success');
         await markTodayStreak();
-        // Forzar recarga completa para asegurar actualización del score
-        await loadData();
-        await loadScoreHistory();
+        // NO recargar datos - actualizar solo score y entradas localmente
+        // Los puntos se actualizan automáticamente por el useEffect de score
       } else {
         setMessage('Error al guardar');
         setMessageType('error');
+        // Solo recargar en caso de error para sincronizar estado
         await loadData();
       }
     } catch (error) {
@@ -401,10 +401,10 @@ export default function GoalTracker() {
 
         {message && (
           <div
-            className={`mb-4 p-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
               messageType === 'success'
-                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'
             }`}
           >
             {message}
