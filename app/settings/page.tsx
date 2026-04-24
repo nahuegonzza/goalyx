@@ -207,6 +207,14 @@ export default function SettingsPage() {
     e.preventDefault();
     setProfileStatus('');
 
+    // Debug: Log what we're sending
+    console.log('📤 Enviando datos del perfil:', {
+      firstName: profileForm.firstName.trim(),
+      lastName: profileForm.lastName.trim(),
+      username: profileForm.username.trim() || null,
+      birthDate: profileForm.birthDate || null
+    });
+
     // Validate username if provided
     if (profileForm.username.trim()) {
       const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
@@ -235,14 +243,21 @@ export default function SettingsPage() {
           birthDate: profileForm.birthDate || null
         })
       });
+
+      console.log('📥 Respuesta de la API:', res.status, res.statusText);
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Error de la API:', errorData);
         throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
       }
+
+      const updatedUser = await res.json();
+      console.log('✅ Usuario actualizado:', updatedUser);
+
       setProfileStatus('Perfil actualizado correctamente');
       setProfileType('success');
       // Reload user
-      const updatedUser = await res.json();
       setUser(updatedUser);
       
       // Update profile form with the response data

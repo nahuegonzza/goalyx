@@ -13,10 +13,12 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>({ goalsCompleted: 0, totalScore: 0, streak: 0 });
 
-  const calculateAge = (birthDate?: string | null) => {
+  const calculateAge = (birthDate?: string | Date | null) => {
     if (!birthDate) return null;
-    // Create date at noon to avoid timezone issues
-    const date = new Date(birthDate + 'T12:00:00');
+    // Handle both string and Date objects
+    const date = typeof birthDate === 'string'
+      ? new Date(birthDate + 'T12:00:00')
+      : new Date(birthDate);
     if (isNaN(date.getTime())) return null;
     const today = new Date();
     let age = today.getFullYear() - date.getFullYear();
