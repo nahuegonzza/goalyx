@@ -23,23 +23,13 @@ export async function GET() {
       where: { id: userId }
     });
 
-    console.log('🔍 Usuario encontrado en BD:', {
-      id: dbUser?.id,
-      email: dbUser?.email,
-      name: dbUser?.name,
-      firstName: dbUser?.firstName,
-      lastName: dbUser?.lastName,
-      username: dbUser?.username,
-      birthDate: dbUser?.birthDate?.toISOString(),
-      updatedAt: dbUser?.updatedAt?.toISOString()
-    });
-
     if (!dbUser && user) {
       dbUser = await ensurePrismaUserForSession();
-    } else if (dbUser && user) {
-      // Ensure user data is up to date
-      dbUser = await ensurePrismaUserForSession();
     }
+    // Remove the automatic update that was overwriting data
+    // else if (dbUser && user) {
+    //   dbUser = await ensurePrismaUserForSession();
+    // }
 
     if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -47,14 +37,7 @@ export async function GET() {
 
     // If user has incomplete data, try to enrich from Supabase metadata
     if (user && (!dbUser.firstName || !dbUser.lastName)) {
-      console.log('🔄 Enriqueciendo datos - condición activada:', {
-        dbUserFirstName: dbUser.firstName,
-        dbUserLastName: dbUser.lastName,
-        condition: !dbUser.firstName || !dbUser.lastName
-      });
-
       const metadata = user.user_metadata as Record<string, any> | undefined;
-      console.log('📊 Metadata de Supabase:', metadata);
 
       const enrichedUser = {
         ...dbUser,
@@ -63,12 +46,6 @@ export async function GET() {
         birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null),
         name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
       };
-
-      console.log('🎯 Usuario enriquecido:', {
-        firstName: enrichedUser.firstName,
-        lastName: enrichedUser.lastName,
-        name: enrichedUser.name
-      });
 
       // Update the database with enriched data
       if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName) {
@@ -85,12 +62,6 @@ export async function GET() {
 
       return NextResponse.json(enrichedUser);
     }
-
-    console.log('✅ Devolviendo usuario sin enriquecimiento:', {
-      firstName: dbUser.firstName,
-      lastName: dbUser.lastName,
-      name: dbUser.name
-    });
 
     return NextResponse.json(dbUser);
   } catch (error) {
@@ -119,20 +90,11 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { firstName, lastName, birthDate, username } = body;
 
-    console.log('📨 PATCH: Datos recibidos:', {
-      firstName,
-      lastName,
-      birthDate,
-      username
-    });
-
     const data: any = {
       firstName: firstName?.trim() || null,
       lastName: lastName?.trim() || null,
       name: firstName?.trim() && lastName?.trim() ? `${firstName.trim()} ${lastName.trim()}` : firstName?.trim() || lastName?.trim() || null,
     };
-
-    console.log('📦 PATCH: Data preparado para guardar:', data);
 
     // Handle username update
     if (username !== undefined) {
@@ -199,29 +161,7 @@ export async function PATCH(request: Request) {
           data,
         });
 
-    console.log('💾 PATCH: Usuario actualizado en BD:', {
-      id: updatedUser.id,
-      firstName: updatedUser.firstName,
-      lastName: updatedUser.lastName,
-      name: updatedUser.name,
-      username: updatedUser.username
-    });
-
-    // Add debug info to response
-    const debugInfo = {
-      received: { firstName, lastName, birthDate, username },
-      processed: data,
-      saved: {
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        name: updatedUser.name
-      }
-    };
-
-    return NextResponse.json({
-      ...updatedUser,
-      _debug: debugInfo
-    });
+    return NextResponse.json(updatedUser);
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Error updating user' }, { status: 500 });
