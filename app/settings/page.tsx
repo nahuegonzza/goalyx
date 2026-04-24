@@ -33,7 +33,7 @@ export default function SettingsPage() {
 
     async function loadModules() {
       try {
-        const res = await fetch('/api/modules');
+        const res = await fetch('/api/modules', { credentials: 'include' });
         if (!res.ok) throw new Error('Error loading modules');
         const data = await res.json();
         setModules(data);
@@ -46,7 +46,7 @@ export default function SettingsPage() {
 
     async function loadUser() {
       try {
-        const res = await fetch('/api/user');
+        const res = await fetch('/api/user', { credentials: 'include' });
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
           throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
@@ -158,6 +158,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch(`/api/modules/${moduleId}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active }),
       });
@@ -178,6 +179,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch('/api/user', {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firstName: profileForm.firstName.trim(),
@@ -232,6 +234,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch('/api/auth/change-password', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentPassword: profileForm.currentPassword,

@@ -27,24 +27,31 @@ export async function GET() {
     await ensurePrismaUserForSession();
   }
 
-  await Promise.all(
-    moduleDefinitions.map((module) =>
-      prisma.module.upsert({
-        where: { slug: module.slug },
-        create: {
-          slug: module.slug,
-          name: module.name,
-          description: module.description,
+  for (const moduleDef of moduleDefinitions) {
+    const existingModule = await prisma.module.findFirst({
+      where: { userId, slug: moduleDef.slug }
+    });
+
+    if (!existingModule) {
+      await prisma.module.create({
+        data: {
+          slug: moduleDef.slug,
+          name: moduleDef.name,
+          description: moduleDef.description,
           userId,
           active: false
-        },
-        update: {
-          name: module.name,
-          description: module.description
         }
-      })
-    )
-  );
+      });
+    } else {
+      await prisma.module.update({
+        where: { id: existingModule.id },
+        data: {
+          name: moduleDef.name,
+          description: moduleDef.description
+        }
+      });
+    }
+  }
 
   const modules = await prisma.module.findMany({
     where: { userId },
@@ -87,19 +94,29 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Módulo no encontrado' }, { status: 404 });
   }
 
-  const updatedModule = await prisma.module.upsert({
-    where: { slug: payload.slug },
-    create: {
-      slug: payload.slug,
-      name: moduleDefinition.name,
-      description: moduleDefinition.description,
-      userId,
-      active: payload.active
-    },
-    update: {
-      active: payload.active
-    }
+  const existingModule = await prisma.module.findFirst({
+    where: { userId, slug: payload.slug }
   });
+
+  let updatedModule;
+  if (existingModule) {
+    updatedModule = await prisma.module.update({
+      where: { id: existingModule.id },
+      data: {
+        active: payload.active
+      }
+    });
+  } else {
+    updatedModule = await prisma.module.create({
+      data: {
+        slug: payload.slug,
+        name: moduleDefinition.name,
+        description: moduleDefinition.description,
+        userId,
+        active: payload.active
+      }
+    });
+  }
 
   return NextResponse.json({
     ...updatedModule,

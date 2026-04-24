@@ -47,7 +47,7 @@ export default function ProfilePage() {
       setLoading(true);
       
       // Load user data with better error handling
-      fetch('/api/user')
+      fetch('/api/user', { credentials: 'include' })
         .then(async (res) => {
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
@@ -79,7 +79,7 @@ export default function ProfilePage() {
       // Placeholder stats
       setStats({ goalsCompleted: 42, totalScore: 1250, streak: 7 });
 
-      fetch(`/api/streaks?date=${streakInfo.today}`)
+      fetch(`/api/streaks?date=${streakInfo.today}`, { credentials: 'include' })
         .then((res) => res.ok ? res.json() : Promise.reject())
         .then((data) => {
           setStreakInfo((prev) => ({

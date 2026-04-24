@@ -23,14 +23,40 @@ export function normalizeDatabaseUrl(url?: string) {
   // Remove accidental trailing semicolon or whitespace
   trimmedUrl = trimmedUrl.replace(/;$/, '').trim();
 
-  // Ensure SSL for pooler connections (port 6543 or pooler.supabase.com)
+  // Ensure SSL and libpq compatibility for pooler connections (port 6543 or pooler.supabase.com)
   if (/pooler\.supabase\.com|:6543/.test(trimmedUrl)) {
-    // Already has sslmode, don't duplicate
-    if (!/[?&]sslmode=/.test(trimmedUrl)) {
-      const separator = trimmedUrl.includes('?') ? '&' : '?';
-      return `${trimmedUrl}${separator}sslmode=require`;
+    try {
+      const url = new URL(trimmedUrl);
+      const params = url.searchParams;
+
+      if (!params.has('sslmode')) {
+        params.set('sslmode', 'require');
+      }
+      if (!params.has('sslaccept')) {
+        params.set('sslaccept', 'accept_invalid_certs');
+      }
+      if (!params.has('uselibpqcompat')) {
+        params.set('uselibpqcompat', 'true');
+      }
+
+      url.search = params.toString();
+      return url.toString();
+    } catch {
+      let result = trimmedUrl;
+      if (!/[?&]sslmode=/.test(result)) {
+        const separator = result.includes('?') ? '&' : '?';
+        result += `${separator}sslmode=require`;
+      }
+      if (!/[?&]sslaccept=/.test(result)) {
+        const separator = result.includes('?') ? '&' : '?';
+        result += `${separator}sslaccept=accept_invalid_certs`;
+      }
+      if (!/[?&]uselibpqcompat=/.test(result)) {
+        const separator = result.includes('?') ? '&' : '?';
+        result += `${separator}uselibpqcompat=true`;
+      }
+      return result;
     }
-    return trimmedUrl;
   }
 
   // Regular Supabase direct connection

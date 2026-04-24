@@ -117,13 +117,15 @@ model Module {
   user        User     @relation(fields: [userId], references: [id])
   userId      String
   name        String
-  slug        String   @unique
+  slug        String
   description String?
   active      Boolean  @default(true)
   config      String   @default("{}")
   createdAt   DateTime @default(now())
   events      Event[]
   entries     ModuleEntry[]
+
+  @@unique([userId, slug])
 }
 
 model ModuleEntry {
