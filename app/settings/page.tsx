@@ -20,11 +20,13 @@ export default function SettingsPage() {
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
+    username: '',
     birthDate: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [profileStatus, setProfileStatus] = useState('');
   const [profileType, setProfileType] = useState<'success' | 'error'>('success');
 
@@ -70,6 +72,7 @@ export default function SettingsPage() {
         setProfileForm({
           firstName,
           lastName,
+          username: data.username || '',
           birthDate,
           currentPassword: '',
           newPassword: '',
@@ -96,6 +99,7 @@ export default function SettingsPage() {
           setProfileForm({
             firstName,
             lastName,
+            username: '',
             birthDate,
             currentPassword: '',
             newPassword: '',
@@ -173,9 +177,52 @@ export default function SettingsPage() {
     }
   };
 
+  const checkUsernameAvailability = async (usernameValue: string) => {
+    if (!usernameValue.trim()) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+    if (!usernameRegex.test(usernameValue.trim())) {
+      setUsernameAvailable(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(usernameValue.trim())}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsernameAvailable(data.available);
+      } else {
+        setUsernameAvailable(false);
+      }
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(false);
+    }
+  };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileStatus('');
+
+    // Validate username if provided
+    if (profileForm.username.trim()) {
+      const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+      if (!usernameRegex.test(profileForm.username.trim())) {
+        setProfileStatus('El nombre de usuario debe tener 3-20 caracteres y solo contener letras, números, guiones y guiones bajos');
+        setProfileType('error');
+        return;
+      }
+
+      if (usernameAvailable === false) {
+        setProfileStatus('Este nombre de usuario no está disponible');
+        setProfileType('error');
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/user', {
         method: 'PATCH',
@@ -184,6 +231,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           firstName: profileForm.firstName.trim(),
           lastName: profileForm.lastName.trim(),
+          username: profileForm.username.trim() || null,
           birthDate: profileForm.birthDate || null
         })
       });
@@ -293,6 +341,32 @@ export default function SettingsPage() {
                     disabled
                     className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-300 cursor-not-allowed"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre de usuario</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={profileForm.username}
+                      onChange={(e) => {
+                        setProfileForm({ ...profileForm, username: e.target.value });
+                        checkUsernameAvailability(e.target.value);
+                      }}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      placeholder="tunombredeusuario"
+                    />
+                    {profileForm.username && (
+                      <div className="mt-1 text-sm">
+                        {usernameAvailable === true && (
+                          <span className="text-emerald-600 dark:text-emerald-400">✓ Nombre de usuario disponible</span>
+                        )}
+                        {usernameAvailable === false && (
+                          <span className="text-red-600 dark:text-red-400">✗ Nombre de usuario no disponible</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">3-20 caracteres, letras, números, guiones y guiones bajos</p>
                 </div>
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">

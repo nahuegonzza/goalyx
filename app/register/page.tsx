@@ -18,6 +18,7 @@ function getRegisterMessage(data: any, errorMessage: string) {
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -26,6 +27,7 @@ export default function RegisterPage() {
   const [status, setStatus] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [loading, setLoading] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +40,43 @@ export default function RegisterPage() {
       setStatusType('error');
       setLoading(false);
       return;
+    }
+
+    if (!username.trim()) {
+      setStatus('El nombre de usuario es obligatorio');
+      setStatusType('error');
+      setLoading(false);
+      return;
+    }
+
+    // Validate username format (alphanumeric, underscore, dash, 3-20 characters)
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+    if (!usernameRegex.test(username.trim())) {
+      setStatus('El nombre de usuario debe tener 3-20 caracteres y solo contener letras, números, guiones y guiones bajos');
+      setStatusType('error');
+      setLoading(false);
+      return;
+    }
+
+    // Check username availability
+    try {
+      const checkRes = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username.trim())}`);
+      if (!checkRes.ok) {
+        const errorData = await checkRes.json();
+        setStatus(errorData.error || 'Error verificando nombre de usuario');
+        setStatusType('error');
+        setLoading(false);
+        return;
+      }
+      const checkData = await checkRes.json();
+      if (!checkData.available) {
+        setStatus('Este nombre de usuario ya está en uso');
+        setStatusType('error');
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking username:', error);
     }
 
     if (password !== confirmPassword) {
@@ -56,6 +95,7 @@ export default function RegisterPage() {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           birth_date: birthDate,
+          username: username.trim().toLowerCase(),
         },
       },
     });
@@ -67,6 +107,21 @@ export default function RegisterPage() {
       const message = getRegisterMessage(data, 'Registro exitoso. Revisa tu correo para verificar tu cuenta.');
       setStatus(message);
       setStatusType('success');
+      
+      // Save username to database if sign up successful
+      if (data?.user) {
+        try {
+          await fetch('/api/user', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username.trim().toLowerCase() }),
+            credentials: 'include'
+          });
+        } catch (err) {
+          console.error('Error saving username:', err);
+        }
+      }
+
       if (data?.session) {
         router.refresh();
         router.push('/');
@@ -74,6 +129,32 @@ export default function RegisterPage() {
     }
 
     setLoading(false);
+  };
+
+  const checkUsernameAvailability = async (usernameValue: string) => {
+    if (!usernameValue.trim()) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+    if (!usernameRegex.test(usernameValue.trim())) {
+      setUsernameAvailable(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(usernameValue.trim())}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsernameAvailable(data.available);
+      } else {
+        setUsernameAvailable(false);
+      }
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(false);
+    }
   };
 
   return (
@@ -144,6 +225,37 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+          </div>
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
+              Nombre de usuario
+            </label>
+            <div className="relative">
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="tunombredeusuario"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  checkUsernameAvailability(e.target.value);
+                }}
+              />
+              {username && (
+                <div className="mt-1 text-sm">
+                  {usernameAvailable === true && (
+                    <span className="text-emerald-400">✓ Nombre de usuario disponible</span>
+                  )}
+                  {usernameAvailable === false && (
+                    <span className="text-red-400">✗ Nombre de usuario no disponible</span>
+                  )}
+                </div>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-slate-500">3-20 caracteres, letras, números, guiones y guiones bajos</p>
           </div>
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">

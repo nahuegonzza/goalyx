@@ -125,6 +125,9 @@ export default function ProfilePage() {
                     <span className="font-medium">Email:</span> {userData?.email || session?.user?.email || 'No disponible'}
                   </p>
                   <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium">Usuario:</span> {userData?.username || 'No establecido'}
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400">
                     <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
                   </p>
                   {calculateAge(userData?.birthDate) !== null && (

@@ -86,13 +86,44 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, birthDate } = body;
+    const { firstName, lastName, birthDate, username } = body;
 
     const data: any = {
       firstName: firstName || null,
       lastName: lastName || null,
       name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null,
     };
+
+    // Handle username update
+    if (username !== undefined) {
+      const normalizedUsername = username ? username.trim().toLowerCase() : null;
+      
+      if (normalizedUsername) {
+        // Validate username format
+        const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+        if (!usernameRegex.test(normalizedUsername)) {
+          return NextResponse.json(
+            { error: 'El nombre de usuario debe tener 3-20 caracteres y solo contener letras, números, guiones y guiones bajos' },
+            { status: 400 }
+          );
+        }
+
+        // Check if username is already taken by another user
+        const existingUser = await prisma.user.findUnique({
+          where: { username: normalizedUsername },
+          select: { id: true }
+        });
+
+        if (existingUser && existingUser.id !== userId) {
+          return NextResponse.json(
+            { error: 'Este nombre de usuario ya está en uso' },
+            { status: 409 }
+          );
+        }
+      }
+
+      data.username = normalizedUsername;
+    }
 
     // TODO: Uncomment birthDate handling after migration is applied
     // if (birthDate) {
@@ -120,6 +151,7 @@ export async function PATCH(request: Request) {
             firstName: data.firstName,
             lastName: data.lastName,
             name: data.name,
+            username: data.username,
           },
         })
       : await prisma.user.update({

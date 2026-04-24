@@ -18,7 +18,7 @@ function getLoginErrorMessage(defaultMessage: string, fallbackMessage: string) {
 }
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,22 +31,47 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const input = emailOrUsername.trim().toLowerCase();
+    let emailToUse = input;
+
+    // Check if input is an email or username
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+    
+    if (!isEmail) {
+      // It's a username, try to find the associated email
+      try {
+        const response = await fetch(`/api/auth/get-email-by-username?username=${encodeURIComponent(input)}`);
+        if (response.ok) {
+          const data = await response.json();
+          emailToUse = data.email;
+        } else {
+          setError('Usuario o contraseña incorrectos');
+          setLoading(false);
+          return;
+        }
+      } catch (checkError) {
+        console.error('Error looking up username:', checkError);
+        setError('Usuario o contraseña incorrectos');
+        setLoading(false);
+        return;
+      }
+    }
+
     const supabase = createBrowserSupabaseClient();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: emailToUse,
       password,
     });
 
-    if (error) {
-      let message = getLoginErrorMessage(error.message, 'Email o contraseña incorrectos');
+    if (authError) {
+      let message = getLoginErrorMessage(authError.message, 'Usuario o contraseña incorrectos');
       try {
-        const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(normalizedEmail)}`);
+        const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(emailToUse)}`);
         if (response.ok) {
           const details = await response.json();
           if (details.serviceRoleAvailable) {
             if (!details.exists) {
-              message = 'No existe ninguna cuenta con ese email.';
+              message = 'No existe ninguna cuenta con ese usuario o email.';
             } else if (!details.emailConfirmed) {
               message = 'El email aún no está verificado. Revisa tu correo.';
             } else {
@@ -99,18 +124,18 @@ export default function LoginPage() {
         {!showForgotPassword ? (
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                Email
+              <label htmlFor="emailOrUsername" className="block text-sm font-medium text-slate-300 mb-2">
+                Email o Usuario
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="emailOrUsername"
+                name="emailOrUsername"
+                type="text"
                 required
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@email.com o tunombredeusuario"
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
               />
             </div>
             <div>
