@@ -41,7 +41,7 @@ export async function GET() {
         ...dbUser,
         firstName: dbUser.firstName || (metadata?.first_name ?? metadata?.firstName) || null,
         lastName: dbUser.lastName || (metadata?.last_name ?? metadata?.lastName) || null,
-        // birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null), // TODO: Uncomment after migration
+        birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null),
         name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
       };
 
@@ -125,16 +125,16 @@ export async function PATCH(request: Request) {
       data.username = normalizedUsername;
     }
 
-    // TODO: Uncomment birthDate handling after migration is applied
-    // if (birthDate) {
-    //   const date = new Date(birthDate);
-    //   if (isNaN(date.getTime())) {
-    //     return NextResponse.json({ error: 'Invalid birthDate' }, { status: 400 });
-    //   }
-    //   data.birthDate = date;
-    // } else if (birthDate === '') {
-    //   data.birthDate = null;
-    // }
+    // Handle birthDate update
+    if (birthDate) {
+      const date = new Date(birthDate);
+      if (isNaN(date.getTime())) {
+        return NextResponse.json({ error: 'Invalid birthDate' }, { status: 400 });
+      }
+      data.birthDate = date;
+    } else if (birthDate === '') {
+      data.birthDate = null;
+    }
 
     const email = user?.email;
     if (user && !email) {
