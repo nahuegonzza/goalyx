@@ -35,8 +35,9 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // If user has incomplete data, try to enrich from Supabase metadata
-    if (user && (!dbUser.firstName || !dbUser.lastName)) {
+    // Only enrich from Supabase metadata if BOTH firstName AND lastName are missing
+    // Don't overwrite existing data with null values
+    if (user && !dbUser.firstName && !dbUser.lastName) {
       const metadata = user.user_metadata as Record<string, any> | undefined;
 
       const enrichedUser = {
@@ -47,8 +48,11 @@ export async function GET() {
         name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
       };
 
-      // Update the database with enriched data
-      if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName) {
+      // Only update database if we actually got new data from Supabase metadata (not null)
+      const hasNewFirstName = enrichedUser.firstName && enrichedUser.firstName !== dbUser.firstName;
+      const hasNewLastName = enrichedUser.lastName && enrichedUser.lastName !== dbUser.lastName;
+      
+      if (hasNewFirstName || hasNewLastName) {
         await prisma.user.update({
           where: { id: dbUser.id },
           data: {
@@ -58,9 +62,12 @@ export async function GET() {
             name: enrichedUser.name
           }
         });
+        // Return enriched data only if we actually updated
+        return NextResponse.json(enrichedUser);
       }
 
-      return NextResponse.json(enrichedUser);
+      // No new data from Supabase, return original database user
+      return NextResponse.json(dbUser);
     }
 
     return NextResponse.json(dbUser);
