@@ -640,7 +640,7 @@ export default function GoalManager() {
                         {/* Días de la semana en edición */}
                         <div>
                           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(vacío = todos los días)'}
+                            Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
                           </label>
                           <div className="flex gap-2 justify-center">
                             {[
@@ -677,7 +677,7 @@ export default function GoalManager() {
                             })}
                           </div>
                           <p className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
-                            {(editForm.weekDays as number[])?.length > 0
+                            {(editForm.weekDays as number[])?.length > 0 && (editForm.weekDays as number[]).length < 7
                               ? `Este objetivo aparecerá solo los días: ${(editForm.weekDays as number[]).map(d => ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d]).join(', ')}`
                               : 'Este objetivo aparecerá todos los días'}
                           </p>
@@ -1045,7 +1045,7 @@ export default function GoalManager() {
                           {/* Días de la semana en edición */}
                           <div>
                             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                              Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(vacío = todos los días)'}
+                              Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
                             </label>
                             <div className="flex gap-2 justify-center">
                               {[
@@ -1082,7 +1082,7 @@ export default function GoalManager() {
                               })}
                             </div>
                             <p className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
-                              {(editForm.weekDays as number[])?.length > 0
+                              {(editForm.weekDays as number[])?.length > 0 && (editForm.weekDays as number[]).length < 7
                                 ? `Este objetivo aparecerá solo los días: ${(editForm.weekDays as number[]).map(d => ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d]).join(', ')}`
                                 : 'Este objetivo aparecerá todos los días'}
                             </p>

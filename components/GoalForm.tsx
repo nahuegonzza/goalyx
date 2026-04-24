@@ -333,7 +333,7 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
       {/* Días de la semana */}
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-          Días de la semana {form.weekDays && form.weekDays.length > 0 ? `(seleccionados: ${form.weekDays.length})` : '(vacío = todos los días)'}
+          Días de la semana {form.weekDays && form.weekDays.length > 0 ? `(seleccionados: ${form.weekDays.length})` : '(Todos los días)'}
         </label>
         <div className="flex gap-2 justify-center">
           {WEEK_DAYS.map((day) => {
@@ -356,7 +356,7 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
           })}
         </div>
         <p className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
-          {form.weekDays && form.weekDays.length > 0
+          {form.weekDays && form.weekDays.length > 0 && form.weekDays.length < 7
             ? `Este objetivo aparecerá solo los días: ${form.weekDays.map(d => WEEK_DAYS.find(wd => wd.index === d)?.full).join(', ')}`
             : 'Este objetivo aparecerá todos los días'}
         </p>
