@@ -23,6 +23,17 @@ export async function GET() {
       where: { id: userId }
     });
 
+    console.log('🔍 Usuario encontrado en BD:', {
+      id: dbUser?.id,
+      email: dbUser?.email,
+      name: dbUser?.name,
+      firstName: dbUser?.firstName,
+      lastName: dbUser?.lastName,
+      username: dbUser?.username,
+      birthDate: dbUser?.birthDate?.toISOString(),
+      updatedAt: dbUser?.updatedAt?.toISOString()
+    });
+
     if (!dbUser && user) {
       dbUser = await ensurePrismaUserForSession();
     } else if (dbUser && user) {
@@ -36,7 +47,15 @@ export async function GET() {
 
     // If user has incomplete data, try to enrich from Supabase metadata
     if (user && (!dbUser.firstName || !dbUser.lastName)) {
+      console.log('🔄 Enriqueciendo datos - condición activada:', {
+        dbUserFirstName: dbUser.firstName,
+        dbUserLastName: dbUser.lastName,
+        condition: !dbUser.firstName || !dbUser.lastName
+      });
+
       const metadata = user.user_metadata as Record<string, any> | undefined;
+      console.log('📊 Metadata de Supabase:', metadata);
+
       const enrichedUser = {
         ...dbUser,
         firstName: dbUser.firstName || (metadata?.first_name ?? metadata?.firstName) || null,
@@ -44,6 +63,12 @@ export async function GET() {
         birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null),
         name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
       };
+
+      console.log('🎯 Usuario enriquecido:', {
+        firstName: enrichedUser.firstName,
+        lastName: enrichedUser.lastName,
+        name: enrichedUser.name
+      });
 
       // Update the database with enriched data
       if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName) {
@@ -60,6 +85,12 @@ export async function GET() {
 
       return NextResponse.json(enrichedUser);
     }
+
+    console.log('✅ Devolviendo usuario sin enriquecimiento:', {
+      firstName: dbUser.firstName,
+      lastName: dbUser.lastName,
+      name: dbUser.name
+    });
 
     return NextResponse.json(dbUser);
   } catch (error) {
