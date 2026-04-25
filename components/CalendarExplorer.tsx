@@ -328,7 +328,7 @@ export default function CalendarExplorer() {
     setViewDate(next);
   };
 
-  const displayLabel = mode === 'monthly' ? formatMonthLabel(viewDate) : mode === 'annual' ? viewDate.getFullYear() : selectedDate;
+  const displayLabel = mode === 'monthly' ? formatMonthLabel(viewDate) : mode === 'annual' ? viewDate.getFullYear().toString() : selectedDate.split('-').reverse().join('/');
 
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg transition-all duration-200">

@@ -177,7 +177,7 @@ export default function HistoryViewer() {
               Historial
             </p>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {selectedDate}
+              {selectedDate.split('-').reverse().join('/')}
             </h2>
           </div>
           <div className="flex items-center gap-1 flex-wrap">
