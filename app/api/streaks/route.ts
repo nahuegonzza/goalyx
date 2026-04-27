@@ -49,14 +49,16 @@ function calculateStreaks(dateKeys: string[], referenceDate: string) {
     prevDate = currentDate;
   });
 
-  if (uniqueDates.length > 0) {
-    let streakDate = new Date(`${uniqueDates[uniqueDates.length - 1]}T00:00:00Z`);
-    const dateSet = new Set(uniqueDates);
+  const dateSet = new Set(uniqueDates);
+  if (dateSet.has(referenceDate)) {
     currentStreak = 0;
+    let streakDate = new Date(`${referenceDate}T00:00:00Z`);
     while (dateSet.has(getDateKey(streakDate))) {
       currentStreak += 1;
       streakDate.setUTCDate(streakDate.getUTCDate() - 1);
     }
+  } else {
+    currentStreak = 0;
   }
 
   return { currentStreak, longestStreak };
