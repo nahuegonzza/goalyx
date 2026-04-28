@@ -24,127 +24,80 @@ const defaultStates: MoodState[] = [
   { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4' },
 ];
 
-// Emojis de caras disponibles
 const availableEmojis = ['😊', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😉', '😌', '😍', '🥰', '😘', '😎', '🤩', '😇', '🤗', '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯', '😪', '😫', '🥱', '😴', '😌', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'];
 
-// Colores disponibles
-const availableColors = [
-  '#22c55e', // verde
-  '#3b82f6', // azul
-  '#ef4444', // rojo
-  '#f59e0b', // amarillo/naranja
-  '#a855f7', // púrpura
-  '#06b6d4', // cian
-  '#ec4899', // rosa
-  '#84cc16', // lima
-  '#f97316', // naranja
-  '#14b8a6', // teal
-];
+const availableColors = ['#22c55e', '#3b82f6', '#ef4444', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6'];
 
 export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose }) => {
   const [states, setStates] = useState<MoodState[]>(
     (config.states as MoodState[]) || defaultStates
   );
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [newTitle, setNewTitle] = useState('');
-  const [newEmoji, setNewEmoji] = useState('');
-  const [newColor, setNewColor] = useState('');
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
     setStates(states.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
 
   const handleDeleteState = (id: string) => {
-    if (states.length <= 1) {
-      alert('Debe haber al menos un estado');
-      return;
-    }
+    if (states.length <= 1) return;
     setStates(states.filter(s => s.id !== id));
   };
 
   const handleAddState = () => {
     const id = `state_${Date.now()}`;
-    setStates([...states, { id, title: 'Nuevo estado', emoji: '😐', color: '#6b7280' }]);
-    setEditingId(id);
-    setNewTitle('Nuevo estado');
-    setNewEmoji('😐');
-    setNewColor('#6b7280');
+    setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280' }]);
   };
 
   const handleSave = () => {
-    onSave({
-      ...config,
-      states,
-      maxPoints: config.maxPoints || 1,
-    });
+    onSave({ ...config, states, maxPoints: config.maxPoints || 1 });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+      {/* Modal: En móvil se pega abajo como un "Action Sheet" */}
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
+        
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Configurar Estados
           </h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
+          <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
             ✕
           </button>
         </div>
 
-        <div className="mb-4">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Define los estados de ánimo disponibles. Cada estado tiene un título, emoji y color.
-          </p>
-        </div>
+        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+          Personaliza tus estados de ánimo.
+        </p>
 
         <div className="space-y-3">
           {states.map((state) => (
             <div
               key={state.id}
-              className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
             >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full text-xl shrink-0"
-                style={{ backgroundColor: state.color + '20' }}
-              >
-                {state.emoji}
-              </div>
-              
-              <input
-                type="text"
-                value={state.title}
-                onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
-                className="flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm"
-                placeholder="Título del estado"
-              />
-
-              {/* Controles en móvil: fila horizontal compacta */}
-              <div className="flex items-center gap-1 justify-end shrink-0">
-              {/* Selector de emoji */}
-              <div className="relative">
+              {/* Emoji Picker Button (Unificado) */}
+              <div className="relative shrink-0">
                 <button
                   type="button"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 text-lg dark:border-slate-600"
                   onClick={() => setEditingId(editingId === state.id ? null : state.id)}
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
+                  style={{ backgroundColor: state.color + '20' }}
                 >
                   {state.emoji}
                 </button>
                 
                 {editingId === state.id && (
-                  <div className="absolute right-0 top-12 z-10 max-h-48 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                  <div className="absolute left-0 top-12 z-20 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                     <div className="grid grid-cols-6 gap-1">
                       {availableEmojis.map((emoji) => (
                         <button
                           key={emoji}
-                          type="button"
                           onClick={() => {
                             handleUpdateState(state.id, 'emoji', emoji);
                             setEditingId(null);
                           }}
-                          className="flex h-8 w-8 items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-700"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           {emoji}
                         </button>
@@ -154,43 +107,53 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                 )}
               </div>
 
-              {/* Selector de color */}
-              <div className="relative">
+              {/* Input de Título */}
+              <input
+                type="text"
+                value={state.title}
+                onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
+                className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
+                placeholder="Nombre del estado..."
+              />
+
+              {/* Acciones Derecha */}
+              <div className="flex items-center gap-2">
+                {/* Color Picker */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="h-6 w-6 rounded-full border-2 border-white shadow-sm dark:border-slate-700"
+                    style={{ backgroundColor: state.color }}
+                    onClick={() => setEditingId(editingId === state.id + '_color' ? null : state.id + '_color')}
+                  />
+                  
+                  {editingId === state.id + '_color' && (
+                    <div className="absolute right-0 top-10 z-20 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                      <div className="grid grid-cols-5 gap-1">
+                        {availableColors.map((color) => (
+                          <button
+                            key={color}
+                            onClick={() => {
+                              handleUpdateState(state.id, 'color', color);
+                              setEditingId(null);
+                            }}
+                            className="h-8 w-8 rounded-full border-2 border-transparent hover:scale-110"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Botón Eliminar */}
                 <button
                   type="button"
-                  className="h-9 w-9 rounded-full border-2 border-slate-300 dark:border-slate-600"
-                  style={{ backgroundColor: state.color }}
-                  onClick={() => setEditingId(editingId === state.id + '_color' ? null : state.id + '_color')}
-                />
-                
-                {editingId === state.id + '_color' && (
-                  <div className="absolute right-0 top-12 z-10 rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-                    <div className="grid grid-cols-5 gap-1">
-                      {availableColors.map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          onClick={() => {
-                            handleUpdateState(state.id, 'color', color);
-                            setEditingId(null);
-                          }}
-                          className="h-8 w-8 rounded-full border-2 border-transparent hover:border-slate-400"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleDeleteState(state.id)}
-                className="rounded-lg p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
-                title="Eliminar estado"
-              >
-                🗑️
-              </button>
+                  onClick={() => handleDeleteState(state.id)}
+                  className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <TrashIcon />
+                </button>
               </div>
             </div>
           ))}
@@ -199,23 +162,21 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
         <button
           type="button"
           onClick={handleAddState}
-          className="mt-4 w-full rounded-lg border-2 border-dashed border-slate-300 py-3 text-sm font-medium text-slate-500 hover:border-slate-400 hover:text-slate-600 dark:border-slate-600 dark:hover:border-slate-500"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-sm font-bold text-slate-500 transition-colors hover:border-emerald-500 hover:text-emerald-500 dark:border-slate-700"
         >
-          + Agregar estado
+          <span>+</span> Agregar estado
         </button>
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-8 flex gap-3">
           <button
-            type="button"
             onClick={onClose}
-            className="flex-1 rounded-lg border border-slate-300 py-3 font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="flex-1 rounded-xl bg-slate-100 py-3.5 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
           >
             Cancelar
           </button>
           <button
-            type="button"
             onClick={handleSave}
-            className="flex-1 rounded-lg bg-emerald-600 py-3 font-medium text-white hover:bg-emerald-700"
+            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600"
           >
             Guardar
           </button>
@@ -224,3 +185,8 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     </div>
   );
 };
+
+// Icono simple para no depender de librerías externas
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+);
