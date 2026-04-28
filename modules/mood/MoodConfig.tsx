@@ -122,14 +122,15 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                 <div className="relative">
                   <button
                     type="button"
-                    className="h-6 w-6 rounded-full border-2 border-white shadow-sm dark:border-slate-700"
+                    className="h-7 w-7 rounded-full border-2 border-white shadow-sm dark:border-slate-600 transition-transform hover:scale-110"
                     style={{ backgroundColor: state.color }}
                     onClick={() => setEditingId(editingId === state.id + '_color' ? null : state.id + '_color')}
                   />
                   
                   {editingId === state.id + '_color' && (
-                    <div className="absolute right-0 top-10 z-20 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                      <div className="grid grid-cols-5 gap-1">
+                    <div className="absolute right-0 top-12 z-20 w-56 rounded-xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Selecciona un color</p>
+                      <div className="grid grid-cols-5 gap-2">
                         {availableColors.map((color) => (
                           <button
                             key={color}
@@ -137,7 +138,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                               handleUpdateState(state.id, 'color', color);
                               setEditingId(null);
                             }}
-                            className="h-8 w-8 rounded-full border-2 border-transparent hover:scale-110"
+                            className="aspect-square rounded-full border-2 border-transparent transition-all hover:scale-125 hover:border-slate-400 dark:hover:border-slate-500"
                             style={{ backgroundColor: color }}
                           />
                         ))}
