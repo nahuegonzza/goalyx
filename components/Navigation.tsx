@@ -112,7 +112,7 @@ export default function Navigation() {
             ))}
             <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
             <Link href="/settings/modules" className={getLinkClasses('/settings/modules')} title="Módulos">
-              <span className="text-lg">📦</span>
+              <img src="/navbar_icons/modules_icon.png" alt="Módulos" className={getIconClasses('/settings/modules')} />
             </Link>
             <Link href="/settings" className={getLinkClasses('/settings')} title="Ajustes">
               <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className={getIconClasses('/settings')} />
@@ -139,7 +139,7 @@ export default function Navigation() {
           </div>
 
           <Link href="/settings/modules" title="Módulos" className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath('/settings/modules') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
-            <span className="text-xl">📦</span>
+            <img src="/navbar_icons/modules_icon.png" alt="Módulos" className="w-6 h-6" />
           </Link>
           <Link href="/settings" title="Ajustes" className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath('/settings') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
             <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-6 h-6" />

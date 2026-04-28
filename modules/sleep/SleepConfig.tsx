@@ -181,7 +181,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 active:bg-indigo-600"
+            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600"
           >
             Guardar
           </button>
