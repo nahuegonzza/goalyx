@@ -280,7 +280,11 @@ export default function RegisterPage() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
             >
-              {showPassword ? '🙈' : '👁️'}
+              <img
+                src={showPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                alt={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                className="w-5 h-5"
+              />
             </button>
           </div>
           </div>
@@ -304,7 +308,11 @@ export default function RegisterPage() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
             >
-              {showConfirmPassword ? '🙈' : '👁️'}
+              <img
+                src={showConfirmPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                alt={showConfirmPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                className="w-5 h-5"
+              />
             </button>
           </div>
           </div>

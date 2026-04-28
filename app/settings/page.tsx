@@ -493,7 +493,11 @@ export default function SettingsPage() {
                       onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
-                      {showCurrentPassword ? '🙈' : '👁️'}
+                      <img
+                        src={showCurrentPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        alt={showCurrentPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                        className="w-5 h-5"
+                      />
                     </button>
                   </div>
                   </div>
@@ -512,7 +516,11 @@ export default function SettingsPage() {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
-                      {showNewPassword ? '🙈' : '👁️'}
+                      <img
+                        src={showNewPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        alt={showNewPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                        className="w-5 h-5"
+                      />
                     </button>
                   </div>
                   </div>
@@ -531,7 +539,11 @@ export default function SettingsPage() {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
-                      {showConfirmPassword ? '🙈' : '👁️'}
+                      <img
+                        src={showConfirmPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        alt={showConfirmPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                        className="w-5 h-5"
+                      />
                     </button>
                   </div>
                   </div>
