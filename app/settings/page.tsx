@@ -515,7 +515,6 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
-          </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Módulos</h2>
