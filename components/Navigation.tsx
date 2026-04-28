@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getLocalDateString } from '@lib/dateHelpers';
 import { useEffect, useState } from 'react';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -40,7 +41,9 @@ export default function Navigation() {
     }
 
     try {
-      const res = await fetch('/api/streaks');
+      // Usar fecha local para evitar desfase UTC
+      const today = getLocalDateString();
+      const res = await fetch(`/api/streaks?date=${today}`);
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
