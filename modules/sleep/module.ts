@@ -13,13 +13,13 @@ export const sleepModule: ModuleDefinition = {
     penaltyMode: 'automatic', // 'automatic' or 'manual'
     penaltyPerHour: 1, // for manual mode
   },
-  calculateScore: (entries: ModuleEntry[], config: Record<string, unknown>) => {
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().slice(0, 10);
+  calculateScore: (entries: ModuleEntry[], config: Record<string, unknown>, targetDate?: string) => {
+    // Usar la fecha objetivo proporcionada o hoy por defecto
+    const target = targetDate || new Date().toISOString().slice(0, 10);
     
     const todayEntry = entries.find(e => {
       const entryDate = e.date.slice(0, 10); // Extract YYYY-MM-DD from ISO string
-      return entryDate === today;
+      return entryDate === target;
     });
     if (!todayEntry) return 0;
 

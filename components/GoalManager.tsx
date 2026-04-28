@@ -588,18 +588,6 @@ export default function GoalManager() {
                               </div>
                             )}
                           </div>
-                          <div>
-                            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Fecha de inicio</label>
-                            <input
-                              type="date"
-                              value={editForm.activatedAt ? editForm.activatedAt.slice(0, 10) : ''}
-                              onChange={(event) => setEditForm({
-                                ...editForm,
-                                activatedAt: event.target.value ? new Date(event.target.value).toISOString() : undefined
-                              })}
-                              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
-                            />
-                          </div>
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2">
@@ -1005,18 +993,6 @@ export default function GoalManager() {
                                   )}
                                 </div>
                               )}
-                            </div>
-                            <div>
-                              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Fecha de inicio</label>
-                              <input
-                                type="date"
-                                value={editForm.activatedAt ? editForm.activatedAt.slice(0, 10) : ''}
-                                onChange={(event) => setEditForm({
-                                  ...editForm,
-                                  activatedAt: event.target.value ? new Date(event.target.value).toISOString() : undefined
-                                })}
-                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
-                              />
                             </div>
                           </div>
 
@@ -1426,18 +1402,6 @@ export default function GoalManager() {
                                   )}
                                 </div>
                               )}
-                            </div>
-                            <div>
-                              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Fecha de inicio</label>
-                              <input
-                                type="date"
-                                value={editForm.activatedAt ? editForm.activatedAt.slice(0, 10) : ''}
-                                onChange={(event) => setEditForm({
-                                  ...editForm,
-                                  activatedAt: event.target.value ? new Date(event.target.value).toISOString() : undefined
-                                })}
-                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
-                              />
                             </div>
                           </div>
 

@@ -132,7 +132,7 @@ export default function CalendarExplorer() {
       const mod = activeModules.find(m => m.id === entry.moduleId);
       if (mod?.definition?.calculateScore) {
         const moduleEntriesForDay = moduleEntries.filter(e => e.moduleId === mod.id && e.date.slice(0, 10) === dateKey);
-        const modulePoints = mod.definition.calculateScore(moduleEntriesForDay, mod.config);
+        const modulePoints = mod.definition.calculateScore(moduleEntriesForDay, mod.config, dateKey);
         const existing = map.get(dateKey) ?? { points: 0, entries: [], events: [] };
         existing.points += modulePoints;
         map.set(dateKey, existing);

@@ -8,20 +8,22 @@ interface SleepDashboardProps {
   module: any; // ModuleState
   onUpdate?: (data: any) => void;
   isEditing?: boolean;
+  date?: string; // Fecha seleccionada del calendario
 }
 
-export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, onUpdate, isEditing = false }) => {
+export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
   const [bedtime, setBedtime] = useState('');
   const [waketime, setWaketime] = useState('');
   const [loading, setLoading] = useState(true);
   const [points, setPoints] = useState(0);
 
-  const today = getLocalDateString();
+  // Usar la fecha proporcionada o hoy por defecto
+  const selectedDate = date || getLocalDateString();
 
   useEffect(() => {
     async function loadTodayEntry() {
       try {
-        const res = await fetch(`/api/moduleEntries?date=${today}&module=sleep`);
+        const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=sleep`);
         const entries = await res.json();
         if (entries && entries.length > 0) {
           const entry = entries[0];
@@ -36,7 +38,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       }
     }
     loadTodayEntry();
-  }, [today]);
+  }, [selectedDate]);
 
   const calculateHours = () => {
     if (!bedtime || !waketime) return 0;
@@ -83,7 +85,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           moduleId: module.id,
-          date: today,
+          date: selectedDate,
           data: { bedtime, waketime, hours }
         })
       });
