@@ -82,7 +82,21 @@ export default function ProfilePage() {
         });
 
       // Placeholder stats
-      setStats({ goalsCompleted: 42, totalScore: 1250, streak: 7 });
+      // setStats({ goalsCompleted: 42, totalScore: 1250, streak: 7 });
+
+      // Fetch real stats from API
+      fetch('/api/user/stats', { credentials: 'include' })
+        .then((res) => res.ok ? res.json() : Promise.reject())
+        .then((data) => {
+          setStats({
+            goalsCompleted: data.goalsCompleted || 0,
+            totalScore: data.totalScore || 0,
+            streak: streakInfo.currentStreak
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading user stats:', error);
+        });
 
       fetch(`/api/streaks?date=${streakInfo.today}`, { credentials: 'include' })
         .then((res) => res.ok ? res.json() : Promise.reject())

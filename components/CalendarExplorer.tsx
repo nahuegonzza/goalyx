@@ -519,7 +519,7 @@ export default function CalendarExplorer() {
                     <button
                       type="button"
                       onClick={handleSaveAllDayEntries}
-                      className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+                      className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
                     >
                       💾 Guardar día
                     </button>

@@ -134,7 +134,7 @@ export default function LoginPage() {
                 name="emailOrUsername"
                 type="text"
                 required
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="tu@email.com o tunombredeusuario"
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}

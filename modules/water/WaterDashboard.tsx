@@ -75,7 +75,7 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
         <div className="flex gap-2">
           <button
             onClick={addGlass}
-            className="flex-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+            className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
           >
             + Vaso
           </button>
