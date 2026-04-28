@@ -123,7 +123,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               borderWidth: '2px',
               borderStyle: 'solid',
               color: state.color,
-              ringColor: state.color,
+              ['--tw-ring-color' as any]: state.color,
             }}
           >
             <span className="text-lg">{state.emoji}</span>
