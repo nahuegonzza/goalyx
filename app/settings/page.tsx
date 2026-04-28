@@ -31,6 +31,8 @@ export default function SettingsPage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [profileStatus, setProfileStatus] = useState('');
   const [profileType, setProfileType] = useState<'success' | 'error'>('success');
+  const [profileCollapsed, setProfileCollapsed] = useState(false);
+  const [passwordCollapsed, setPasswordCollapsed] = useState(false);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -358,8 +360,17 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Perfil</h2>
+          <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setProfileCollapsed(!profileCollapsed)}
+              className="w-full flex items-center justify-between p-6 text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Perfil</h2>
+              <span className={`transform transition-transform ${profileCollapsed ? '' : 'rotate-90'} text-slate-500`}>▶</span>
+            </button>
+            {!profileCollapsed && (
+              <div className="px-6 pb-6 space-y-6">
             {userLoading ? (
               <p className="text-slate-500 dark:text-slate-400">Cargando...</p>
             ) : user ? (
@@ -438,8 +449,32 @@ export default function SettingsPage() {
                     Actualizar Perfil
                   </button>
                 </form>
-                <form onSubmit={handleChangePassword} className="space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4">
-                  <h3 className="text-md font-semibold text-slate-900 dark:text-white">Cambiar Contraseña</h3>
+                {profileStatus && (
+                  <p className={`text-sm font-medium ${profileType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {profileStatus}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-slate-500 dark:text-slate-400">Error cargando perfil</p>
+            )}
+              </div>
+            )}
+          </div>
+
+          {/* Cambiar Contraseña - sección separada */}
+          <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setPasswordCollapsed(!passwordCollapsed)}
+              className="w-full flex items-center justify-between p-6 text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Cambiar Contraseña</h2>
+              <span className={`transform transition-transform ${passwordCollapsed ? '' : 'rotate-90'} text-slate-500`}>▶</span>
+            </button>
+            {!passwordCollapsed && (
+              <div className="px-6 pb-6">
+                <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña Actual</label>
                     <input
@@ -477,15 +512,9 @@ export default function SettingsPage() {
                     Cambiar Contraseña
                   </button>
                 </form>
-                {profileStatus && (
-                  <p className={`text-sm font-medium ${profileType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
-                    {profileStatus}
-                  </p>
-                )}
               </div>
-            ) : (
-              <p className="text-slate-500 dark:text-slate-400">Error cargando perfil</p>
             )}
+          </div>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
