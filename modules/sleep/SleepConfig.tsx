@@ -21,58 +21,170 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
       penaltyMode,
       penaltyPerHour,
     });
-    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">Configuración de Sueño</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium">Horas ideales</label>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+      {/* Modal: En móvil se pega abajo como un "Action Sheet" */}
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
+        
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>🌙</span>
+            Configurar Sueño
+          </h2>
+          <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+            ✕
+          </button>
+        </div>
+
+        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+          Ajusta tus objetivos de sueño.
+        </p>
+
+        <div className="space-y-5">
+          {/* Horas ideales */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Horas ideales de sueño
+            </label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setIdealHours(Math.max(1, idealHours - 0.5))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                -
+              </button>
+              <span className="text-3xl font-bold text-slate-900 dark:text-white w-16 text-center">
+                {idealHours}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIdealHours(Math.min(14, idealHours + 0.5))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                +
+              </button>
+              <span className="text-sm text-slate-500">horas</span>
+            </div>
             <input
-              type="number"
+              type="range"
+              min="1"
+              max="14"
+              step="0.5"
               value={idealHours}
               onChange={(e) => setIdealHours(Number(e.target.value))}
-              className="mt-1 block w-full border rounded px-3 py-2"
+              className="mt-3 w-full accent-indigo-500"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium">Puntos máximos</label>
-            <input
-              type="number"
-              value={maxPoints}
-              onChange={(e) => setMaxPoints(Number(e.target.value))}
-              className="mt-1 block w-full border rounded px-3 py-2"
-            />
+
+          {/* Puntos máximos */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Puntos máximos por día
+            </label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setMaxPoints(Math.max(1, maxPoints - 1))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                -
+              </button>
+              <span className="text-3xl font-bold text-slate-900 dark:text-white w-16 text-center">
+                {maxPoints}
+              </span>
+              <button
+                type="button"
+                onClick={() => setMaxPoints(Math.min(10, maxPoints + 1))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                +
+              </button>
+              <span className="text-sm text-slate-500">puntos</span>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium">Modo de penalización</label>
-            <select
-              value={penaltyMode}
-              onChange={(e) => setPenaltyMode(e.target.value)}
-              className="mt-1 block w-full border rounded px-3 py-2"
-            >
-              <option value="automatic">Automática</option>
-              <option value="manual">Manual</option>
-            </select>
+
+          {/* Modo de penalización */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              Modo de penalización
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPenaltyMode('automatic')}
+                className={`rounded-lg py-3 px-4 text-sm font-semibold transition ${
+                  penaltyMode === 'automatic'
+                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                ⚡ Automático
+              </button>
+              <button
+                type="button"
+                onClick={() => setPenaltyMode('manual')}
+                className={`rounded-lg py-3 px-4 text-sm font-semibold transition ${
+                  penaltyMode === 'manual'
+                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                }`}
+              >
+                ✏️ Manual
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              {penaltyMode === 'automatic' 
+                ? 'Los puntos se calculan automáticamente según las horas dormidas'
+                : 'Define cuántos puntos se restan por cada hora bajo el objetivo'}
+            </p>
           </div>
+
+          {/* Puntos por hora (solo en manual) */}
           {penaltyMode === 'manual' && (
-            <div>
-              <label className="block text-sm font-medium">Puntos a restar por hora</label>
-              <input
-                type="number"
-                value={penaltyPerHour}
-                onChange={(e) => setPenaltyPerHour(Number(e.target.value))}
-                className="mt-1 block w-full border rounded px-3 py-2"
-              />
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4 animate-in fade-in slide-in-from-top-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                Puntos a restar por hora
+              </label>
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setPenaltyPerHour(Math.max(0.5, penaltyPerHour - 0.5))}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  -
+                </button>
+                <span className="text-3xl font-bold text-slate-900 dark:text-white w-16 text-center">
+                  {penaltyPerHour}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPenaltyPerHour(Math.min(5, penaltyPerHour + 0.5))}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  +
+                </button>
+                <span className="text-sm text-slate-500">pts/hora</span>
+              </div>
             </div>
           )}
         </div>
-        <div className="flex justify-end space-x-2 mt-6">
-          <button onClick={onClose} className="px-4 py-2 border rounded">Cancelar</button>
-          <button onClick={handleSave} className="px-4 py-2 bg-blue-500 text-white rounded">Guardar</button>
+
+        <div className="mt-8 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 rounded-xl bg-slate-100 py-3.5 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSave}
+            className="flex-1 rounded-xl bg-indigo-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 active:bg-indigo-600"
+          >
+            Guardar
+          </button>
         </div>
       </div>
     </div>
