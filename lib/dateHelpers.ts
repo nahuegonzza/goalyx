@@ -40,3 +40,17 @@ export function formatDateDMY(dateString: string): string {
   const [year, month, day] = dateString.split('-');
   return `${day}/${month}/${year}`;
 }
+
+/**
+ * Formats a YYYY-MM-DD string to "Martes 28 de Abril" format for display.
+ */
+export function formatDateLong(dateString: string): string {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  
+  const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  
+  return `${dayNames[date.getDay()]} ${day} de ${monthNames[date.getMonth()]}`;
+}
