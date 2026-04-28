@@ -33,6 +33,9 @@ export default function SettingsPage() {
   const [profileType, setProfileType] = useState<'success' | 'error'>('success');
   const [profileCollapsed, setProfileCollapsed] = useState(true);
   const [passwordCollapsed, setPasswordCollapsed] = useState(true);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -477,33 +480,60 @@ export default function SettingsPage() {
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña Actual</label>
+                    <div className="relative">
                     <input
-                      type="password"
+                      type={showCurrentPassword ? 'text' : 'password'}
                       value={profileForm.currentPassword}
                       onChange={(e) => setProfileForm({ ...profileForm, currentPassword: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 pr-10 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      {showCurrentPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nueva Contraseña</label>
+                    <div className="relative">
                     <input
-                      type="password"
+                      type={showNewPassword ? 'text' : 'password'}
                       value={profileForm.newPassword}
                       onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 pr-10 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      {showNewPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirmar Nueva Contraseña</label>
+                    <div className="relative">
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       value={profileForm.confirmPassword}
                       onChange={(e) => setProfileForm({ ...profileForm, confirmPassword: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 pr-10 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      {showConfirmPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
                   </div>
                   <button
                     type="submit"

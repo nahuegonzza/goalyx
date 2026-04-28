@@ -26,6 +26,8 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('');
   const router = useRouter();
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -142,16 +144,25 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
                 Contraseña
               </label>
+              <div className="relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
-                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-10 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             </div>
 
             {error && (
