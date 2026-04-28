@@ -161,7 +161,7 @@ export default function LoginPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
               >
                 <img
-                  src={showPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                  src={showPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                   alt={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                   className="w-5 h-5"
                 />
@@ -179,14 +179,14 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? 'Iniciando...' : 'Iniciar Sesión'}
               </button>
             </div>
 
             <div className="text-center">
-              <Link href="/register" className="text-blue-400 hover:text-blue-300 transition-colors">
+              <Link href="/register" className="text-emerald-400 hover:text-emerald-300 transition-colors">
                 ¿No tienes cuenta? Regístrate
               </Link>
             </div>
@@ -195,7 +195,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm"
               >
                 ¿Olvidaste tu contraseña?
               </button>

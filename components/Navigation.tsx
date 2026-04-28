@@ -89,7 +89,7 @@ export default function Navigation() {
         <div className="relative flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <img
-              src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+              src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
               alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
               className="w-10 h-10 rounded-full"
             />
@@ -125,7 +125,7 @@ export default function Navigation() {
         <div className="relative mx-auto flex max-w-5xl items-center justify-between py-3 px-4">
           <div className="flex items-center gap-2">
             <img
-              src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+              src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
               alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
               className="w-10 h-10 rounded-full"
             />

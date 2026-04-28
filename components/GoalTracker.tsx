@@ -351,7 +351,7 @@ export default function GoalTracker() {
               </div>
               <div className="flex items-center gap-4">
                 <img
-                  src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+                  src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
                   alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
                   className="h-16 w-16 rounded-full"
                 />

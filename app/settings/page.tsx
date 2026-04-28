@@ -494,7 +494,7 @@ export default function SettingsPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
                       <img
-                        src={showCurrentPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        src={showCurrentPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                         alt={showCurrentPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                         className="w-5 h-5"
                       />
@@ -517,7 +517,7 @@ export default function SettingsPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
                       <img
-                        src={showNewPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        src={showNewPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                         alt={showNewPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                         className="w-5 h-5"
                       />
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     >
                       <img
-                        src={showConfirmPassword ? '/navbar_icons/no_view_pass_icon.png' : '/navbar_icons/view_pass_icon.png'}
+                        src={showConfirmPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                         alt={showConfirmPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                         className="w-5 h-5"
                       />

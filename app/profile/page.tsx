@@ -192,7 +192,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={streakInfo.todayFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+                      src={streakInfo.todayFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
                       alt={streakInfo.todayFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
                       className="w-10 h-10 rounded-full"
                     />
@@ -208,7 +208,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={'/navbar_icons/streak_on.gif'}
+                      src={'/icons/ui/streak_on.gif'}
                       alt={'Racha cumplida'}
                       className="w-10 h-10 rounded-full"
                     />                
