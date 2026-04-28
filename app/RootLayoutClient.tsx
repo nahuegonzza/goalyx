@@ -2,8 +2,41 @@
 
 import { ThemeProvider } from '@lib/ThemeProvider';
 import ServiceWorkerRegister from '@components/ServiceWorkerRegister';
+import { useEffect } from 'react';
 
 export default function RootLayoutClient({ children }: { children: React.ReactNode }) {
+  // Prevenir zoom en móvil
+  useEffect(() => {
+    const preventZoom = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+    
+    const preventZoomOnDoubleTap = (e: MouseEvent) => {
+      if (e.detail > 1) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', preventZoom, { passive: false });
+    document.addEventListener('dblclick', preventZoomOnDoubleTap, { passive: false });
+
+    // Prevenir zoom con teclado
+    const preventKeyboardZoom = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0')) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('keydown', preventKeyboardZoom, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', preventZoom);
+      document.removeEventListener('dblclick', preventZoomOnDoubleTap);
+      document.removeEventListener('keydown', preventKeyboardZoom);
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <ServiceWorkerRegister />
