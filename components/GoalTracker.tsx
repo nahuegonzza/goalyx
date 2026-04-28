@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Goal, GoalEntryWithGoal, ScoreHistory, Event, DailyScore } from '@types';
-import { getLocalDateString, parseLocalDate, formatLocalDate } from '@lib/dateHelpers';
+import { getLocalDateString, parseLocalDate, formatLocalDate, formatDateDMY } from '@lib/dateHelpers';
 import { isGoalActiveOnDate } from '@lib/goalHelpers';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import CompactGoalItem from '@components/CompactGoalItem';
@@ -337,7 +337,7 @@ export default function GoalTracker() {
             Registro diario
           </p>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {today}
+            {formatDateDMY(today)}
           </h2>
         </div>
         <br />

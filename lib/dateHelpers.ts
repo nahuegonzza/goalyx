@@ -31,3 +31,12 @@ export function formatLocalDate(date: Date): string {
   const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Formats a YYYY-MM-DD string to DD/MM/YYYY format for display.
+ */
+export function formatDateDMY(dateString: string): string {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
