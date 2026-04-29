@@ -101,11 +101,26 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { firstName, lastName, birthDate, username } = body;
 
-    const data: any = {
-      firstName: firstName?.trim() || null,
-      lastName: lastName?.trim() || null,
-      name: firstName?.trim() && lastName?.trim() ? `${firstName.trim()} ${lastName.trim()}` : firstName?.trim() || lastName?.trim() || null,
-    };
+    // Only update fields that are explicitly provided in the request
+    // Don't overwrite existing data with null when field is not provided
+    const data: any = {};
+
+    // Only add firstName if it's explicitly provided (not undefined)
+    if (firstName !== undefined) {
+      data.firstName = firstName?.trim() || null;
+    }
+
+    // Only add lastName if it's explicitly provided (not undefined)
+    if (lastName !== undefined) {
+      data.lastName = lastName?.trim() || null;
+    }
+
+    // Only update name if both firstName and lastName are provided
+    if (firstName !== undefined && lastName !== undefined) {
+      data.name = firstName?.trim() && lastName?.trim() 
+        ? `${firstName.trim()} ${lastName.trim()}` 
+        : firstName?.trim() || lastName?.trim() || null;
+    }
 
     // Handle username update
     if (username !== undefined) {
@@ -152,6 +167,21 @@ export async function PATCH(request: Request) {
     const email = user?.email;
     if (user && !email) {
       return NextResponse.json({ error: 'User email is required' }, { status: 400 });
+    }
+
+    // Security check: Verify the session user matches the database user
+    // This prevents cross-user data overwrites due to session/cookie issues
+    if (user) {
+      const dbUserByEmail = await prisma.user.findUnique({
+        where: { email: email! },
+        select: { id: true }
+      });
+      
+      // If user exists in DB with different ID, something is wrong with the session
+      if (dbUserByEmail && dbUserByEmail.id !== userId) {
+        console.error('Security: Session user ID mismatch', { sessionUserId: userId, dbUserId: dbUserByEmail.id });
+        return NextResponse.json({ error: 'Session mismatch - please re-login' }, { status: 403 });
+      }
     }
 
     const updatedUser = user
