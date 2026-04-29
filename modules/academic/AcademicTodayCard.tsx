@@ -1,0 +1,69 @@
+'use client';
+
+import type { AcademicEvent, AcademicSubject } from './academicHelpers';
+
+interface AcademicTodayCardProps {
+  event: AcademicEvent;
+  subject: AcademicSubject | undefined;
+  onToggleComplete: (event: AcademicEvent) => Promise<void>;
+}
+
+export function AcademicTodayCard({ event, subject, onToggleComplete }: AcademicTodayCardProps) {
+  const icon = event.type === 'exam' ? (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 4h12v16H6z" />
+      <path d="M9 8h6" />
+      <path d="M9 12h4" />
+      <path d="M12 16h2" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M5 13l4 4L19 7" />
+      <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+    </svg>
+  );
+
+  const badgeText = event.type === 'exam'
+    ? `${event.examType ?? 'Parcial'}`
+    : `${event.priority ? `Prioridad ${event.priority}` : 'Tarea'}`;
+
+  const borderColor = subject?.color ?? (event.type === 'exam' ? 'border-orange-400' : 'border-emerald-400');
+  const textColor = event.type === 'exam' ? 'text-orange-700 dark:text-orange-300' : 'text-emerald-700 dark:text-emerald-300';
+
+  return (
+    <div className={`rounded-3xl border-2 ${borderColor} bg-white p-4 shadow-sm dark:bg-slate-950`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
+            {icon}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{event.type === 'exam' ? 'Examen programado' : 'Tarea pendiente'}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{subject?.name ?? 'Materia no encontrada'}</p>
+          </div>
+        </div>
+        <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+          <input
+            type="checkbox"
+            checked={event.completed}
+            onChange={() => onToggleComplete(event)}
+            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+          />
+          Listo
+        </label>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-base font-semibold text-slate-900 dark:text-white">{event.title}</p>
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${textColor} bg-slate-100 dark:bg-slate-900`}>{badgeText}</span>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-400">{event.description || 'Sin descripción'}</p>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span className="rounded-full border border-slate-200 px-2 py-1 dark:border-slate-700">{event.date}</span>
+          {subject?.semester ? <span className="rounded-full border border-slate-200 px-2 py-1 dark:border-slate-700">{subject.semester}</span> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
