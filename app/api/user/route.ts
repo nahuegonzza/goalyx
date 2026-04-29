@@ -19,6 +19,25 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // CRITICAL: Verify the userId matches the authenticated user
+    // This prevents reading wrong user data due to cookie/session issues
+    if (user && user.email) {
+      const dbUserByEmail = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { id: true }
+      });
+      
+      // If user exists in DB with different ID, something is wrong with the session
+      if (dbUserByEmail && dbUserByEmail.id !== userId) {
+        console.error('CRITICAL: User ID mismatch in GET', { 
+          sessionUserId: userId, 
+          dbUserId: dbUserByEmail.id,
+          sessionEmail: user.email 
+        });
+        return NextResponse.json({ error: 'Session error - please re-login' }, { status: 403 });
+      }
+    }
+
     let dbUser = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -96,6 +115,25 @@ export async function PATCH(request: Request) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // CRITICAL: Verify the userId matches the authenticated user
+    // This prevents cross-user data overwrites due to cookie/session issues
+    if (user && user.email) {
+      const dbUser = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { id: true }
+      });
+      
+      // If user exists in DB, the ID must match the session user ID
+      if (dbUser && dbUser.id !== userId) {
+        console.error('CRITICAL: User ID mismatch - possible session hijacking', { 
+          sessionUserId: userId, 
+          dbUserId: dbUser.id,
+          sessionEmail: user.email 
+        });
+        return NextResponse.json({ error: 'Session error - please re-login' }, { status: 403 });
+      }
     }
 
     const body = await request.json();

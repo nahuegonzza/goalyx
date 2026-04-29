@@ -111,15 +111,23 @@ export default function RegisterPage() {
       setStatus(message);
       setStatusType('success');
       
-      // Save username to database if sign up successful
+      // Save username to database - wait for session to be established
+      // This prevents the race condition where PATCH uses wrong user session
       if (data?.user) {
         try {
-          await fetch('/api/user', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: username.trim().toLowerCase() }),
-            credentials: 'include'
-          });
+          // Wait a moment for cookies to be set, then verify session before PATCH
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Verify we have a valid session before saving username
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData?.session) {
+            await fetch('/api/user', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: username.trim().toLowerCase() }),
+              credentials: 'include'
+            });
+          }
         } catch (err) {
           console.error('Error saving username:', err);
         }
