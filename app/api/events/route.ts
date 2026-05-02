@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
+import { EventPayloadSchema, type ValidatedEventPayload } from '@lib/validators';
 
 export async function GET(request: Request) {
   const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
@@ -61,52 +62,64 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
+  try {
+    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
-  // ❌ NO fallback a usuario por defecto
-  let userId: string | undefined;
-  if (user?.id) {
-    userId = user.id;
-  } else {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    // ❌ NO fallback a usuario por defecto
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  // Ensure Prisma user exists
-  if (user) {
-    await ensurePrismaUserForSession();
-  }
+    // Ensure Prisma user exists
+    if (user) {
+      await ensurePrismaUserForSession();
+    }
 
-  const payload = (await request.json()) as {
-    type: string;
-    value: number;
-    moduleSlug: string;
-    metadata?: Record<string, unknown>;
-  };
-  const moduleDefinition = moduleDefinitions.find((module) => module.slug === payload.moduleSlug);
+    const payload = await request.json();
 
-  const eventData: any = {
-    userId,
-    type: payload.type,
-    value: payload.value,
-    metadata: JSON.stringify(payload.metadata ?? {})
-  };
+    // Validate input
+    const validationResult = EventPayloadSchema.safeParse(payload);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        error: 'Invalid input data', 
+        details: validationResult.error.issues 
+      }, { status: 400 });
+    }
 
-  if (moduleDefinition) {
-    eventData.module = {
-      connectOrCreate: {
-        where: { slug: moduleDefinition.slug },
-        create: { slug: moduleDefinition.slug, name: moduleDefinition.name, description: moduleDefinition.description, userId }
-      }
+    const validatedPayload: ValidatedEventPayload = validationResult.data;
+
+    const moduleDefinition = moduleDefinitions.find((module) => module.slug === validatedPayload.moduleSlug);
+
+    const eventData: any = {
+      userId,
+      type: validatedPayload.type,
+      value: validatedPayload.value,
+      metadata: JSON.stringify(validatedPayload.metadata ?? {})
     };
+
+    if (moduleDefinition) {
+      eventData.module = {
+        connectOrCreate: {
+          where: { slug: moduleDefinition.slug },
+          create: { slug: moduleDefinition.slug, name: moduleDefinition.name, description: moduleDefinition.description, userId }
+        }
+      };
+    }
+
+    const event = await prisma.event.create({
+      data: eventData
+    });
+
+    return NextResponse.json(event, { status: 201 });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const event = await prisma.event.create({
-    data: eventData
-  });
-
-  return NextResponse.json(event, { status: 201 });
 }

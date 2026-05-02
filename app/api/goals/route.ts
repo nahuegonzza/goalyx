@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { prisma, withRetry } from '@lib/prisma';
 import type { GoalPayload } from '@types';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
+import { GoalPayloadSchema, type ValidatedGoalPayload } from '@lib/validators';
 
 function normalizeGoalType(type: string) {
   if (type === 'HABIT') return 'BOOLEAN';
@@ -42,8 +43,8 @@ export async function GET() {
 
     return NextResponse.json(normalized);
   } catch (error) {
-    console.error('Error fetching goals:', error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error fetching goals' }, { status: 500 });
+    console.error('Error in goals API:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -70,13 +71,25 @@ export async function POST(request: Request) {
     }
 
     const payload = (await request.json()) as GoalPayload;
-    const activatedAt = payload.activatedAt ? new Date(payload.activatedAt) : new Date();
+
+    // Validate input
+    const validationResult = GoalPayloadSchema.safeParse(payload);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        error: 'Invalid input data', 
+        details: validationResult.error.issues 
+      }, { status: 400 });
+    }
+
+    const validatedPayload: ValidatedGoalPayload = validationResult.data;
+
+    const activatedAt = validatedPayload.activatedAt ? new Date(validatedPayload.activatedAt) : new Date();
 
     const existingGoal = await withRetry(() =>
       prisma.goal.findFirst({
         where: {
           userId: userId,
-          title: payload.title
+          title: validatedPayload.title
         }
       })
     );
@@ -86,18 +99,18 @@ export async function POST(request: Request) {
         prisma.goal.update({
           where: { id: existingGoal.id },
           data: {
-            description: payload.description,
-            type: payload.type,
-            icon: payload.icon ?? 'star',
-            color: payload.color ?? 'slate',
-            order: payload.order ?? existingGoal.order,
-            pointsIfTrue: payload.pointsIfTrue,
-            pointsIfFalse: payload.pointsIfFalse,
-            pointsPerUnit: payload.pointsPerUnit,
+            description: validatedPayload.description,
+            type: validatedPayload.type,
+            icon: validatedPayload.icon ?? 'star',
+            color: validatedPayload.color ?? 'slate',
+            order: validatedPayload.order ?? existingGoal.order,
+            pointsIfTrue: validatedPayload.pointsIfTrue,
+            pointsIfFalse: validatedPayload.pointsIfFalse,
+            pointsPerUnit: validatedPayload.pointsPerUnit,
             isActive: true,
             activatedAt,
             deactivatedAt: null,
-            weekDays: payload.weekDays ?? []
+            weekDays: validatedPayload.weekDays ?? []
           }
         })
       );
@@ -116,25 +129,25 @@ export async function POST(request: Request) {
       prisma.goal.create({
         data: {
           userId: userId,
-          title: payload.title,
-          description: payload.description,
-          type: payload.type,
-          icon: payload.icon ?? 'star',
-          color: payload.color ?? 'slate',
-          order: payload.order ?? ((lastGoal?.order ?? -1) + 1),
-          pointsIfTrue: payload.pointsIfTrue,
-          pointsIfFalse: payload.pointsIfFalse,
-          pointsPerUnit: payload.pointsPerUnit,
+          title: validatedPayload.title,
+          description: validatedPayload.description,
+          type: validatedPayload.type,
+          icon: validatedPayload.icon ?? 'star',
+          color: validatedPayload.color ?? 'slate',
+          order: validatedPayload.order ?? ((lastGoal?.order ?? -1) + 1),
+          pointsIfTrue: validatedPayload.pointsIfTrue,
+          pointsIfFalse: validatedPayload.pointsIfFalse,
+          pointsPerUnit: validatedPayload.pointsPerUnit,
           isActive: true,
           activatedAt,
-          weekDays: payload.weekDays ?? []
+          weekDays: validatedPayload.weekDays ?? []
         }
       })
     );
 
     return NextResponse.json(goal, { status: 201 });
   } catch (error) {
-    console.error('Error creating goal:', error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error creating goal' }, { status: 500 });
+    console.error('Error creating/updating goal:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

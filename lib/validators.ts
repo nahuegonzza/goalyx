@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Email validation utility
  * Validates email format according to standard rules
@@ -47,9 +49,87 @@ export function validatePassword(password: string): string | undefined {
     return 'La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales';
   }
   */
-
-  return undefined;
 }
+
+// Zod schemas for input validation
+
+export const GoalPayloadSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
+  description: z.string().max(500, 'Description too long').optional(),
+  type: z.enum(['BOOLEAN', 'NUMERIC'], { required_error: 'Type must be BOOLEAN or NUMERIC' }),
+  icon: z.string().max(50).optional().default('star'),
+  color: z.string().max(50).optional().default('slate'),
+  order: z.number().int().min(0).optional(),
+  pointsIfTrue: z.number().min(0).max(1000).optional().default(1),
+  pointsIfFalse: z.number().min(0).max(1000).optional().default(0),
+  pointsPerUnit: z.number().min(0).max(1000).optional(),
+  isActive: z.boolean().optional().default(true),
+  deactivatedAt: z.string().datetime().nullable().optional(),
+  activatedAt: z.string().datetime().optional(),
+  weekDays: z.array(z.number().int().min(0).max(6)).optional().default([]),
+});
+
+export const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters').max(128, 'New password too long'),
+});
+
+export const GoalEntryPayloadSchema = z.object({
+  goalId: z.string().uuid('Invalid goal ID'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format').optional(),
+  value: z.number().optional(),
+  valueFloat: z.number().optional(),
+  valueBoolean: z.boolean().optional(),
+}).refine((data) => {
+  // Ensure at least one value field is provided
+  return data.value !== undefined || data.valueFloat !== undefined || data.valueBoolean !== undefined;
+}, {
+  message: 'At least one value field must be provided',
+});
+
+export type ValidatedGoalEntryPayload = z.infer<typeof GoalEntryPayloadSchema>;
+
+export const GoalPatchSchema = z.object({
+  title: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  type: z.enum(['BOOLEAN', 'NUMERIC']).optional(),
+  icon: z.string().max(50).optional(),
+  color: z.string().max(50).optional(),
+  order: z.number().int().min(0).optional(),
+  pointsIfTrue: z.number().min(0).max(1000).optional(),
+  pointsIfFalse: z.number().min(0).max(1000).optional(),
+  pointsPerUnit: z.number().min(0).max(1000).optional(),
+  isActive: z.boolean().optional(),
+  activatedAt: z.string().datetime().optional(),
+  weekDays: z.array(z.number().int().min(0).max(6)).optional(),
+});
+
+export const EventPayloadSchema = z.object({
+  type: z.string().min(1).max(100),
+  value: z.number().min(0).max(10000),
+  moduleSlug: z.string().min(1).max(100),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+export const RulePayloadSchema = z.object({
+  target: z.string().min(1).max(255),
+  condition: z.string().min(1).max(500),
+  action: z.string().min(1).max(500),
+  priority: z.number().int().min(0).max(1000).optional().default(0),
+  active: z.boolean().optional().default(true),
+  config: z.record(z.unknown()).optional(),
+});
+
+export const ModuleEntryPayloadSchema = z.object({
+  moduleId: z.string().uuid('Invalid module ID'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format').optional(),
+  data: z.record(z.unknown()),
+});
+
+export type ValidatedGoalPatch = z.infer<typeof GoalPatchSchema>;
+export type ValidatedEventPayload = z.infer<typeof EventPayloadSchema>;
+export type ValidatedRulePayload = z.infer<typeof RulePayloadSchema>;
+export type ValidatedModuleEntryPayload = z.infer<typeof ModuleEntryPayloadSchema>;
 
 /**
  * Sanitize user input to prevent injection attacks

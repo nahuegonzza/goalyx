@@ -2,9 +2,10 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import type { GoalPayload } from '@types';
 import { getServerSupabaseUser } from '@lib/supabase-server';
+import { GoalPatchSchema, type ValidatedGoalPatch } from '@lib/validators';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
   try {
@@ -25,23 +26,37 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
     const { goalId } = params;
     const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
 
-    const goal = await prisma.goal.findUnique({ where: { id: goalId } });
+    // Validate input
+    const validationResult = GoalPatchSchema.safeParse(payload);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        error: 'Invalid input data', 
+        details: validationResult.error.issues 
+      }, { status: 400 });
+    }
+
+    const validatedPayload: ValidatedGoalPatch = validationResult.data;
+
+    const goal = await withRetry(() =>
+      prisma.goal.findUnique({ where: { id: goalId } })
+    );
     if (!goal || goal.userId !== userId) {
       return NextResponse.json({ error: 'Objetivo no encontrado' }, { status: 404 });
     }
 
-    const updateData: any = {
-      title: payload.title,
-      description: payload.description,
-      type: payload.type,
-      icon: payload.icon,
-      color: payload.color,
-      order: payload.order,
-      pointsIfTrue: payload.pointsIfTrue,
-      pointsIfFalse: payload.pointsIfFalse,
-      pointsPerUnit: payload.pointsPerUnit,
-      weekDays: payload.weekDays ?? []
-    };
+    const updateData: any = {};
+    
+    // Only include fields that were provided and validated
+    if (validatedPayload.title !== undefined) updateData.title = validatedPayload.title;
+    if (validatedPayload.description !== undefined) updateData.description = validatedPayload.description;
+    if (validatedPayload.type !== undefined) updateData.type = validatedPayload.type;
+    if (validatedPayload.icon !== undefined) updateData.icon = validatedPayload.icon;
+    if (validatedPayload.color !== undefined) updateData.color = validatedPayload.color;
+    if (validatedPayload.order !== undefined) updateData.order = validatedPayload.order;
+    if (validatedPayload.pointsIfTrue !== undefined) updateData.pointsIfTrue = validatedPayload.pointsIfTrue;
+    if (validatedPayload.pointsIfFalse !== undefined) updateData.pointsIfFalse = validatedPayload.pointsIfFalse;
+    if (validatedPayload.pointsPerUnit !== undefined) updateData.pointsPerUnit = validatedPayload.pointsPerUnit;
+    if (validatedPayload.weekDays !== undefined) updateData.weekDays = validatedPayload.weekDays;
 
     if (typeof payload.isActive === 'boolean') {
       updateData.isActive = payload.isActive;
@@ -53,19 +68,21 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
       }
     }
 
-    if (payload.activatedAt) {
-      updateData.activatedAt = new Date(payload.activatedAt);
+    if (validatedPayload.activatedAt) {
+      updateData.activatedAt = new Date(validatedPayload.activatedAt);
     }
 
-    const updatedGoal = await prisma.goal.update({
-      where: { id: goalId },
-      data: updateData
-    });
+    const updatedGoal = await withRetry(() =>
+      prisma.goal.update({
+        where: { id: goalId },
+        data: updateData
+      })
+    );
 
     return NextResponse.json(updatedGoal);
   } catch (error) {
     console.error('Error updating goal:', error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error updating goal' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

@@ -4,13 +4,32 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import { parseModuleConfig } from '@lib/modules';
+import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { moduleId: string } }
 ) {
   try {
+    const { user } = await getServerSupabaseUser();
+    
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { active, config } = await request.json();
+
+    // CRITICAL: Verify module belongs to the authenticated user
+    const module = await prisma.module.findUnique({
+      where: { id: params.moduleId }
+    });
+
+    if (!module || module.userId !== userId) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 });
+    }
 
     const updateData: any = {};
     if (active !== undefined) updateData.active = active;
@@ -27,6 +46,6 @@ export async function PATCH(
     });
   } catch (error) {
     console.error('Error updating module:', error);
-    return NextResponse.json({ error: 'Error updating module' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

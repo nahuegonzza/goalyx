@@ -4,6 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
+import { ModuleEntryPayloadSchema } from '@lib/validators';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -83,51 +84,66 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
-
-  // ❌ NO fallback a usuario por defecto
-  let userId: string | undefined;
-  if (user?.id) {
-    userId = user.id;
-  } else {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Ensure Prisma user exists
-  if (user) {
-    await ensurePrismaUserForSession();
-  }
-
   try {
-    const body = await request.json();
-    const { moduleId, date, data } = body;
+    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
-    if (!moduleId || !date || !data) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // ❌ NO fallback a usuario por defecto
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const normalizedDate = normalizeDateToStartOfDay(date);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Ensure Prisma user exists
+    if (user) {
+      await ensurePrismaUserForSession();
+    }
+
+    const body = await request.json();
+
+    // Validate input
+    const validationResult = ModuleEntryPayloadSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        error: 'Invalid input data', 
+        details: validationResult.error.issues 
+      }, { status: 400 });
+    }
+
+    const validatedPayload = validationResult.data;
+
+    // CRITICAL: Verify module belongs to the authenticated user
+    const module = await prisma.module.findUnique({
+      where: { id: validatedPayload.moduleId }
+    });
+
+    if (!module || module.userId !== userId) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 });
+    }
+
+    const normalizedDate = normalizeDateToStartOfDay(validatedPayload.date ?? new Date().toISOString().split('T')[0]);
 
     const entry = await prisma.moduleEntry.upsert({
       where: {
         moduleId_date: {
-          moduleId,
+          moduleId: validatedPayload.moduleId,
           date: normalizedDate
         }
       },
       update: {
-        data: JSON.stringify(data),
+        data: JSON.stringify(validatedPayload.data),
         updatedAt: new Date()
       },
       create: {
         userId,
-        moduleId,
+        moduleId: validatedPayload.moduleId,
         date: normalizedDate,
-        data: JSON.stringify(data)
+        data: JSON.stringify(validatedPayload.data)
       },
       include: { module: true }
     });
@@ -135,6 +151,6 @@ export async function POST(request: Request) {
     return NextResponse.json(entry);
   } catch (error) {
     console.error('Error saving module entry:', error);
-    return NextResponse.json({ error: 'Failed to save module entry' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

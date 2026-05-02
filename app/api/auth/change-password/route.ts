@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@lib/supabase-server';
+import { ChangePasswordSchema } from '@lib/validators';
 
 export async function POST(request: Request) {
   try {
@@ -11,11 +12,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { currentPassword, newPassword } = body;
 
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // Validate input
+    const validationResult = ChangePasswordSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        error: 'Invalid input data', 
+        details: validationResult.error.issues 
+      }, { status: 400 });
     }
+
+    const { currentPassword, newPassword } = validationResult.data;
 
     // Verify current password by attempting sign in
     const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -39,6 +46,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error changing password:', error);
-    return NextResponse.json({ error: 'Error changing password' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
