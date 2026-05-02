@@ -129,12 +129,6 @@ export default function ModulesSettingsPage() {
             <h1 className="text-4xl font-bold tracking-tight">Módulos</h1>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Personaliza tu experiencia</p>
           </div>
-          <button
-            onClick={() => router.push('/settings')}
-            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
-          >
-            <span>←</span> <span className="hidden sm:inline">Volver</span>
-          </button>
         </div>
 
         {/* Stats */}
