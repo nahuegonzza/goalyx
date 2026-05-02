@@ -8,6 +8,7 @@ import { calculateDailyScore } from '@core/score/scoreCalculator';
 import CompactGoalItem from '@components/CompactGoalItem';
 import { moduleDefinitions } from '../modules';
 import { parseModuleConfig } from '../lib/modules';
+import Image from 'next/image';
 import type { ActiveModule } from '../lib/modules';
 
 function buildEntryPayload(goal: Goal, value: boolean | number | null, date: string) {
@@ -350,10 +351,13 @@ export default function GoalTracker() {
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Mejor racha: {longestStreak} días</p>
               </div>
               <div className="flex items-center gap-4">
-                <img
+                <Image
                   src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
                   alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
-                  className="h-16 w-16 rounded-full"
+                  width={64}
+                  height={64}
+                  className="rounded-full"
+                  unoptimized
                 />
                 <div>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">

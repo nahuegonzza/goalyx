@@ -118,11 +118,11 @@ export async function POST(request: Request) {
     const validatedPayload = validationResult.data;
 
     // CRITICAL: Verify module belongs to the authenticated user
-    const module = await prisma.module.findUnique({
+    const moduleRecord = await prisma.module.findUnique({
       where: { id: validatedPayload.moduleId }
     });
 
-    if (!module || module.userId !== userId) {
+    if (!moduleRecord || moduleRecord.userId !== userId) {
       return NextResponse.json({ error: 'Module not found' }, { status: 404 });
     }
 

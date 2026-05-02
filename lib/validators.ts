@@ -56,7 +56,7 @@ export function validatePassword(password: string): string | undefined {
 export const GoalPayloadSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
   description: z.string().max(500, 'Description too long').optional(),
-  type: z.enum(['BOOLEAN', 'NUMERIC'], { required_error: 'Type must be BOOLEAN or NUMERIC' }),
+  type: z.enum(['BOOLEAN', 'NUMERIC']),
   icon: z.string().max(50).optional().default('star'),
   color: z.string().max(50).optional().default('slate'),
   order: z.number().int().min(0).optional(),
@@ -87,7 +87,7 @@ export const GoalEntryPayloadSchema = z.object({
   message: 'At least one value field must be provided',
 });
 
-export type ValidatedGoalEntryPayload = z.infer<typeof GoalEntryPayloadSchema>;
+export type ValidatedGoalPayload = z.infer<typeof GoalPayloadSchema>;
 
 export const GoalPatchSchema = z.object({
   title: z.string().min(1).max(100).optional(),
@@ -108,7 +108,7 @@ export const EventPayloadSchema = z.object({
   type: z.string().min(1).max(100),
   value: z.number().min(0).max(10000),
   moduleSlug: z.string().min(1).max(100),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.object({}).passthrough().optional(),
 });
 
 export const RulePayloadSchema = z.object({
@@ -117,13 +117,13 @@ export const RulePayloadSchema = z.object({
   action: z.string().min(1).max(500),
   priority: z.number().int().min(0).max(1000).optional().default(0),
   active: z.boolean().optional().default(true),
-  config: z.record(z.unknown()).optional(),
+  config: z.object({}).passthrough().optional(),
 });
 
 export const ModuleEntryPayloadSchema = z.object({
   moduleId: z.string().uuid('Invalid module ID'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format').optional(),
-  data: z.record(z.unknown()),
+  data: z.object({}).passthrough(),
 });
 
 export type ValidatedGoalPatch = z.infer<typeof GoalPatchSchema>;

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { getLocalDateString } from '@lib/dateHelpers';
 import { useEffect, useState } from 'react';
@@ -88,10 +89,12 @@ export default function Navigation() {
       <nav className="hidden sm:block mb-4 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
         <div className="relative flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <img
+            <Image
               src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
               alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
-              className="w-10 h-10 rounded-full"
+              width={40}
+              height={40}
+              className="rounded-full"
             />
             <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
               {currentStreak} día{currentStreak === 1 ? '' : 's'}
@@ -100,22 +103,22 @@ export default function Navigation() {
 
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link href="/" className="flex items-center justify-center">
-              <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-10 h-10 object-contain" />
+              <Image src="/image-no-background-500x500.png" alt="Goalyx Logo" width={40} height={40} className="object-contain" />
             </Link>
           </div>
 
           <div className="flex flex-wrap items-center gap-1">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
-                <img src={item.icon} alt={item.label} className={getIconClasses(item.href)} />
+                <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={getIconClasses(item.href)} />
               </Link>
             ))}
             <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
             <Link href="/settings/modules" className={getLinkClasses('/settings/modules')} title="Módulos">
-              <img src="/navbar_icons/modules_icon.png" alt="Módulos" className={getIconClasses('/settings/modules')} />
+              <Image src="/navbar_icons/modules_icon.png" alt="Módulos" width={24} height={24} unoptimized className={getIconClasses('/settings/modules')} />
             </Link>
             <Link href="/settings" className={getLinkClasses('/settings')} title="Ajustes">
-              <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className={getIconClasses('/settings')} />
+              <Image src="/navbar_icons/settings_icon.png" alt="Ajustes" width={24} height={24} unoptimized className={getIconClasses('/settings')} />
             </Link>
           </div>
         </div>
@@ -124,10 +127,12 @@ export default function Navigation() {
       <nav className="sm:hidden fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-sm">
         <div className="relative mx-auto flex max-w-5xl items-center justify-between py-3 px-4">
           <div className="flex items-center gap-2">
-            <img
+            <Image
               src={todayStreakFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
               alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
-              className="w-10 h-10 rounded-full"
+              width={40}
+              height={40}
+              className="rounded-full"
             />
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
               {currentStreak}
@@ -135,15 +140,15 @@ export default function Navigation() {
           </div>
 
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
+            <Image src="/image-no-background-500x500.png" alt="Goalyx Logo" width={48} height={48} />
           </div>
 
           <div className="flex items-center gap-1">
             <Link href="/settings/modules" title="Módulos" className={`flex h-10 w-10 items-center justify-center rounded-xl ${isActivePath('/settings/modules') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
-              <img src="/navbar_icons/modules_icon.png" alt="Módulos" className="w-5 h-5" />
+              <Image src="/navbar_icons/modules_icon.png" alt="Módulos" width={20} height={20} unoptimized />
             </Link>
             <Link href="/settings" title="Ajustes" className={`flex h-10 w-10 items-center justify-center rounded-xl ${isActivePath('/settings') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
-              <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-5 h-5" />
+              <Image src="/navbar_icons/settings_icon.png" alt="Ajustes" width={20} height={20} unoptimized />
             </Link>
           </div>
         </div>
@@ -159,7 +164,7 @@ export default function Navigation() {
                 title={item.label}
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath(item.href) ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
+                <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>
@@ -170,7 +175,7 @@ export default function Navigation() {
               title={homeItem.label}
               className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-slate-300 dark:border-slate-600 shadow-xl ${pathname === homeItem.href ? 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white' : 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white'} transition-transform duration-200 hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-700`}
             >
-              <img src={homeItem.icon} alt={homeItem.label} className={`${pathname === homeItem.href ? 'w-7 h-7 filter dark:filter-none' : 'w-6 h-6 filter dark:filter-none'}`} />
+              <Image src={homeItem.icon} alt={homeItem.label} width={24} height={24} unoptimized className={`${pathname === homeItem.href ? 'w-7 h-7 filter dark:filter-none' : 'w-6 h-6 filter dark:filter-none'}`} />
             </Link>
           </div>
 
@@ -182,7 +187,7 @@ export default function Navigation() {
                 title={item.label}
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath(item.href) ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
+                <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
+import Image from 'next/image';
 
 function getLoginErrorMessage(defaultMessage: string, fallbackMessage: string) {
   if (!defaultMessage) return fallbackMessage;
@@ -160,10 +161,12 @@ export default function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
               >
-                <img
+                <Image
                   src={showPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                   alt={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                  className="w-5 h-5"
+                  width={20}
+                  height={20}
+                  unoptimized
                 />
               </button>
             </div>

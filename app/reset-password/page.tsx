@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
+import Image from 'next/image';
 
 function ResetPasswordContent() {
   const [password, setPassword] = useState('');
@@ -88,10 +89,12 @@ function ResetPasswordContent() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
             >
-              <img
+              <Image
                 src={showPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                 alt={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                unoptimized
               />
             </button>
           </div>
@@ -116,10 +119,12 @@ function ResetPasswordContent() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
             >
-              <img
+              <Image
                 src={showConfirmPassword ? '/icons/ui/no_view_pass_icon.png' : '/icons/ui/view_pass_icon.png'}
                 alt={showConfirmPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                unoptimized
               />
             </button>
           </div>

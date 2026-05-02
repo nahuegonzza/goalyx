@@ -5,6 +5,7 @@ import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import { getLocalDateString } from '@lib/dateHelpers';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,7 +113,7 @@ export default function ProfilePage() {
           console.error('Error loading profile streak info:', error);
         });
     }
-  }, [session, streakInfo.today]);
+  }, [session, streakInfo.today, streakInfo.currentStreak]);
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
@@ -205,10 +206,13 @@ export default function ProfilePage() {
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <img
+                    <Image
                       src={streakInfo.todayFulfilled ? '/icons/ui/streak_on.gif' : '/icons/ui/streak_off.png'}
                       alt={streakInfo.todayFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
-                      className="w-10 h-10 rounded-full"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                      unoptimized
                     />
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">
@@ -221,10 +225,13 @@ export default function ProfilePage() {
 
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <img
+                    <Image
                       src={'/icons/ui/streak_on.gif'}
                       alt={'Racha cumplida'}
-                      className="w-10 h-10 rounded-full"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                      unoptimized
                     />                
                     <div>
                     <p className="font-medium text-slate-900 dark:text-white">
