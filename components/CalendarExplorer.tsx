@@ -71,12 +71,12 @@ export default function CalendarExplorer() {
       setLoading(true);
       try {
         const [entriesRes, goalsRes, scoreRes, eventsRes, modulesRes, moduleEntriesRes] = await Promise.all([
-          fetch('/api/goalEntries'),
-          fetch('/api/goals'),
-          fetch(`/api/score/history?date=${selectedDate}`),
-          fetch('/api/events'),
-          fetch('/api/modules'),
-          fetch('/api/moduleEntries')
+          fetch('/api/goalEntries', { credentials: 'include' }),
+          fetch('/api/goals', { credentials: 'include' }),
+          fetch(`/api/score/history?date=${selectedDate}`, { credentials: 'include' }),
+          fetch('/api/events', { credentials: 'include' }),
+          fetch('/api/modules', { credentials: 'include' }),
+          fetch('/api/moduleEntries', { credentials: 'include' })
         ]);
 
         if (!entriesRes.ok || !goalsRes.ok || !scoreRes.ok || !eventsRes.ok || !modulesRes.ok || !moduleEntriesRes.ok) {
@@ -211,6 +211,7 @@ export default function CalendarExplorer() {
 
     const response = await fetch('/api/goalEntries', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
@@ -229,7 +230,7 @@ export default function CalendarExplorer() {
     setEditingGoalId(null);
     setDayEdits({});
     // Reload data to reflect changes
-    const entriesRes = await fetch('/api/goalEntries');
+    const entriesRes = await fetch('/api/goalEntries', { credentials: 'include' });
     if (entriesRes.ok) {
       const entriesData = await entriesRes.json();
       setEntries(entriesData);

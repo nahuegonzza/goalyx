@@ -12,7 +12,7 @@ export default function ModuleTracker() {
   useEffect(() => {
     async function loadModules() {
       try {
-        const res = await fetch('/api/modules');
+        const res = await fetch('/api/modules', { credentials: 'include' });
         const modules = await res.json();
         const active = modules.filter((m: any) => m.active);
         // Combine with definitions

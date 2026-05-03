@@ -138,11 +138,11 @@ export default function SettingsPage() {
     setExportLoading(true);
     try {
       const [goalsRes, entriesRes, eventsRes, modulesRes, moduleEntriesRes] = await Promise.all([
-        fetch('/api/goals'),
-        fetch('/api/goalEntries'),
-        fetch('/api/events'),
-        fetch('/api/modules'),
-        fetch('/api/moduleEntries')
+        fetch('/api/goals', { credentials: 'include' }),
+        fetch('/api/goalEntries', { credentials: 'include' }),
+        fetch('/api/events', { credentials: 'include' }),
+        fetch('/api/modules', { credentials: 'include' }),
+        fetch('/api/moduleEntries', { credentials: 'include' })
       ]);
 
       if (!goalsRes.ok || !entriesRes.ok || !eventsRes.ok || !modulesRes.ok || !moduleEntriesRes.ok) {

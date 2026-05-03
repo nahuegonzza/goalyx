@@ -113,7 +113,7 @@ export default function Analytics() {
     setLoading(true);
     try {
       // Load all entries for analytics (no date filter)
-      const res = await fetch('/api/goalEntries?all=true');
+      const res = await fetch('/api/goalEntries?all=true', { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setEntries(data);
@@ -126,7 +126,7 @@ export default function Analytics() {
 
   async function loadModuleEntries() {
     try {
-      const res = await fetch('/api/moduleEntries');
+      const res = await fetch('/api/moduleEntries', { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setModuleEntries(data);
@@ -137,7 +137,7 @@ export default function Analytics() {
 
   async function loadModules() {
     try {
-      const res = await fetch('/api/modules');
+      const res = await fetch('/api/modules', { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const modules = await res.json();
       const active = modules.filter((m: any) => m.active);
@@ -157,7 +157,7 @@ export default function Analytics() {
 
   async function loadGoals() {
     try {
-      const res = await fetch('/api/goals');
+      const res = await fetch('/api/goals', { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setGoals(data);

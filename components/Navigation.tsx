@@ -26,7 +26,7 @@ export default function Navigation() {
 
   useEffect(() => {
     if (session?.user) {
-      fetch('/api/user')
+      fetch('/api/user', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           const displayName = data.firstName || data.email;
@@ -44,7 +44,7 @@ export default function Navigation() {
     try {
       // Usar fecha local para evitar desfase UTC
       const today = getLocalDateString();
-      const res = await fetch(`/api/streaks?date=${today}`);
+      const res = await fetch(`/api/streaks?date=${today}`, { credentials: 'include' });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }

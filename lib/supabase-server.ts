@@ -43,10 +43,10 @@ export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
 
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (error || !user) {
-      console.log('❌ No user session found');
+    if (error || !session?.user) {
+      console.log('❌ No user session found', error?.message ?? '');
       return {
         user: null,
         supabase: null,
@@ -55,17 +55,15 @@ export async function getServerSupabaseUser() {
       };
     }
 
-    console.log('✅ User authenticated:', user.id);
+    console.log('✅ User authenticated:', session.user.id);
     return {
-      user,
+      user: session.user,
       supabase,
       isServiceRole: false,
       serviceRoleAvailable: false
     };
   } catch (error) {
     console.log('⚠️ Auth error:', error);
-    
-    // Error de autenticación - no usar fallback
     console.log('❌ Auth error - denying access');
     return {
       user: null,

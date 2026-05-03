@@ -23,7 +23,7 @@ export function parseModuleConfig(config: unknown): Record<string, unknown> {
 
 export async function getActiveModules(): Promise<ActiveModule[]> {
   try {
-    const res = await fetch('/api/modules');
+    const res = await fetch('/api/modules', { credentials: 'include' });
     if (!res.ok) return [];
 
     const modules = await res.json();

@@ -53,7 +53,7 @@ export default function HistoryViewer() {
 
   async function loadGoals() {
     try {
-      const res = await fetch('/api/goals');
+      const res = await fetch('/api/goals', { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setGoals(data.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));
@@ -74,7 +74,7 @@ export default function HistoryViewer() {
   async function loadEntries() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/goalEntries?date=${selectedDate}`);
+      const res = await fetch(`/api/goalEntries?date=${selectedDate}`, { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setEntries(data);
@@ -87,7 +87,7 @@ export default function HistoryViewer() {
 
   async function loadEvents() {
     try {
-      const res = await fetch(`/api/events?date=${selectedDate}`);
+      const res = await fetch(`/api/events?date=${selectedDate}`, { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setEvents(data);
@@ -126,6 +126,7 @@ export default function HistoryViewer() {
       const payload = buildEntryPayload(goal, value, selectedDate);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });

@@ -15,6 +15,7 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
     try {
       const res = await fetch(`/api/modules/${module.id}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: newConfig }),
       });

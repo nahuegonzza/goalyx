@@ -32,7 +32,7 @@ export default function GoalManager() {
     setLoading(true);
     setStatusMessage('');
     try {
-      const res = await fetch('/api/goals');
+      const res = await fetch('/api/goals', { credentials: 'include' });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         throw new Error(body?.error || `HTTP error! status: ${res.status}`);

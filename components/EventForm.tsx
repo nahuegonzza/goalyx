@@ -24,6 +24,7 @@ export default function EventForm({ modules }: EventFormProps) {
 
     const response = await fetch('/api/events', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: form.type,

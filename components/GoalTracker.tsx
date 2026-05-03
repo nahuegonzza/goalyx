@@ -64,10 +64,10 @@ export default function GoalTracker() {
     setLoading(true);
     try {
       const [goalsRes, entriesRes, eventsRes, moduleEntriesRes] = await Promise.all([
-        fetch('/api/goals'),
-        fetch('/api/goalEntries'),
-        fetch('/api/events'),
-        fetch('/api/moduleEntries')
+        fetch('/api/goals', { credentials: 'include' }),
+        fetch('/api/goalEntries', { credentials: 'include' }),
+        fetch('/api/events', { credentials: 'include' }),
+        fetch('/api/moduleEntries', { credentials: 'include' })
       ]);
 
       // Check if responses are OK before parsing JSON
@@ -149,7 +149,7 @@ export default function GoalTracker() {
 
   async function loadModules() {
     try {
-      const res = await fetch('/api/modules');
+      const res = await fetch('/api/modules', { credentials: 'include' });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         throw new Error(body?.error || `HTTP error! status: ${res.status}`);
@@ -174,7 +174,7 @@ export default function GoalTracker() {
 
   async function loadModuleEntries() {
     try {
-      const res = await fetch('/api/moduleEntries');
+      const res = await fetch('/api/moduleEntries', { credentials: 'include' });
       if (!res.ok) {
         console.error('Failed to fetch moduleEntries');
         return;
@@ -216,6 +216,7 @@ export default function GoalTracker() {
     try {
       const res = await fetch('/api/streaks', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: today })
       });
@@ -263,6 +264,7 @@ export default function GoalTracker() {
       const payload = buildEntryPayload(goal, value, today);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });

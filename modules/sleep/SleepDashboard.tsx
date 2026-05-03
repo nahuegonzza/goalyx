@@ -82,6 +82,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     try {
       const res = await fetch('/api/moduleEntries', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           moduleId: module.id,

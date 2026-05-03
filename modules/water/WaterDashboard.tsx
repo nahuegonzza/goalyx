@@ -43,6 +43,7 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
   const addGlass = async () => {
     const res = await fetch('/api/moduleEntries', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ moduleId: module.id, date, data: { value: 1 } })
     });

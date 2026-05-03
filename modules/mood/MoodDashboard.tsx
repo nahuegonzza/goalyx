@@ -38,7 +38,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
   useEffect(() => {
     async function loadTodayEntry() {
       try {
-        const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=mood`);
+        const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=mood`, { credentials: 'include' });
         const entries = await res.json();
         if (entries && entries.length > 0) {
           const entry = entries[0];
@@ -63,6 +63,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
     try {
       const res = await fetch('/api/moduleEntries', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           moduleId: module.id,

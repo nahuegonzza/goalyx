@@ -88,7 +88,7 @@ export function useAcademicModule(
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/moduleEntries?module=${moduleSlug}`, { cache: 'no-store' });
+      const res = await fetch(`/api/moduleEntries?module=${moduleSlug}`, { cache: 'no-store', credentials: 'include' });
       if (!res.ok) throw new Error('No se pudieron recargar los datos académicos');
       const entries: ModuleEntry[] = await res.json();
       setAllEntries(entries);
@@ -106,6 +106,7 @@ export function useAcademicModule(
     try {
       const result = await fetch('/api/moduleEntries', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           moduleId,

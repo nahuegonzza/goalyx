@@ -61,6 +61,7 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
     try {
       const response = await fetch('/api/goals', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
