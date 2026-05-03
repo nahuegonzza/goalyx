@@ -20,7 +20,6 @@ export default function GoalManager() {
   const [dragOverPosition, setDragOverPosition] = useState<'before' | 'after' | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
-  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Goal>>({});
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -53,12 +52,12 @@ export default function GoalManager() {
 
   function handleEditGoal(goal: Goal) {
     setEditingGoal(goal);
+    setEditForm(goal);
     setShowEditModal(true);
   }
 
   async function handleUpdateGoal(goalId: string) {
     await handleSaveEditGoal(goalId, editForm);
-    setEditingGoalId(null);
     setEditForm({});
   }
 
@@ -480,10 +479,7 @@ export default function GoalManager() {
                           <button
                             title="Editar"
                             type="button"
-                            onClick={() => {
-                              setEditingGoalId(goal.id);
-                              setEditForm(goal);
-                            }}
+                            onClick={() => handleEditGoal(goal)}
                             className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                           >
                             ✏️
@@ -543,10 +539,7 @@ export default function GoalManager() {
                           <button
                             title="Editar"
                             type="button"
-                            onClick={() => {
-                              setEditingGoalId(goal.id);
-                              setEditForm(goal);
-                            }}
+                            onClick={() => handleEditGoal(goal)}
                             className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                           >
                             ✏️
