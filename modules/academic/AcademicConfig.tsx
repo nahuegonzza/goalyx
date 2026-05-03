@@ -1,23 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AcademicSubject } from "./academicHelpers";
 
 interface AcademicConfigProps {
-  config: Record<string, unknown>;
-  onSave: (newConfig: Record<string, unknown>) => void;
-  onClose: () => void;
+  config?: Record<string, unknown>;
+  subjects?: AcademicSubject[];
+  onSave?: (newConfig: Record<string, unknown>) => void;
+  onSaveSubjects?: (updatedSubjects: AcademicSubject[]) => Promise<void> | void;
+  onDeleteSubject?: (subjectId: string) => Promise<void> | void;
+  onClose?: () => void;
 }
 
 export function AcademicConfig({
   config,
+  subjects: subjectsProp,
   onSave,
+  onSaveSubjects,
+  onDeleteSubject,
   onClose,
 }: AcademicConfigProps) {
   const [subjects, setSubjects] = useState<AcademicSubject[]>(
-    (config.subjects as AcademicSubject[]) || [],
+    subjectsProp ?? ((config?.subjects as AcademicSubject[]) || []),
   );
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (subjectsProp) {
+      setSubjects(subjectsProp);
+    } else if (config?.subjects) {
+      setSubjects(config.subjects as AcademicSubject[]);
+    }
+  }, [subjectsProp, config?.subjects]);
 
   const handleFieldChange = (
     id: string,
@@ -41,18 +55,30 @@ export function AcademicConfig({
     setSubjects((current) => [...current, nextSubject]);
   };
 
-  const handleDeleteSubject = (subjectId: string) => {
+  const handleDeleteSubject = async (subjectId: string) => {
     setSubjects((current) =>
       current.filter((subject) => subject.id !== subjectId),
     );
+
+    if (onDeleteSubject) {
+      try {
+        await onDeleteSubject(subjectId);
+      } catch (error) {
+        console.error('Error deleting academic subject:', error);
+      }
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      onSave({ subjects });
+      if (onSaveSubjects) {
+        await onSaveSubjects(subjects);
+      } else if (onSave) {
+        onSave({ subjects });
+      }
     } catch (error) {
-      console.error("Error saving academic config:", error);
+      console.error('Error saving academic config:', error);
     } finally {
       setSaving(false);
     }
