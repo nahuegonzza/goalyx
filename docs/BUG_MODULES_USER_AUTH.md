@@ -2,7 +2,7 @@
 
 **Fecha:** 3 de Mayo de 2026
 **Severidad:** Alta
-**Estado:** Corregido en código fuente / documentado
+**Estado:** Corregido localmente — esquema y endpoint verificados; pendiente deploy/migración en producción
 
 ---
 
@@ -76,7 +76,8 @@ Esto mejora la fiabilidad del envío de cookies de sesión en solicitudes a los 
 
 1. Verificar en producción si el problema desaparece en usuarios distintos al del "ID por defecto".
 2. Revisar la configuración de Vercel para asegurarse de que no exista ninguna variable `DEFAULT_USER_ID` que siga interfiriendo.
-3. Si persiste, añadir logging temporal en las APIs de `getServerSupabaseUser()` para capturar las respuestas del servidor y el estado de sesión.
+3. Revisar el esquema de la base de datos de `Module` para asegurarse de que la clave única sea compuesta por `userId` y `slug`, no solo `slug`.
+4. Si persiste, añadir logging temporal en las APIs de `getServerSupabaseUser()` para capturar las respuestas del servidor y el estado de sesión.
 
 ---
 
@@ -84,6 +85,7 @@ Esto mejora la fiabilidad del envío de cookies de sesión en solicitudes a los 
 
 - No se encontró código en el repositorio actual que use directamente `DEFAULT_USER_ID` en la lógica de rutas principales.
 - Sin embargo, el hecho de que la app funcione bien para un perfil concreto refuerza la hipótesis de una sesión que no se resuelve correctamente para otros usuarios.
+- Se usó un endpoint de depuración temporal para inspeccionar los índices, y solo se dejó habilitado en desarrollo.
 
 ----------------------------------
 
@@ -116,6 +118,21 @@ Se añadió `credentials: 'include'` en múltiples peticiones cliente a rutas pr
 ### Mejora adicional de auth routes
 
 - Se actualizó `app/api/auth/change-password/route.ts` para usar `supabase.auth.getSession()` en lugar de `supabase.auth.getUser()`.
+
+### Nueva evidencia de raíz del problema
+
+- Se reprodujo el bug con un usuario de prueba creado directamente desde un endpoint de depuración.
+- El servidor reconoce correctamente la sesión.
+- La llamada a `/api/modules` fallaba con un `500` porque al crear módulos chocaba con la restricción única global `Module_slug_key`.
+- Esto confirma que el problema principal no era la sesión, sino el estado del índice de la tabla `Module`.
+- El esquema actual en `prisma/schema.prisma` declara `@@unique([userId, slug])`, pero la base de datos aún tenía el índice equivocado.
+
+### Corrección aplicada
+
+- Se agregó una migración manual en `prisma/migrations/20260503_fix_module_unique_slug/migration.sql` para eliminar la restricción única global sobre `slug` y crear la clave única compuesta `userId, slug`.
+- Se aplicó la corrección directamente en la base de datos local con el endpoint de depuración.
+- Verificación exitosa: `/api/modules` ahora responde `200` y devuelve los módulos del usuario sin error.
+- Comando recomendado para desplegar la corrección: `npx prisma migrate dev --name fix-module-unique-slug` en desarrollo o `npx prisma migrate deploy` en producción.
 
 ### Resultado de la validación
 

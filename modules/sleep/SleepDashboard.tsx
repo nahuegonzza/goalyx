@@ -23,7 +23,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   useEffect(() => {
     async function loadTodayEntry() {
       try {
-        const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=sleep`);
+        const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=sleep`, { credentials: 'include' });
         const entries = await res.json();
         if (entries && entries.length > 0) {
           const entry = entries[0];

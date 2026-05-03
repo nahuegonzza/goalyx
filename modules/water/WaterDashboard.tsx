@@ -23,7 +23,7 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
   async function loadEntries() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/moduleEntries?moduleId=${module.id}&date=${date}`);
+      const res = await fetch(`/api/moduleEntries?moduleId=${module.id}&date=${date}`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setEntries(data);

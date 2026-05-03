@@ -199,7 +199,7 @@ export default function GoalTracker() {
 
   async function loadStreakInfo() {
     try {
-      const res = await fetch(`/api/streaks?date=${today}`);
+      const res = await fetch(`/api/streaks?date=${today}`, { credentials: 'include' });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -343,7 +343,6 @@ export default function GoalTracker() {
             {formatDateLong(today)}
           </h2>
         </div>
-        <br />
         {showStreakCard && (
           <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -40,7 +40,7 @@ export function useAcademicModule(
       setError(null);
 
       try {
-        const res = await fetch(`/api/moduleEntries?module=${moduleSlug}`, { cache: 'no-store' });
+        const res = await fetch(`/api/moduleEntries?module=${moduleSlug}`, { cache: 'no-store', credentials: 'include' });
         if (!res.ok) {
           throw new Error('No se pudieron cargar los datos académicos');
         }
