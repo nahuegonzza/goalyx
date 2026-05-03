@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { ModuleState } from '@types';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicTodayCard } from './AcademicTodayCard';
+import { AcademicEventForm } from './AcademicEventForm';
 import type { AcademicEvent } from './academicHelpers';
 
 interface AcademicDashboardProps {
@@ -22,11 +24,21 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     subjects,
     todayEvents,
     upcomingEvents,
-    toggleEventCompleted
+    toggleEventCompleted,
+    addEvent,
+    isSaving
   } = useAcademicModule(module.id, module.slug, selectedDate, config);
+
+  const [showEventForm, setShowEventForm] = useState(false);
 
   const handleToggleCompleted = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
+    onUpdate?.({ updated: true });
+  };
+
+  const handleAddEvent = async (event: AcademicEvent) => {
+    await addEvent(event);
+    setShowEventForm(false);
     onUpdate?.({ updated: true });
   };
 
@@ -40,6 +52,14 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
 
   return (
     <section className="space-y-6">
+      <AcademicEventForm
+        subjects={subjects}
+        isOpen={showEventForm}
+        onClose={() => setShowEventForm(false)}
+        onSave={handleAddEvent}
+        isSaving={isSaving}
+      />
+
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -81,7 +101,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
           <div className="mt-5 space-y-4">
             {todayEvents.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-                No hay exámenes ni tareas para hoy. Agrega un evento para comenzar.
+                No hay exámenes ni tareas para hoy. <button onClick={() => setShowEventForm(true)} className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Agrega uno</button>
               </div>
             ) : (
               todayEvents.map((event) => {
@@ -97,6 +117,13 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
               })
             )}
           </div>
+
+          <button
+            onClick={() => setShowEventForm(true)}
+            className="mt-6 w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+          >
+            + Agregar evento
+          </button>
         </div>
 
         <div className="space-y-4">

@@ -1,174 +1,243 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
-import type { AcademicEvent, AcademicSubject, AcademicExamType, AcademicTaskPriority } from './academicHelpers';
+import { useEffect, useState } from 'react';
+import { getLocalDateString } from '@lib/dateHelpers';
+import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority } from './academicHelpers';
 
 interface AcademicEventFormProps {
   subjects: AcademicSubject[];
-  onAddEvent: (event: AcademicEvent) => Promise<void>;
-  isSaving: boolean;
+  event?: AcademicEvent;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (event: AcademicEvent) => Promise<void>;
+  isSaving?: boolean;
 }
 
-const examTypes: AcademicExamType[] = ['parcial', 'final', 'recuperatorio'];
-const taskPriorities: AcademicTaskPriority[] = ['alta', 'media', 'baja'];
-
-export function AcademicEventForm({ subjects, onAddEvent, isSaving }: AcademicEventFormProps) {
-  const [eventType, setEventType] = useState<AcademicEvent['type']>('exam');
-  const [subjectId, setSubjectId] = useState<string>(subjects[0]?.id ?? '');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+export function AcademicEventForm({
+  subjects,
+  event: initialEvent,
+  isOpen,
+  onClose,
+  onSave,
+  isSaving = false,
+}: AcademicEventFormProps) {
+  const [eventType, setEventType] = useState<AcademicEventType>('task');
   const [examType, setExamType] = useState<AcademicExamType>('parcial');
   const [priority, setPriority] = useState<AcademicTaskPriority>('media');
-  const [completed, setCompleted] = useState(false);
+  const [subjectId, setSubjectId] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState(getLocalDateString());
 
   useEffect(() => {
-    if (subjects.length && !subjects.some((subject) => subject.id === subjectId)) {
-      setSubjectId(subjects[0].id);
+    if (initialEvent) {
+      setEventType(initialEvent.type);
+      setExamType(initialEvent.examType || 'parcial');
+      setPriority(initialEvent.priority || 'media');
+      setSubjectId(initialEvent.subjectId);
+      setTitle(initialEvent.title);
+      setDescription(initialEvent.description);
+      setDate(initialEvent.date.slice(0, 10));
+    } else {
+      setEventType('task');
+      setExamType('parcial');
+      setPriority('media');
+      setSubjectId(subjects.length > 0 ? subjects[0].id : '');
+      setTitle('');
+      setDescription('');
+      setDate(getLocalDateString());
     }
-  }, [subjects, subjectId]);
+  }, [initialEvent, isOpen, subjects]);
 
-  const subjectOptions = useMemo(() => subjects.map((subject) => (
-    <option key={subject.id} value={subject.id}>{subject.name || 'Asignar materia'}</option>
-  )), [subjects]);
+  const handleSave = async () => {
+    if (!subjectId || !title) {
+      alert('Por favor completa materia y título');
+      return;
+    }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!title.trim() || !subjectId) return;
-
-    const newEvent: AcademicEvent = {
-      id: crypto.randomUUID(),
+    const event: AcademicEvent = {
+      id: initialEvent?.id || crypto.randomUUID(),
       subjectId,
-      title: title.trim(),
-      description: description.trim(),
-      date,
-      completed,
+      title,
+      description,
+      date: date,
+      completed: initialEvent?.completed || false,
       type: eventType,
-      examType: eventType === 'exam' ? examType : undefined,
-      priority: eventType === 'task' ? priority : undefined
+      ...(eventType === 'exam' ? { examType } : { priority }),
     };
 
-    await onAddEvent(newEvent);
-    setTitle('');
-    setDescription('');
-    setCompleted(false);
-    setDate(new Date().toISOString().slice(0, 10));
+    await onSave(event);
+    onClose();
   };
 
-  if (subjects.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-        Agrega primero una materia para poder crear parciales y tareas.
-      </div>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-        <div className="flex-1 space-y-3">
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Tipo de evento</label>
-            <select
-              value={eventType}
-              onChange={(e) => setEventType(e.target.value as AcademicEvent['type'])}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            >
-              <option value="exam">Examen</option>
-              <option value="task">Tarea</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Materia</label>
-            <select
-              value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            >
-              {subjectOptions}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-auto">
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Fecha</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            />
-          </div>
-
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>{eventType === 'exam' ? '📝' : '✓'}</span>
+            {initialEvent ? 'Editar Evento' : 'Nuevo Evento'}
+          </h2>
           <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-slate-950 dark:hover:bg-emerald-400"
+            onClick={onClose}
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            {isSaving ? 'Guardando...' : 'Agregar evento'}
+            ✕
           </button>
         </div>
-      </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <div className="space-y-3">
-          <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Título</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={eventType === 'exam' ? 'Parcial de Estadística' : 'Tarea de Filosofía'}
-            className="w-full rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-          />
-        </div>
-
-        <div className="space-y-3">
-          <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Descripción</label>
-          <input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Tema, consultorio, lugar..."
-            className="w-full rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-          />
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {eventType === 'exam' ? (
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Tipo de examen</label>
-            <select
-              value={examType}
-              onChange={(e) => setExamType(e.target.value as AcademicExamType)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            >
-              {examTypes.map((typeOption) => (
-                <option key={typeOption} value={typeOption}>{typeOption}</option>
-              ))}
-            </select>
+        {subjects.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-rose-300 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-700/40 dark:bg-rose-950/40 dark:text-rose-200">
+            Agrega primero una materia en la configuración para poder crear eventos.
           </div>
         ) : (
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Prioridad</label>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            >
-              {taskPriorities.map((priorityOption) => (
-                <option key={priorityOption} value={priorityOption}>{priorityOption}</option>
-              ))}
-            </select>
+          <div className="space-y-5">
+            {/* Tipo de evento */}
+            <div>
+              <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                Tipo de evento
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEventType('exam')}
+                  className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    eventType === 'exam'
+                      ? 'border-2 border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-950/50 dark:text-emerald-300'
+                      : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                  }`}
+                >
+                  📝 Examen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventType('task')}
+                  className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    eventType === 'task'
+                      ? 'border-2 border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-950/50 dark:text-emerald-300'
+                      : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                  }`}
+                >
+                  ✓ Tarea
+                </button>
+              </div>
+            </div>
+
+            {/* Materia */}
+            <div>
+              <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                Materia *
+              </label>
+              <select
+                value={subjectId}
+                onChange={(e) => setSubjectId(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="">Selecciona una materia</option>
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {subject.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Título */}
+            <div>
+              <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                Título *
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ej. Análisis Matemático I"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              />
+            </div>
+
+            {/* Tipo de examen o prioridad de tarea */}
+            {eventType === 'exam' ? (
+              <div>
+                <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                  Tipo de examen
+                </label>
+                <select
+                  value={examType}
+                  onChange={(e) => setExamType(e.target.value as AcademicExamType)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                >
+                  <option value="parcial">Parcial</option>
+                  <option value="final">Final</option>
+                  <option value="recuperatorio">Recuperatorio</option>
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                  Prioridad
+                </label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                >
+                  <option value="alta">Alta</option>
+                  <option value="media">Media</option>
+                  <option value="baja">Baja</option>
+                </select>
+              </div>
+            )}
+
+            {/* Fecha */}
+            <div>
+              <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                Fecha
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              />
+            </div>
+
+            {/* Descripción */}
+            <div>
+              <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                Descripción (opcional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Agrega detalles sobre este evento..."
+                rows={3}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900 resize-none"
+              />
+            </div>
           </div>
         )}
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-          <input type="checkbox" checked={completed} onChange={(e) => setCompleted(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-          Marcar como completado
-        </label>
+        <div className="mt-8 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving || subjects.length === 0}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+          >
+            {isSaving ? 'Guardando...' : initialEvent ? 'Actualizar' : 'Crear'}
+          </button>
+        </div>
       </div>
-    </form>
+    </div>
   );
 }
