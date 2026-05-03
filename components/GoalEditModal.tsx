@@ -137,18 +137,18 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
                 </button>
                 {showIconPicker && (
                   <div className="absolute top-full z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-lg">
-                    {ICON_OPTIONS.map((icon) => (
+                    {ICON_OPTIONS.map((option) => (
                       <button
-                        key={icon}
+                        key={option.key}
                         type="button"
                         onClick={() => {
-                          setForm({ ...form, icon });
+                          setForm({ ...form, icon: option.key });
                           setShowIconPicker(false);
                         }}
                         className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-600"
                       >
-                        <span className="text-lg">{getGoalIcon(icon)}</span>
-                        <span className="text-slate-900 dark:text-white">{icon}</span>
+                        <span className="text-lg">{getGoalIcon(option.key)}</span>
+                        <span className="text-slate-900 dark:text-white">{option.label}</span>
                       </button>
                     ))}
                   </div>
@@ -181,17 +181,17 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
                     </button>
                     {COLOR_OPTIONS.map((color) => (
                       <button
-                        key={color.value}
+                        key={color.key}
                         type="button"
                         onClick={() => {
-                          setForm({ ...form, color: color.value });
+                          setForm({ ...form, color: color.key });
                           setShowColorPicker(false);
                         }}
                         className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-600"
                       >
                         <div
                           className="h-4 w-4 rounded-full border border-slate-300 dark:border-slate-600"
-                          style={{ backgroundColor: color.value }}
+                          style={{ backgroundColor: color.bgColor }}
                         />
                         <span className="text-slate-900 dark:text-white">{color.label}</span>
                       </button>
@@ -219,30 +219,21 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
                   <label className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Rojo</label>
                   <NumberInput
                     value={rgbColor.r}
-                    onChange={(value) => handleRgbChange('r', value)}
-                    min={0}
-                    max={255}
-                    className="w-full"
+                    onCommit={(value) => handleRgbChange('r', value)}
                   />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Verde</label>
                   <NumberInput
                     value={rgbColor.g}
-                    onChange={(value) => handleRgbChange('g', value)}
-                    min={0}
-                    max={255}
-                    className="w-full"
+                    onCommit={(value) => handleRgbChange('g', value)}
                   />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Azul</label>
                   <NumberInput
                     value={rgbColor.b}
-                    onChange={(value) => handleRgbChange('b', value)}
-                    min={0}
-                    max={255}
-                    className="w-full"
+                    onCommit={(value) => handleRgbChange('b', value)}
                   />
                 </div>
               </div>
@@ -262,18 +253,16 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Puntos si completado</label>
                 <NumberInput
                   value={form.pointsIfTrue ?? 1}
-                  onChange={(value) => setForm({ ...form, pointsIfTrue: value })}
-                  min={0}
-                  className="w-full"
+                  onCommit={(value) => setForm({ ...form, pointsIfTrue: value })}
+                  step={0.1}
                 />
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Puntos si no completado</label>
                 <NumberInput
                   value={form.pointsIfFalse ?? 0}
-                  onChange={(value) => setForm({ ...form, pointsIfFalse: value })}
-                  min={0}
-                  className="w-full"
+                  onCommit={(value) => setForm({ ...form, pointsIfFalse: value })}
+                  step={0.1}
                 />
               </div>
             </div>
@@ -284,9 +273,8 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
               <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Puntos por unidad</label>
               <NumberInput
                 value={form.pointsPerUnit ?? 1}
-                onChange={(value) => setForm({ ...form, pointsPerUnit: value })}
-                min={0}
-                className="w-full"
+                onCommit={(value) => setForm({ ...form, pointsPerUnit: value })}
+                step={0.1}
               />
             </div>
           )}
