@@ -50,15 +50,21 @@ function calculateStreaks(dateKeys: string[], referenceDate: string) {
   });
 
   const dateSet = new Set(uniqueDates);
-  if (dateSet.has(referenceDate)) {
-    currentStreak = 0;
-    let streakDate = new Date(`${referenceDate}T00:00:00Z`);
-    while (dateSet.has(getDateKey(streakDate))) {
-      currentStreak += 1;
-      streakDate.setUTCDate(streakDate.getUTCDate() - 1);
-    }
-  } else {
-    currentStreak = 0;
+  
+  // Si hoy está registrado, contar desde hoy hacia atrás
+  // Si hoy NO está pero ayer sí, contar desde ayer (racha salvable pero incompleta)
+  // Si ayer tampoco está, racha rota (currentStreak = 0)
+  let streakDate = new Date(`${referenceDate}T00:00:00Z`);
+  
+  // Si hoy no está en el set, retroceder un día para comenzar a contar desde ayer
+  if (!dateSet.has(getDateKey(streakDate))) {
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
+  }
+  
+  // Ahora contar hacia atrás desde donde estamos (hoy si está, ayer si no)
+  while (dateSet.has(getDateKey(streakDate))) {
+    currentStreak += 1;
+    streakDate.setUTCDate(streakDate.getUTCDate() - 1);
   }
 
   return { currentStreak, longestStreak };
