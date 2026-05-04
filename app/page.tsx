@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { ensurePrismaUserForSession, getServerSupabaseUser } from '@lib/supabase-server';
+import { prisma } from '@lib/prisma';
 import Navigation from '@components/Navigation';
 import GoalTracker from '@components/GoalTracker';
 
@@ -10,17 +11,26 @@ export default async function Home() {
     redirect('/login');
   }
 
+  let dbUser = null;
+
   try {
     await ensurePrismaUserForSession();
+    dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { username: true, firstName: true, name: true }
+    });
   } catch (error) {
     console.error('Prisma sync failed', error);
   }
 
-  // Definimos la prioridad: firstName -> username -> email
-  // Usamos user_metadata porque normalmente es ahí donde Supabase guarda los campos extra
-  const displayName = 
-    user.firstName || 
-    user.username || 
+  const displayName =
+    user.user_metadata?.first_name ||
+    user.user_metadata?.firstName ||
+    user.user_metadata?.full_name ||
+    dbUser?.firstName ||
+    user.user_metadata?.username ||
+    dbUser?.username ||
+    dbUser?.name ||
     user.email;
 
   return (
