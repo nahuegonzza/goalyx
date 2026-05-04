@@ -48,6 +48,7 @@ export default function GoalTracker() {
   const [academicCollapsed, setAcademicCollapsed] = useState(false);
 
   const today = useMemo(() => getLocalDateString(), []);
+  const [selectedDate, setSelectedDate] = useState(today);
 
   const orderedModules = useMemo(() => {
     const orderMap: Record<string, number> = { mood: 0, sleep: 1, academic: 4 };
@@ -77,6 +78,15 @@ export default function GoalTracker() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  useEffect(() => {
+    (async () => {
+      await loadData();
+      await loadScoreHistory();
+      await loadStreakInfo();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
 
   async function loadData() {
     setLoading(true);
@@ -151,7 +161,7 @@ export default function GoalTracker() {
       const eventsData = JSON.parse(eventsText);
       const moduleEntriesData = JSON.parse(moduleEntriesText);
 
-      const activeGoals = goalsData.filter((goal: Goal) => isGoalActiveOnDate(goal, today));
+      const activeGoals = goalsData.filter((goal: Goal) => isGoalActiveOnDate(goal, selectedDate));
       setGoals(activeGoals.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));
       setEntries(entriesData);
       setEvents(eventsData);
@@ -206,7 +216,7 @@ export default function GoalTracker() {
 
   async function loadScoreHistory() {
     try {
-      const res = await fetch(`/api/score/history?date=${today}`);
+      const res = await fetch(`/api/score/history?date=${selectedDate}`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setScoreHistory(data);
@@ -217,7 +227,7 @@ export default function GoalTracker() {
 
   async function loadStreakInfo() {
     try {
-      const res = await fetch(`/api/streaks?date=${today}`, { credentials: 'include' });
+      const res = await fetch(`/api/streaks?date=${selectedDate}`, { credentials: 'include' });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -236,7 +246,7 @@ export default function GoalTracker() {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: today })
+        body: JSON.stringify({ date: selectedDate })
       });
 
       if (!res.ok) {
@@ -253,18 +263,33 @@ export default function GoalTracker() {
     }
   }
 
+  function goToPreviousDay() {
+    const currentDate = parseLocalDate(selectedDate);
+    currentDate.setDate(currentDate.getDate() - 1);
+    setSelectedDate(formatLocalDate(currentDate));
+  }
+
+  function goToNextDay() {
+    const currentDate = parseLocalDate(selectedDate);
+    currentDate.setDate(currentDate.getDate() + 1);
+    const nextDate = formatLocalDate(currentDate);
+    if (nextDate <= today) {
+      setSelectedDate(nextDate);
+    }
+  }
+
   async function handleSaveEntry(goal: Goal, value: boolean | number) {
     setSavingGoalId(goal.id);
     setMessage('');
     setEntries((prevEntries) => {
       const existingIndex = prevEntries.findIndex((entry) =>
-        entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === today
+        entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === selectedDate
       );
       const updatedEntry = {
         id: existingIndex !== -1 ? prevEntries[existingIndex].id : `temp-${goal.id}`,
         userId: goal.userId,
         goalId: goal.id,
-        date: today,
+        date: selectedDate,
         createdAt: existingIndex !== -1 ? prevEntries[existingIndex].createdAt : new Date().toISOString(),
         goal,
         valueBoolean: goal.type === 'BOOLEAN' ? Boolean(value) : prevEntries[existingIndex]?.valueBoolean ?? null,
@@ -279,7 +304,7 @@ export default function GoalTracker() {
     });
 
     try {
-      const payload = buildEntryPayload(goal, value, today);
+      const payload = buildEntryPayload(goal, value, selectedDate);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
         credentials: 'include',
@@ -291,7 +316,7 @@ export default function GoalTracker() {
         const updatedEntry = await res.json();
         setEntries((prevEntries) => {
           const existingIndex = prevEntries.findIndex((entry) =>
-            entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === today
+            entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === selectedDate
           );
           if (existingIndex !== -1) {
             return prevEntries.map((entry, index) =>
@@ -321,7 +346,7 @@ export default function GoalTracker() {
   }
 
   const goalEntriesMap = useMemo(() => {
-    const todayEntries = entries.filter((e) => getLocalDateStringFromEntry(e.date) === today);
+    const todayEntries = entries.filter((e) => getLocalDateStringFromEntry(e.date) === selectedDate);
     return new Map(todayEntries.map((entry) => [entry.goalId, entry]));
   }, [entries, today]);
 
@@ -357,9 +382,26 @@ export default function GoalTracker() {
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Registro diario
           </p>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {formatDateLong(today)}
-          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goToPreviousDay}
+              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              title="Día anterior"
+            >
+              ←
+            </button>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {formatDateLong(selectedDate)}
+            </h2>
+            <button
+              onClick={goToNextDay}
+              disabled={selectedDate === today}
+              className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Día siguiente"
+            >
+              →
+            </button>
+          </div>
         </div>
         {showStreakCard && (
           <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
