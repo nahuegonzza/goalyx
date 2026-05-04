@@ -160,7 +160,7 @@ export async function PATCH(request: Request) {
 
     // Handle username update
     if (username !== undefined) {
-      const normalizedUsername = username ? username.trim().toLowerCase() : null;
+      const normalizedUsername = username ? username.trim() : null;
       
       if (normalizedUsername) {
         // Validate username format
@@ -172,9 +172,14 @@ export async function PATCH(request: Request) {
           );
         }
 
-        // Check if username is already taken by another user
-        const existingUser = await prisma.user.findUnique({
-          where: { username: normalizedUsername },
+        // Check if username is already taken by another user (case-insensitive)
+        const existingUser = await prisma.user.findFirst({
+          where: {
+            username: {
+              equals: normalizedUsername,
+              mode: 'insensitive'
+            }
+          },
           select: { id: true }
         });
 
