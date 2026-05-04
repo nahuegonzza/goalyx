@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getLocalDateString } from "@lib/dateHelpers";
 import type { AcademicSubject } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
+import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface AcademicConfigProps {
   config?: Record<string, unknown>;
@@ -224,14 +225,14 @@ export function AcademicConfig({
                       <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
                         Color
                       </label>
-                      <input
-                        type="color"
-                        value={subject.color}
-                        onChange={(e) =>
-                          handleFieldChange(subject.id, "color", e.target.value)
-                        }
-                        className="mt-1 h-11 w-full cursor-pointer rounded-xl border border-slate-300 bg-white p-1 text-sm outline-none transition focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-950"
-                      />
+                      <div className="mt-1">
+                        <UnifiedColorPicker
+                          value={subject.color}
+                          onChange={(color) =>
+                            handleFieldChange(subject.id, "color", color)
+                          }
+                        />
+                      </div>
                     </div>
                     <button
                       type="button"

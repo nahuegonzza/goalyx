@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Goal, GoalPayload } from '@types';
-import { ICON_OPTIONS, COLOR_OPTIONS, getColorOption, getGoalIcon, isCustomColor } from '@lib/goalIconsColors';
+import { ICON_OPTIONS, getGoalIcon } from '@lib/goalIconsColors';
 import NumberInput from '@components/NumberInput';
+import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface GoalFormProps {
   initialData?: Partial<Goal>;
@@ -66,9 +67,6 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const [status, setStatus] = useState<string>('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [showIconPicker, setShowIconPicker] = useState(false);
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showRgbPicker, setShowRgbPicker] = useState(false);
-  const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
 
   const normalizedInitial = useMemo(() => normalizeForm(normalizeInitialData(initialData)), [initialData]);
   const normalizedCurrent = useMemo(() => normalizeForm(form), [form]);
@@ -77,23 +75,6 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   useEffect(() => {
     const merged = normalizeInitialData(initialData);
     setForm(merged);
-
-    if (merged.color && isCustomColor(merged.color)) {
-      const color = merged.color;
-      if (color.startsWith('rgb(')) {
-        const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-        if (match) {
-          setRgbColor({ r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) });
-        }
-      } else if (color.startsWith('#') && color.length === 7) {
-        const r = parseInt(color.slice(1, 3), 16);
-        const g = parseInt(color.slice(3, 5), 16);
-        const b = parseInt(color.slice(5, 7), 16);
-        setRgbColor({ r, g, b });
-      }
-    } else {
-      setRgbColor({ r: 255, g: 255, b: 255 });
-    }
   }, [initialData]);
 
   useEffect(() => {
@@ -120,13 +101,6 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
     setForm({ ...form, weekDays: form.weekDays?.length === 7 ? [] : allDays });
   };
 
-  const handleRgbChange = (component: 'r' | 'g' | 'b', value: number) => {
-    const normalizedValue = Math.max(0, Math.min(255, Math.round(value)));
-    const nextRgb = { ...rgbColor, [component]: normalizedValue };
-    setRgbColor(nextRgb);
-    setForm({ ...form, color: `rgb(${nextRgb.r}, ${nextRgb.g}, ${nextRgb.b})` });
-  };
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('Guardando objetivo...');
@@ -138,8 +112,6 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
         setStatus('✓ Cambios guardados');
         setStatusType('success');
         setShowIconPicker(false);
-        setShowColorPicker(false);
-        setShowRgbPicker(false);
         if (!initialData) {
           setForm(initialState);
         }
@@ -155,8 +127,6 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
       setStatusType('error');
     }
   }
-
-  const selectedColor = getColorOption(form.color ?? 'white');
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -228,104 +198,11 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
         </div>
 
         <div className="relative">
-          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Color</label>
-          <button
-            type="button"
-            onClick={() => setShowColorPicker(!showColorPicker)}
-            className="flex h-12 w-full items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
-            aria-label="Seleccionar color"
-          >
-            <span
-              className="h-6 w-6 rounded-full border border-slate-300 dark:border-slate-600"
-              style={{
-                backgroundColor: selectedColor.bgColor,
-                borderColor: selectedColor.borderColor
-              }}
-            />
-          </button>
-          {showColorPicker && (
-            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-4 z-20">
-              <div className="grid grid-cols-6 gap-3">
-                {COLOR_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={() => {
-                      setForm({ ...form, color: opt.key });
-                      setShowColorPicker(false);
-                      setShowRgbPicker(false);
-                    }}
-                    className="w-10 h-10 rounded-full border-2 transition-all hover:scale-110 focus:outline-none"
-                    style={{
-                      backgroundColor: opt.bgColor,
-                      borderColor: opt.borderColor,
-                      boxShadow: form.color === opt.key ? '0 0 0 3px rgba(16, 185, 129, 0.35)' : 'none'
-                    }}
-                    aria-label={opt.label}
-                  />
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setShowRgbPicker(!showRgbPicker)}
-                  className="w-10 h-10 rounded-full border-2 border-slate-400 dark:border-slate-500 flex items-center justify-center text-[0.63rem] font-black text-slate-600 dark:text-slate-300 hover:scale-110 transition-all"
-                  aria-label="RGB personalizado"
-                >
-                  RGB
-                </button>
-              </div>
-              {showRgbPicker && (
-                <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600">
-                  <div className="grid gap-3">
-                    <div className="grid gap-2">
-                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Rojo</label>
-                      <NumberInput
-                        value={rgbColor.r}
-                        onCommit={(value) => handleRgbChange('r', value)}
-                        min={0}
-                        step={1}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Verde</label>
-                      <NumberInput
-                        value={rgbColor.g}
-                        onCommit={(value) => handleRgbChange('g', value)}
-                        min={0}
-                        step={1}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Azul</label>
-                      <NumberInput
-                        value={rgbColor.b}
-                        onCommit={(value) => handleRgbChange('b', value)}
-                        min={0}
-                        step={1}
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <span
-                      className="h-6 w-6 rounded-full border border-slate-300 dark:border-slate-500"
-                      style={{ backgroundColor: `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})` }}
-                    />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">rgb({rgbColor.r}, {rgbColor.g}, {rgbColor.b})</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setForm({ ...form, color: `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})` });
-                        setShowColorPicker(false);
-                        setShowRgbPicker(false);
-                      }}
-                      className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-700 transition"
-                    >
-                      Aplicar
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <UnifiedColorPicker
+            label="Color"
+            value={form.color ?? 'white'}
+            onChange={(color) => setForm({ ...form, color })}
+          />
         </div>
 
         <div className="md:col-span-2 grid gap-4 md:grid-cols-2">

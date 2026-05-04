@@ -74,7 +74,9 @@ export default function NumberInput({
         const normalized = internalValue.trim().replace(',', '.');
         const current = Number(normalized) || 0;
         const direction = event.deltaY < 0 ? 1 : -1;
-        const next = current + direction * step;
+        const wheelStep = Math.abs(step) < 1 ? 1 : step;
+        const baseValue = Number.isInteger(current) ? current : Math.round(current);
+        const next = baseValue + direction * wheelStep;
         const value = Number.isNaN(next) ? 0 : next;
         setInternalValue(String(value));
         onCommit(value);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface MoodState {
   id: string;
@@ -25,8 +26,6 @@ const defaultStates: MoodState[] = [
 ];
 
 const availableEmojis = ['😊', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😉', '😌', '😍', '🥰', '😘', '😎', '🤩', '😇', '🤗', '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯', '😪', '😫', '🥱', '😴', '😌', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'];
-
-const availableColors = ['#22c55e', '#3b82f6', '#ef4444', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6'];
 
 export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose }) => {
   const [states, setStates] = useState<MoodState[]>(
@@ -119,32 +118,11 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
               {/* Acciones Derecha */}
               <div className="flex items-center gap-2">
                 {/* Color Picker */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    className="h-7 w-7 rounded-full border-2 border-white shadow-sm dark:border-slate-600 transition-transform hover:scale-110"
-                    style={{ backgroundColor: state.color }}
-                    onClick={() => setEditingId(editingId === state.id + '_color' ? null : state.id + '_color')}
+                <div className="min-w-[3rem]">
+                  <UnifiedColorPicker
+                    value={state.color}
+                    onChange={(color) => handleUpdateState(state.id, 'color', color)}
                   />
-                  
-                  {editingId === state.id + '_color' && (
-                    <div className="absolute right-0 top-12 z-20 w-56 rounded-xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Selecciona un color</p>
-                      <div className="grid grid-cols-5 gap-2">
-                        {availableColors.map((color) => (
-                          <button
-                            key={color}
-                            onClick={() => {
-                              handleUpdateState(state.id, 'color', color);
-                              setEditingId(null);
-                            }}
-                            className="aspect-square rounded-full border-2 border-transparent transition-all hover:scale-125 hover:border-slate-400 dark:hover:border-slate-500"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Botón Eliminar */}
