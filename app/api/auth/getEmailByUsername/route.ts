@@ -3,16 +3,21 @@ import { prisma } from '@lib/prisma';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const username = url.searchParams.get('username')?.trim().toLowerCase();
+  const username = url.searchParams.get('username')?.trim();
 
   if (!username) {
     return NextResponse.json({ error: 'Username requerido' }, { status: 400 });
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { username },
-      select: { email: true }
+    const user = await prisma.user.findFirst({
+      where: {
+        username: {
+          equals: username,
+          mode: 'insensitive'
+        }
+      },
+      select: { email: true, username: true }
     });
 
     if (!user) {
@@ -21,7 +26,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       email: user.email,
-      username: username
+      username: user.username
     });
   } catch (error) {
     console.error('Error getting email by username:', error);

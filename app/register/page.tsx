@@ -99,7 +99,7 @@ export default function RegisterPage() {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           birth_date: birthDate,
-          username: username.trim().toLowerCase(),
+          username: username.trim(),
         },
       },
     });
@@ -125,7 +125,7 @@ export default function RegisterPage() {
             await fetch('/api/user', {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username: username.trim().toLowerCase() }),
+              body: JSON.stringify({ username: username.trim() }),
               credentials: 'include'
             });
           }

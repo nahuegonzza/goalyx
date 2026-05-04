@@ -3,7 +3,7 @@ import { prisma } from '@lib/prisma';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const username = url.searchParams.get('username')?.trim().toLowerCase();
+  const username = url.searchParams.get('username')?.trim();
 
   if (!username) {
     return NextResponse.json({ error: 'Username requerido' }, { status: 400 });
@@ -17,7 +17,12 @@ export async function GET(request: Request) {
 
   try {
     const existingUser = await prisma.user.findFirst({
-      where: { username: username },
+      where: {
+        username: {
+          equals: username,
+          mode: 'insensitive'
+        }
+      },
       select: { id: true }
     });
 
