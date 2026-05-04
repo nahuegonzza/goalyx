@@ -47,7 +47,6 @@ function normalizeInitialData(data?: Partial<Goal>): GoalFormData {
     isActive: data.isActive ?? initialState.isActive,
     deactivatedAt: data.deactivatedAt ?? initialState.deactivatedAt,
     activatedAt: data.activatedAt ?? initialState.activatedAt,
-    scheduledDays: data.scheduledDays ?? initialState.scheduledDays,
     weekDays: Array.isArray(data.weekDays) ? data.weekDays : initialState.weekDays,
   };
 }
