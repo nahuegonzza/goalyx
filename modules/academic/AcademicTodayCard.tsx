@@ -42,14 +42,16 @@ export function AcademicTodayCard({ event, subject, onToggleComplete }: Academic
             <p className="text-xs text-slate-500 dark:text-slate-400">{subject?.name ?? 'Materia no encontrada'}</p>
           </div>
         </div>
-        <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-          <input
-            type="checkbox"
-            checked={event.completed}
-            onChange={() => onToggleComplete(event)}
-            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-          />
-          Listo
+        <label className="inline-flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
+          <span>Listo</span>
+          <button
+            type="button"
+            onClick={() => onToggleComplete(event)}
+            aria-pressed={event.completed}
+            className={`relative h-7 w-14 rounded-full transition-colors ${event.completed ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+          >
+            <span className={`absolute left-1 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-white shadow transition-transform ${event.completed ? 'translate-x-7' : 'translate-x-0'}`} />
+          </button>
         </label>
       </div>
 
