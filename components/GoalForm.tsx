@@ -35,14 +35,19 @@ function normalizeInitialData(data?: Partial<Goal>): GoalFormData {
   if (!data) return initialState;
 
   return {
-    ...initialState,
-    ...data,
+    title: data.title ?? initialState.title,
     description: data.description ?? initialState.description,
+    type: data.type ?? initialState.type,
     icon: data.icon ?? initialState.icon,
     color: data.color ?? initialState.color,
+    order: data.order ?? initialState.order,
     pointsIfTrue: data.pointsIfTrue ?? initialState.pointsIfTrue,
     pointsIfFalse: data.pointsIfFalse ?? initialState.pointsIfFalse,
     pointsPerUnit: data.pointsPerUnit ?? initialState.pointsPerUnit,
+    isActive: data.isActive ?? initialState.isActive,
+    deactivatedAt: data.deactivatedAt ?? initialState.deactivatedAt,
+    activatedAt: data.activatedAt ?? initialState.activatedAt,
+    scheduledDays: data.scheduledDays ?? initialState.scheduledDays,
     weekDays: Array.isArray(data.weekDays) ? data.weekDays : initialState.weekDays,
   };
 }
@@ -66,7 +71,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
 
-  const normalizedInitial = useMemo(() => normalizeForm({ ...initialState, ...initialData }), [initialData]);
+  const normalizedInitial = useMemo(() => normalizeForm(normalizeInitialData(initialData)), [initialData]);
   const normalizedCurrent = useMemo(() => normalizeForm(form), [form]);
   const isDirty = JSON.stringify(normalizedInitial) !== JSON.stringify(normalizedCurrent);
 
