@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { COLOR_OPTIONS, getColorOption, isCustomColor, rgbToHex } from '@lib/goalIconsColors';
 
 interface UnifiedColorPickerProps {
@@ -29,6 +30,9 @@ export default function UnifiedColorPicker({
   const [showRgb, setShowRgb] = useState(false);
   const [customHex, setCustomHex] = useState('#ffffff');
   const rootRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [overlayStyle, setOverlayStyle] = useState<Record<string, number>>({});
   const selected = useMemo(() => getColorOption(value), [value]);
 
   useEffect(() => {
@@ -43,10 +47,14 @@ export default function UnifiedColorPicker({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!rootRef.current) return;
-      if (!rootRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setShowRgb(false);
+      if (
+        rootRef.current.contains(event.target as Node) ||
+        overlayRef.current?.contains(event.target as Node)
+      ) {
+        return;
       }
+      setIsOpen(false);
+      setShowRgb(false);
     };
 
     if (isOpen) {
@@ -57,6 +65,61 @@ export default function UnifiedColorPicker({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !buttonRef.current) return;
+
+    const updatePosition = () => {
+      const rect = buttonRef.current!.getBoundingClientRect();
+      const popupWidth = 288;
+      const popupHeight = showRgb ? 420 : 216;
+      const margin = 8;
+      let top = rect.bottom + margin;
+      if (top + popupHeight > window.innerHeight - margin) {
+        top = rect.top - popupHeight - margin;
+        if (top < margin) top = margin;
+      }
+      let left = rect.left;
+      if (left + popupWidth > window.innerWidth - margin) {
+        left = window.innerWidth - popupWidth - margin;
+      }
+      if (left < margin) left = margin;
+      setOverlayStyle({ top, left, width: popupWidth });
+    };
+
+    updatePosition();
+  }, [isOpen, showRgb]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updatePosition = () => {
+      if (!buttonRef.current) return;
+      const rect = buttonRef.current.getBoundingClientRect();
+      const popupWidth = 288;
+      const popupHeight = showRgb ? 420 : 216;
+      const margin = 8;
+      let top = rect.bottom + margin;
+      if (top + popupHeight > window.innerHeight - margin) {
+        top = rect.top - popupHeight - margin;
+        if (top < margin) top = margin;
+      }
+      let left = rect.left;
+      if (left + popupWidth > window.innerWidth - margin) {
+        left = window.innerWidth - popupWidth - margin;
+      }
+      if (left < margin) left = margin;
+      setOverlayStyle({ top, left, width: popupWidth });
+    };
+
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen, showRgb]);
 
   const handleSelect = (color: string) => {
     onChange(color);
@@ -73,6 +136,7 @@ export default function UnifiedColorPicker({
       )}
       <button
         type="button"
+        ref={buttonRef}
         onClick={() => setIsOpen((current) => !current)}
         className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white text-slate-900 shadow-sm transition hover:shadow-md dark:border-slate-600 dark:bg-slate-800 dark:text-white"
         aria-label="Seleccionar color"
@@ -83,8 +147,16 @@ export default function UnifiedColorPicker({
         />
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 z-30 mt-3 w-[18rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-950">
+      {isOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          ref={overlayRef}
+          className="fixed z-50 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-950"
+          style={{
+            top: overlayStyle.top,
+            left: overlayStyle.left,
+            width: overlayStyle.width,
+          }}
+        >
           <div className="grid grid-cols-6 gap-3">
             {COLOR_OPTIONS.map((option) => (
               <button
@@ -139,7 +211,8 @@ export default function UnifiedColorPicker({
               </div>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

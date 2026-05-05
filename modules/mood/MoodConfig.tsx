@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface MoodState {
@@ -35,6 +36,9 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const emojiButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const emojiOverlayRef = useRef<HTMLDivElement | null>(null);
+  const [emojiOverlayStyle, setEmojiOverlayStyle] = useState<Record<string, number>>({});
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
     const updatedValue = field === 'points' ? parseInt(value) || 0 : value;
@@ -60,6 +64,71 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     const id = `state_${Date.now()}`;
     setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280', points: 1 }]);
   };
+
+  useLayoutEffect(() => {
+    if (!editingId) return;
+    const button = emojiButtonRefs.current[editingId];
+    if (!button) return;
+
+    const rect = button.getBoundingClientRect();
+    const popupWidth = 256;
+    const popupHeight = 220;
+    const margin = 8;
+    let top = rect.bottom + margin;
+    if (top + popupHeight > window.innerHeight - margin) {
+      top = rect.top - popupHeight - margin;
+      if (top < margin) top = margin;
+    }
+    let left = rect.left;
+    if (left + popupWidth > window.innerWidth - margin) {
+      left = window.innerWidth - popupWidth - margin;
+    }
+    if (left < margin) left = margin;
+
+    setEmojiOverlayStyle({ top, left, width: popupWidth });
+  }, [editingId]);
+
+  useEffect(() => {
+    if (!editingId) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const button = emojiButtonRefs.current[editingId];
+      if (!button) return;
+      if (button.contains(event.target as Node)) return;
+      if (emojiOverlayRef.current?.contains(event.target as Node)) return;
+      setEditingId(null);
+    };
+
+    const updatePosition = () => {
+      const button = emojiButtonRefs.current[editingId];
+      if (!button) return;
+      const rect = button.getBoundingClientRect();
+      const popupWidth = 256;
+      const popupHeight = 220;
+      const margin = 8;
+      let top = rect.bottom + margin;
+      if (top + popupHeight > window.innerHeight - margin) {
+        top = rect.top - popupHeight - margin;
+        if (top < margin) top = margin;
+      }
+      let left = rect.left;
+      if (left + popupWidth > window.innerWidth - margin) {
+        left = window.innerWidth - popupWidth - margin;
+      }
+      if (left < margin) left = margin;
+      setEmojiOverlayStyle({ top, left, width: popupWidth });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [editingId]);
 
   const handleSave = async () => {
     if (hasEmptyState) {
@@ -111,6 +180,9 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
               <div className="relative shrink-0">
                 <button
                   type="button"
+                  ref={(el) => {
+                    emojiButtonRefs.current[state.id] = el;
+                  }}
                   onClick={() => setEditingId(editingId === state.id ? null : state.id)}
                   className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
                   style={{ backgroundColor: state.color + '20' }}
@@ -118,8 +190,16 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                   {state.emoji}
                 </button>
                 
-                {editingId === state.id && (
-                  <div className="absolute left-0 top-12 z-20 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                {editingId === state.id && typeof document !== 'undefined' && createPortal(
+                  <div
+                    ref={emojiOverlayRef}
+                    className="fixed z-50 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                    style={{
+                      top: emojiOverlayStyle.top,
+                      left: emojiOverlayStyle.left,
+                      width: emojiOverlayStyle.width,
+                    }}
+                  >
                     <div className="grid grid-cols-6 gap-1">
                       {availableEmojis.map((emoji) => (
                         <button
@@ -134,7 +214,8 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
 
