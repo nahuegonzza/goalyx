@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Goal, GoalPayload } from '@types';
 import { ICON_OPTIONS, getGoalIcon } from '@lib/goalIconsColors';
 import NumberInput from '@components/NumberInput';
@@ -68,6 +69,10 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [showIconPicker, setShowIconPicker] = useState(false);
 
+  const iconButtonRef = useRef<HTMLButtonElement>(null);
+  const iconOverlayRef = useRef<HTMLDivElement>(null);
+  const [iconOverlayStyle, setIconOverlayStyle] = useState<Record<string, number>>({});
+
   const normalizedInitial = useMemo(() => normalizeForm(normalizeInitialData(initialData)), [initialData]);
   const normalizedCurrent = useMemo(() => normalizeForm(form), [form]);
   const isDirty = JSON.stringify(normalizedInitial) !== JSON.stringify(normalizedCurrent);
@@ -80,6 +85,70 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
+
+  useLayoutEffect(() => {
+    if (!showIconPicker || !iconButtonRef.current) return;
+
+    const updatePosition = () => {
+      const rect = iconButtonRef.current!.getBoundingClientRect();
+      const popupWidth = 240; // Más pequeño que antes
+      const popupHeight = 200; // Altura fija con scroll
+      const margin = 8;
+      let top = rect.bottom + margin;
+      if (top + popupHeight > window.innerHeight - margin) {
+        top = rect.top - popupHeight - margin;
+        if (top < margin) top = margin;
+      }
+      let left = rect.left;
+      if (left + popupWidth > window.innerWidth - margin) {
+        left = window.innerWidth - popupWidth - margin;
+      }
+      if (left < margin) left = margin;
+      setIconOverlayStyle({ top, left, width: popupWidth });
+    };
+
+    updatePosition();
+  }, [showIconPicker]);
+
+  useEffect(() => {
+    if (!showIconPicker) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!iconButtonRef.current) return;
+      if (iconButtonRef.current.contains(event.target as Node)) return;
+      if (iconOverlayRef.current?.contains(event.target as Node)) return;
+      setShowIconPicker(false);
+    };
+
+    const updatePosition = () => {
+      if (!iconButtonRef.current) return;
+      const rect = iconButtonRef.current.getBoundingClientRect();
+      const popupWidth = 240;
+      const popupHeight = 200;
+      const margin = 8;
+      let top = rect.bottom + margin;
+      if (top + popupHeight > window.innerHeight - margin) {
+        top = rect.top - popupHeight - margin;
+        if (top < margin) top = margin;
+      }
+      let left = rect.left;
+      if (left + popupWidth > window.innerWidth - margin) {
+        left = window.innerWidth - popupWidth - margin;
+      }
+      if (left < margin) left = margin;
+      setIconOverlayStyle({ top, left, width: popupWidth });
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [showIconPicker]);
 
   function normalizeForm(value: GoalFormData) {
     return {
@@ -166,34 +235,46 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="relative">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Icono</label>
           <button
             type="button"
+            ref={iconButtonRef}
             onClick={() => setShowIconPicker(!showIconPicker)}
             className="flex h-12 w-full items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-2xl outline-none focus:ring-2 focus:ring-emerald-500"
             aria-label="Seleccionar icono"
           >
             {getGoalIcon(form.icon ?? 'star')}
           </button>
-          {showIconPicker && (
-            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-5 gap-2 z-20">
-              {ICON_OPTIONS.map((opt) => (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => {
-                    setForm({ ...form, icon: opt.key });
-                    setShowIconPicker(false);
-                  }}
-                  className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
-                  aria-label={opt.label}
-                >
-                  {opt.emoji}
-                </button>
-              ))}
-            </div>
+          {showIconPicker && typeof document !== 'undefined' && createPortal(
+            <div
+              ref={iconOverlayRef}
+              className="fixed z-50 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-2xl max-h-52 overflow-y-auto"
+              style={{
+                top: iconOverlayStyle.top,
+                left: iconOverlayStyle.left,
+                width: iconOverlayStyle.width,
+              }}
+            >
+              <div className="grid grid-cols-4 gap-2">
+                {ICON_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      setForm({ ...form, icon: opt.key });
+                      setShowIconPicker(false);
+                    }}
+                    className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
+                    aria-label={opt.label}
+                  >
+                    {opt.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>,
+            document.body
           )}
         </div>
 
