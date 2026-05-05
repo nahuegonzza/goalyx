@@ -38,20 +38,35 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
     const updatedValue = field === 'points' ? parseInt(value) || 0 : value;
+    setError('');
     setStates(states.map(s => s.id === id ? { ...s, [field]: updatedValue } : s));
   };
 
   const handleDeleteState = (id: string) => {
     if (states.length <= 1) return;
+    setError('');
     setStates(states.filter(s => s.id !== id));
   };
 
+  const hasEmptyState = states.some(state => !state.title.trim());
+  const canAddNewState = !hasEmptyState;
+
   const handleAddState = () => {
+    if (!canAddNewState) {
+      setError('Completa el estado pendiente antes de agregar uno nuevo.');
+      return;
+    }
+
     const id = `state_${Date.now()}`;
     setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280', points: 1 }]);
   };
 
   const handleSave = async () => {
+    if (hasEmptyState) {
+      setError('No se puede guardar mientras exista un estado sin nombre.');
+      return;
+    }
+
     setSaving(true);
     setError('');
     try {
@@ -169,10 +184,17 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
         <button
           type="button"
           onClick={handleAddState}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-sm font-bold text-slate-500 transition-colors hover:border-emerald-500 hover:text-emerald-500 dark:border-slate-700"
+          disabled={!canAddNewState}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-sm font-bold text-slate-500 transition-colors hover:border-emerald-500 hover:text-emerald-500 dark:border-slate-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
         >
           <span>+</span> Agregar estado
         </button>
+
+        {hasEmptyState && (
+          <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+            Completa el estado pendiente antes de crear uno nuevo o guardar.
+          </p>
+        )}
 
         <div className="mt-8 flex gap-3">
           <button
@@ -183,7 +205,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
           </button>
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || hasEmptyState}
             className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Guardar
