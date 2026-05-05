@@ -12,15 +12,16 @@ interface MoodState {
   title: string;
   emoji: string;
   color: string;
+  points: number;
 }
 
 const defaultStates: MoodState[] = [
-  { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e' },
-  { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6' },
-  { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444' },
-  { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b' },
-  { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7' },
-  { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4' },
+  { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e', points: 1 },
+  { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6', points: 1 },
+  { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444', points: 1 },
+  { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b', points: 1 },
+  { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7', points: 1 },
+  { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4', points: 1 },
 ];
 
 export const MoodHistory: React.FC<MoodHistoryProps> = ({ date, data }) => {

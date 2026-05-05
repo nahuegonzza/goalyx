@@ -8,6 +8,7 @@ interface MoodState {
   title: string;
   emoji: string;
   color: string;
+  points: number;
 }
 
 interface MoodConfigProps {
@@ -17,12 +18,12 @@ interface MoodConfigProps {
 }
 
 const defaultStates: MoodState[] = [
-  { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e' },
-  { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6' },
-  { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444' },
-  { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b' },
-  { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7' },
-  { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4' },
+  { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e', points: 1 },
+  { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6', points: 1 },
+  { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444', points: 1 },
+  { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b', points: 1 },
+  { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7', points: 1 },
+  { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4', points: 1 },
 ];
 
 const availableEmojis = ['😊', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😉', '😌', '😍', '🥰', '😘', '😎', '🤩', '😇', '🤗', '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯', '😪', '😫', '🥱', '😴', '😌', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'];
@@ -36,7 +37,8 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
   const [error, setError] = useState('');
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
-    setStates(states.map(s => s.id === id ? { ...s, [field]: value } : s));
+    const updatedValue = field === 'points' ? parseInt(value) || 0 : value;
+    setStates(states.map(s => s.id === id ? { ...s, [field]: updatedValue } : s));
   };
 
   const handleDeleteState = (id: string) => {
@@ -46,7 +48,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
 
   const handleAddState = () => {
     const id = `state_${Date.now()}`;
-    setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280' }]);
+    setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280', points: 1 }]);
   };
 
   const handleSave = async () => {
@@ -128,6 +130,17 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                 onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
                 className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
                 placeholder="Nombre del estado..."
+              />
+
+              {/* Input de Puntos */}
+              <input
+                type="number"
+                value={state.points}
+                onChange={(e) => handleUpdateState(state.id, 'points', e.target.value)}
+                className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
+                placeholder="1"
+                min="-10"
+                max="10"
               />
 
               {/* Acciones Derecha */}

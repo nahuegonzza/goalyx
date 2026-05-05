@@ -8,6 +8,7 @@ interface MoodState {
   title: string;
   emoji: string;
   color: string;
+  points: number;
 }
 
 interface MoodDashboardProps {
@@ -34,12 +35,12 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
 
   // Estados del config o los por defecto
   const states: MoodState[] = (config.states as MoodState[]) || [
-    { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e' },
-    { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6' },
-    { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444' },
-    { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b' },
-    { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7' },
-    { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4' },
+    { id: 'happy', title: 'Contento', emoji: '😊', color: '#22c55e', points: 1 },
+    { id: 'sad', title: 'Triste', emoji: '😢', color: '#3b82f6', points: 1 },
+    { id: 'sick', title: 'Enfermo', emoji: '🤒', color: '#ef4444', points: 1 },
+    { id: 'tired', title: 'Cansado', emoji: '😴', color: '#f59e0b', points: 1 },
+    { id: 'energetic', title: 'Enérgico', emoji: '⚡', color: '#a855f7', points: 1 },
+    { id: 'calm', title: 'Tranquilo', emoji: '😌', color: '#06b6d4', points: 1 },
   ];
 
   const selectedDate = date || getLocalDateString();
@@ -64,9 +65,13 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
   }, [selectedDate]);
 
   useEffect(() => {
-    const maxPoints = (config.maxPoints as number) || 1;
-    setPoints(selectedMood ? maxPoints : 0);
-  }, [selectedMood, config]);
+    if (selectedMood) {
+      const mood = states.find(s => s.id === selectedMood);
+      setPoints(mood?.points || 1);
+    } else {
+      setPoints(0);
+    }
+  }, [selectedMood, states]);
 
   const saveEntry = async (moodId: string) => {
     try {
