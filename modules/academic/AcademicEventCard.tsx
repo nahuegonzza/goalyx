@@ -173,20 +173,20 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white">
+    <article style={cardBorderStyle} className="rounded-3xl border border-slate-200 bg-white dark:bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-slate-900 dark:text-white">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
               {getExamLabel(event)}
             </span>
-            <span className="text-slate-300">{formatDateLabel(event.sourceDate)}</span>
+            <span className="text-slate-400 dark:text-slate-300">{formatDateLabel(event.sourceDate)}</span>
             <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
               {event.completed ? 'Completado' : 'Pendiente'}
             </span>
           </div>
-          <h2 className="mt-4 text-xl font-semibold leading-snug text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-          <p className="mt-2 text-sm text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
+          <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
         </div>
         <div className="flex flex-col gap-3 sm:items-end">
           <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
@@ -228,7 +228,7 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
                     (e.target as HTMLInputElement).blur();
                   }
                 }}
-                className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white dark:bg-slate-800"
+                className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white text-slate-900 dark:bg-slate-800 dark:text-white dark:border-slate-600"
               />
             ) : (
               <button
@@ -279,16 +279,16 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-2xl border border-slate-200 bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-white">
+    <article style={cardBorderStyle} className="rounded-2xl border border-slate-200 bg-white dark:bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-slate-900 dark:text-white">
       <div className="flex flex-col gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 text-xs">
             <span className={`rounded-full px-2 py-0.5 font-semibold uppercase tracking-[0.15em] ${getExamBadgeStyle(event)}`}>
               {getExamLabel(event)}
             </span>
-            <span className="text-slate-400">{formatDateLabel(event.sourceDate)}</span>
+            <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
           </div>
-          <h3 className="mt-2 text-sm font-semibold leading-snug text-white truncate">{event.title}</h3>
+          <h3 className="mt-2 text-sm font-semibold leading-snug text-slate-900 dark:text-white truncate">{event.title}</h3>
         </div>
         <div className="flex items-center justify-between gap-2">
           <span style={subjectBadgeStyles} className="rounded-full px-2 py-0.5 text-xs font-semibold max-w-[60%] truncate">
@@ -330,7 +330,7 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
                     (e.target as HTMLInputElement).blur();
                   }
                 }}
-                className="w-16 px-1 py-0.5 text-center text-xs rounded border border-slate-300 bg-white dark:bg-slate-800"
+                className="w-16 px-1 py-0.5 text-center text-xs rounded border border-slate-300 bg-white text-slate-900 dark:bg-slate-800 dark:text-white dark:border-slate-600"
               />
             ) : (
               <button
@@ -381,15 +381,15 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-lg border border-slate-200 bg-[#0f172a] px-3 py-2 shadow-sm text-white">
+    <article style={cardBorderStyle} className="rounded-lg border border-slate-200 bg-white dark:bg-[#0f172a] px-3 py-2 shadow-sm text-slate-900 dark:text-white">
       <div className="flex items-center gap-2 justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-xs">
             <span className={`rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-[0.1em] ${getExamBadgeStyle(event)}`}>
               {event.type === 'exam' ? event.examType?.charAt(0).toUpperCase() : 'T'}
             </span>
-            <h3 className="text-xs font-semibold text-white truncate max-w-[150px]">{event.title}</h3>
-            <span className="text-slate-500 text-xs flex-shrink-0">{formatDateLabel(event.sourceDate).split(',')[0]}</span>
+            <h3 className="text-xs font-semibold text-slate-900 dark:text-white truncate max-w-[150px]">{event.title}</h3>
+            <span className="text-slate-500 dark:text-slate-500 text-xs flex-shrink-0">{formatDateLabel(event.sourceDate).split(',')[0]}</span>
           </div>
         </div>
         <div className="flex gap-1 flex-shrink-0">
@@ -428,7 +428,7 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
                   (e.target as HTMLInputElement).blur();
                 }
               }}
-              className="w-12 px-1 py-0 text-center text-xs rounded border border-slate-300 bg-white dark:bg-slate-800"
+              className="w-12 px-1 py-0 text-center text-xs rounded border border-slate-300 bg-white text-slate-900 dark:bg-slate-800 dark:text-white dark:border-slate-600"
             />
           ) : (
             <button
