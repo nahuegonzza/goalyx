@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
+import { getColorOption } from '@lib/goalIconsColors';
 import type { ModuleState } from '@types';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicTodayCard } from './AcademicTodayCard';
@@ -248,8 +249,9 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                 ) : (
                   upcomingEvents.slice(0, 5).map((event) => {
                     const subject = subjects.find((item) => item.id === event.subjectId);
+                    const eventCardStyle = subject?.color ? { borderColor: getColorOption(subject.color).bgColor } : undefined;
                     return (
-                      <div key={event.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                      <div key={event.id} style={eventCardStyle} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -280,8 +282,9 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                 ) : (
                   pastEvents.slice(0, 5).map((event) => {
                     const subject = subjects.find((item) => item.id === event.subjectId);
+                    const eventCardStyle = subject?.color ? { borderColor: getColorOption(subject.color).bgColor } : undefined;
                     return (
-                      <div key={event.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                      <div key={event.id} style={eventCardStyle} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="text-sm font-semibold text-slate-900 dark:text-white">

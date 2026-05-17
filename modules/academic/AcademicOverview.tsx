@@ -411,15 +411,7 @@ const getContrastTextColor = (color: string) => {
 
 const getSubjectCardStyle = (color?: string) => {
   if (!color) return undefined;
-  const bg = hexToRgba(color, 0.16);
-  const start = hexToRgba(color, 0.24);
-  const end = hexToRgba(color, 0.10);
-  if (!bg || !start || !end) return undefined;
-  return {
-    borderColor: color,
-    backgroundColor: bg,
-    backgroundImage: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
-  };
+  return { borderColor: color };
 };
 
 export default function AcademicOverview() {
@@ -823,9 +815,7 @@ export default function AcademicOverview() {
                     const subject = event.subject;
                     const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
                     const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                    const cardClassName = cardStyles
-                      ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
-                      : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                    const cardClassName = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
                     const subjectBadgeStyles = resolvedSubjectColor ? {
                       backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                       color: getContrastTextColor(resolvedSubjectColor),
@@ -947,9 +937,7 @@ export default function AcademicOverview() {
                             const subject = event.subject;
                             const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
                             const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                            const cardClassName = cardStyles
-                              ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
-                              : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                            const cardClassName = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
                             const subjectBadgeStyles = resolvedSubjectColor ? {
                               backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                               color: getContrastTextColor(resolvedSubjectColor),
