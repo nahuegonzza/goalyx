@@ -93,6 +93,7 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
               onClick={() => handleChange(Number(inputValue) - 1)}
               className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 transition"
               type="button"
+              title="Disminuir valor"
             >
               −
             </button>
@@ -126,6 +127,7 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
             <button
               onClick={() => handleChange(Number(inputValue) + 1)}
               className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 transition"
+              title="Aumentar valor"
             >
               +
             </button>

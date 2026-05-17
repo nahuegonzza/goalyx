@@ -488,6 +488,7 @@ export default function Analytics() {
             onClick={() => setDailyCollapsed(!dailyCollapsed)}
             aria-expanded={!dailyCollapsed}
             className="inline-flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+            title={dailyCollapsed ? 'Expandir datos diarios' : 'Contraer datos diarios'}
           >
             <span className={`transform transition-transform ${dailyCollapsed ? '' : 'rotate-90'}`}>▶</span>
             Datos diarios

@@ -72,7 +72,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
               return;
             }
             setShowUnsavedDialog(true);
-          }} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          }} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" title="Cerrar configuración">
             ✕
           </button>
         </div>
@@ -87,6 +87,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setIdealHours(Math.max(1, idealHours - 0.5))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Disminuir horas ideales"
               >
                 -
               </button>
@@ -97,6 +98,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setIdealHours(Math.min(14, idealHours + 0.5))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Aumentar horas ideales"
               >
                 +
               </button>
@@ -123,6 +125,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setMaxPoints(Math.max(1, maxPoints - 1))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Disminuir puntos máximos"
               >
                 -
               </button>
@@ -133,6 +136,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setMaxPoints(Math.min(10, maxPoints + 1))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Aumentar puntos máximos"
               >
                 +
               </button>
@@ -150,6 +154,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setToleranceMinutes(Math.max(0, toleranceMinutes - 5))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Disminuir minutos de tolerancia"
               >
                 -
               </button>
@@ -160,6 +165,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 type="button"
                 onClick={() => setToleranceMinutes(Math.min(120, toleranceMinutes + 5))}
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Aumentar minutos de tolerancia"
               >
                 +
               </button>
@@ -222,13 +228,14 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 Puntos a restar por hora
               </label>
               <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setPenaltyPerHour(Math.max(0.5, penaltyPerHour - 0.5))}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
-                  -
-                </button>
+              <button
+                type="button"
+                onClick={() => setPenaltyPerHour(Math.max(0.5, penaltyPerHour - 0.5))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                title="Disminuir penalización por hora"
+              >
+                -
+              </button>
                 <span className="text-3xl font-bold text-slate-900 dark:text-white w-16 text-center">
                   {penaltyPerHour}
                 </span>
@@ -236,6 +243,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                   type="button"
                   onClick={() => setPenaltyPerHour(Math.min(5, penaltyPerHour + 0.5))}
                   className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  title="Aumentar penalización por hora"
                 >
                   +
                 </button>
@@ -255,6 +263,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
               setShowUnsavedDialog(true);
             }}
             className="flex-1 rounded-xl bg-slate-100 py-3.5 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            title="Descartar cambios y cerrar"
           >
             Cancelar
           </button>
@@ -262,6 +271,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
             onClick={handleSave}
             disabled={saving}
             className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Guardar configuración"
           >
             Guardar
           </button>

@@ -236,6 +236,7 @@ export default function HistoryViewer() {
             <button
               onClick={prevDate}
               className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+              title="Día anterior"
             >
               ← Anterior
             </button>
@@ -248,12 +249,14 @@ export default function HistoryViewer() {
             <button
               onClick={nextDate}
               className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+              title="Día siguiente"
             >
               Siguiente →
             </button>
             <button
               onClick={() => setSelectedDate(today)}
               className="rounded-lg bg-emerald-600 dark:bg-emerald-600 px-3 py-1 text-sm font-medium text-white hover:bg-emerald-700 dark:hover:bg-emerald-700 transition"
+              title="Ir a hoy"
             >
               Hoy
             </button>

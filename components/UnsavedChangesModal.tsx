@@ -33,6 +33,7 @@ export default function UnsavedChangesModal({
             type="button"
             onClick={onKeepEditing}
             className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            title="Volver a editar"
           >
             Seguir editando
           </button>
@@ -40,6 +41,7 @@ export default function UnsavedChangesModal({
             type="button"
             onClick={onDiscard}
             className="rounded-2xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-700"
+            title="Descartar cambios y cerrar"
           >
             Cerrar sin guardar
           </button>

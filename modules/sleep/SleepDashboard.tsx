@@ -126,6 +126,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
               ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
               : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
           }`}
+          title="Aumentar hora"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -161,6 +162,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
               ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
               : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
           }`}
+          title="Disminuir hora"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -180,6 +182,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
               ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
               : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
           }`}
+          title="Aumentar minuto"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -215,6 +218,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
               ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
               : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
           }`}
+          title="Disminuir minuto"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -443,6 +447,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
               }}
               disabled={!canAddNap}
               className={`inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition ${canAddNap ? 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700' : 'bg-slate-400 cursor-not-allowed opacity-70'}`}
+              title="Agregar nueva siesta"
             >
               Agregar Siesta
             </button>
@@ -488,6 +493,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                     }}
                     disabled={!isEditing || saving}
                     className="text-sm text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Eliminar siesta"
                   >
                     Eliminar
                   </button>

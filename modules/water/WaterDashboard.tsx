@@ -128,6 +128,7 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
             onClick={addGlass}
             disabled={saving}
             className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed"
+            title="Agregar vaso de agua"
           >
             {saving ? 'Guardando...' : '+ Vaso'}
           </button>
@@ -135,6 +136,7 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
             onClick={removeGlass}
             disabled={totalGlasses === 0 || saving}
             className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            title="Quitar vaso de agua"
           >
             {saving ? 'Guardando...' : '- Vaso'}
           </button>

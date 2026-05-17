@@ -32,6 +32,7 @@ export default function InfoModal({
             type="button"
             onClick={onClose}
             className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+            title="Cerrar información"
           >
             {confirmLabel}
           </button>

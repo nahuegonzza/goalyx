@@ -37,6 +37,7 @@ export default function ConfirmationModal({
             type="button"
             onClick={onCancel}
             className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            title="Cancelar operación"
           >
             {cancelLabel}
           </button>
@@ -44,6 +45,7 @@ export default function ConfirmationModal({
             type="button"
             onClick={onConfirm}
             className="rounded-2xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-700"
+            title="Confirmar operación"
           >
             {confirmLabel}
           </button>

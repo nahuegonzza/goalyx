@@ -47,6 +47,7 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
             type="button"
             onClick={() => onToggle(module.id, !module.active)}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${module.active ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
+            title={module.active ? 'Desactivar módulo' : 'Activar módulo'}
           >
             {module.active ? 'Desactivar' : 'Activar'}
           </button>
@@ -56,6 +57,7 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
             type="button"
             onClick={() => setShowConfig(true)}
             className="rounded-full px-3 py-1 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+            title="Abrir configuración"
           >
             Configurar
           </button>
@@ -65,6 +67,7 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
             type="button"
             onClick={() => setShowConfig(true)}
             className="rounded-full px-3 py-1 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+            title="Abrir configuración"
           >
             Configurar
           </button>

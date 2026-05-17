@@ -270,6 +270,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
                 color: getTextColor(normalizeColor(state.color), isDarkMode),
                 ['--tw-ring-color' as any]: getBorderColor(normalizeColor(state.color), isDarkMode),
               }}
+              title={`Seleccionar estado de ánimo: ${state.title}`}
             >
               <span className="text-lg">{state.emoji}</span>
               <span className="hidden sm:inline">{state.title}</span>

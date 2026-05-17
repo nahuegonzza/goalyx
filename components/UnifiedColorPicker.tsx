@@ -147,7 +147,7 @@ export default function UnifiedColorPicker({
         ref={buttonRef}
         onClick={() => setIsOpen((current) => !current)}
         className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white text-slate-900 shadow-sm transition hover:shadow-md dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-        aria-label="Seleccionar color"
+        title="Abrir selector de color"
       >
         <span
           className="h-8 w-8 rounded-full border-2 border-slate-300 dark:border-slate-500"
@@ -175,14 +175,14 @@ export default function UnifiedColorPicker({
                   value === option.key ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-transparent hover:scale-110 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
                 style={{ backgroundColor: option.bgColor, borderColor: option.borderColor }}
-                aria-label={option.label}
+                title={`Seleccionar color: ${option.label}`}
               />
             ))}
             <button
               type="button"
               onClick={openColorPicker}
               className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-slate-300 bg-gradient-to-br from-rose-400 via-amber-300 to-sky-500 shadow-sm transition hover:border-slate-400 hover:shadow-md dark:border-slate-700"
-              aria-label="Color personalizado"
+              title="Abrir selector de color personalizado"
             >
               <span className="sr-only">Personalizado</span>
               <span className="h-7 w-7 rounded-full bg-[linear-gradient(135deg,rgba(236,72,153,1),rgba(251,191,36,1),rgba(59,130,246,1))] shadow-inner" />

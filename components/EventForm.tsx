@@ -90,7 +90,7 @@ export default function EventForm({ modules }: EventFormProps) {
           placeholder='{"detalle":"marcha"}'
         />
       </div>
-      <button className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+      <button className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800" title="Registrar evento">
         Registrar evento
       </button>
       <p className="text-sm text-slate-500">{status}</p>

@@ -344,6 +344,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
             type="button"
             onClick={handleToggleAllWeekDays}
             className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+            title={form.weekDays?.length === 7 ? 'Deseleccionar todos los días' : 'Seleccionar todos los días'}
           >
             {form.weekDays?.length === 7 ? 'Desactivar todos' : 'Activar todos'}
           </button>
@@ -388,6 +389,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
               setShowUnsavedDialog(true);
             }}
             className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto"
+            title="Cancelar cambios"
           >
             Cancelar
           </button>
@@ -395,6 +397,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
         <button
           type="submit"
           className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition sm:w-auto"
+          title="Guardar objetivo"
         >
           {submitLabel}
         </button>

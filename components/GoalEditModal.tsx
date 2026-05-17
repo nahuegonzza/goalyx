@@ -42,6 +42,7 @@ export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModa
             type="button"
             onClick={handleClose}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            title="Cerrar modal"
           >
             ✕
           </button>

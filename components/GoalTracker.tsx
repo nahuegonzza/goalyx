@@ -539,6 +539,7 @@ export default function GoalTracker() {
                             type="button"
                             onClick={() => setHabitsCollapsed(!habitsCollapsed)}
                             className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                            title={habitsCollapsed ? 'Expandir hábitos' : 'Contraer hábitos'}
                           >
                             <span className={`transform transition-transform ${habitsCollapsed ? '' : 'rotate-90'}`}>▶</span>
                             Hábitos
@@ -565,6 +566,7 @@ export default function GoalTracker() {
                             type="button"
                             onClick={() => setMetricsCollapsed(!metricsCollapsed)}
                             className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                            title={metricsCollapsed ? 'Expandir métricas' : 'Contraer métricas'}
                           >
                             <span className={`transform transition-transform ${metricsCollapsed ? '' : 'rotate-90'}`}>▶</span>
                             Métricas
@@ -600,8 +602,7 @@ export default function GoalTracker() {
                     <button
                       type="button"
                       onClick={() => toggleModuleCollapse(module.slug)}
-                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                    >
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"                        title={isCollapsed ? `Expandir ${module.name}` : `Contraer ${module.name}`}                    >
                       <span className={`transform transition-transform ${isCollapsed ? '' : 'rotate-90'}`}>▶</span>
                       {module.name}
                     </button>
