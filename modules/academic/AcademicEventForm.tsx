@@ -191,6 +191,63 @@ export function AcademicEventForm({
     onClose();
   };
 
+  const examOptions = availableExamTypes.length > 0
+    ? availableExamTypes.map((t) => (
+        <option key={t.key} value={t.key}>
+          {t.label}
+        </option>
+      ))
+    : [
+        <option key="parcial" value="parcial">
+          Parcial
+        </option>,
+        <option key="final" value="final">
+          Final
+        </option>,
+        <option key="recuperatorio" value="recuperatorio">
+          Recuperatorio
+        </option>,
+        <option key="exposicion" value="exposicion">
+          Exposición
+        </option>,
+        <option key="regular" value="regular">
+          Regular
+        </option>,
+        <option key="oral" value="oral">
+          Oral
+        </option>,
+      ];
+
+  const taskOptions = availableTaskTypes.length > 0
+    ? availableTaskTypes.map((t) => (
+        <option key={t.key} value={t.key}>
+          {t.label}
+        </option>
+      ))
+    : [
+        <option key="corta" value="corta">
+          Corta (15-30 min)
+        </option>,
+        <option key="media" value="media">
+          Media (30-60 min)
+        </option>,
+        <option key="extensa" value="extensa">
+          Extensa (1-2 horas)
+        </option>,
+        <option key="lectura" value="lectura">
+          Lectura
+        </option>,
+        <option key="escritura" value="escritura">
+          Escritura
+        </option>,
+        <option key="codigo" value="codigo">
+          Código/Programación
+        </option>,
+        <option key="practica" value="practica">
+          Práctica/Ejercicios
+        </option>,
+      ];
+
   if (!isOpen) return null;
 
   return (
@@ -285,18 +342,28 @@ export function AcademicEventForm({
                   <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
                     Tipo de examen
                   </label>
-                  <select value={examType} onChange={(e) => setExamType(e.target.value as AcademicExamType)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
-                    {availableExamTypes.length > 0 ? availableExamTypes.map((t) => <option key={t.key} value={t.key}>{t.label}</option>) : (
+                  <select
+                    value={examType}
+                    onChange={(e) => setExamType(e.target.value as AcademicExamType)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    {availableExamTypes.length > 0 ? (
+                      availableExamTypes.map((t) => (
+                        <option key={t.key} value={t.key}>
+                          {t.label}
+                        </option>
+                      ))
+                    ) : (
                       <>
                         <option value="parcial">Parcial</option>
                         <option value="final">Final</option>
                         <option value="recuperatorio">Recuperatorio</option>
                         <option value="exposicion">Exposición</option>
-                      <option value="regular">Regular</option>
-                      <option value="oral">Oral</option>
-                    </>
-                  )}
-                </select>
+                        <option value="regular">Regular</option>
+                        <option value="oral">Oral</option>
+                      </>
+                    )}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
@@ -320,8 +387,18 @@ export function AcademicEventForm({
                   <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
                     Tipo de tarea
                   </label>
-                  <select value={estimatedDuration} onChange={(e) => setEstimatedDuration(e.target.value as AcademicTaskDuration)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
-                    {availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => <option key={t.key} value={t.key}>{t.label} {t.label !== t.key ? '' : ''}</option>) : (
+                  <select
+                    value={estimatedDuration}
+                    onChange={(e) => setEstimatedDuration(e.target.value as AcademicTaskDuration)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    {availableTaskTypes.length > 0 ? (
+                      availableTaskTypes.map((t) => (
+                        <option key={t.key} value={t.key}>
+                          {t.label}
+                        </option>
+                      ))
+                    ) : (
                       <>
                         <option value="corta">Corta (15-30 min)</option>
                         <option value="media">Media (30-60 min)</option>
@@ -429,6 +506,6 @@ export function AcademicEventForm({
         onKeepEditing={handleKeepEditing}
         onDiscard={handleDiscardChanges}
       />
-    </div>
+  </ModalOverlay>
   );
 }
