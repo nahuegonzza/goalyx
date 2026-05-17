@@ -676,15 +676,15 @@ export default function AcademicOverview() {
             </button>
             <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
               <button
-                onClick={() => setEventDisplayStyle('detailed')}
+                onClick={() => setEventDisplayStyle('list')}
                 className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
-                  eventDisplayStyle === 'detailed'
+                  eventDisplayStyle === 'list'
                     ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
                     : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
                 }`}
-                title="Vista detallada"
+                title="Vista lista"
               >
-                ☰
+                ⋮
               </button>
               <button
                 onClick={() => setEventDisplayStyle('compact')}
@@ -698,15 +698,15 @@ export default function AcademicOverview() {
                 ▦▦
               </button>
               <button
-                onClick={() => setEventDisplayStyle('list')}
+                onClick={() => setEventDisplayStyle('detailed')}
                 className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
-                  eventDisplayStyle === 'list'
+                  eventDisplayStyle === 'detailed'
                     ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
                     : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
                 }`}
-                title="Vista lista"
+                title="Vista detallada"
               >
-                ⋮
+                ☰
               </button>
             </div>
             <button
@@ -718,14 +718,13 @@ export default function AcademicOverview() {
           </div>
         </div>
 
-        <section className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-950">
+        <section className="rounded-3xl bg-slate-50 p-1 dark:bg-slate-950">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Inicio</p>
               <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">Resumen</h2>
             </div>
           </div>
-            <div className="mt-6 space-y-4">
+            <div className="mt-4 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
                   <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Eventos</p>
@@ -824,14 +823,13 @@ export default function AcademicOverview() {
           availableTaskTypes={availableTaskTypes}
         />
 
-        <section className="mt-6 rounded-3xl bg-slate-50 p-4 dark:bg-slate-950">
+        <section className="mt-4 rounded-3xl bg-slate-50 p-1 dark:bg-slate-950">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos</p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{filteredEvents.length} resultados</h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos ({filteredEvents.length})</p>
             </div>
           </div>
-            <div className="mt-6">
+            <div className="mt-4">
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((item) => (
