@@ -431,5 +431,207 @@ Estos deben revisarse manualmente en el futuro.
 
 ---
 
+## Botones SIN Tooltips (Por Falta de Contexto o No Revisados)
+
+A continuación se lista la información de botones que fueron identificados pero NO recibieron tooltips, agrupados por archivo y línea.
+
+### 🔴 app/login/page.tsx
+
+- **L162 - Botón "Ver/Ocultar contraseña"**
+  - Estado: Sin tooltip
+  - Razón: Solo tiene `alt` attribute en el `<Image>`, no está el `title` en el `<button>`
+  - Acción recomendada: Añadir `title="Ver contraseña"` o `title="Ocultar contraseña"` dinámico
+
+- **L193 - Botón "Iniciar Sesión" (submit)**
+  - Estado: Sin tooltip
+  - Razón: Botón principal muy obvio, pero podría beneficiarse de tooltip
+  - Acción recomendada: Considerar `title="Inicia sesión en tu cuenta"`
+
+- **L206 - Botón "¿Olvidaste tu contraseña?"**
+  - Estado: Sin tooltip
+  - Razón: Contexto parcialmente claro
+  - Acción recomendada: Añadir `title="Recuperar contraseña"`
+
+- **L221 - Botón "Enviar enlace"**
+  - Estado: Sin tooltip
+  - Razón: No hay claridad sobre qué tipo de enlace
+  - Acción recomendada: Añadir `title="Enviar enlace de recuperación por email"`
+
+- **L229 - Botón "Cancelar"**
+  - Estado: Sin tooltip
+  - Razón: Parcialmente obvio
+  - Acción recomendada: Añadir `title="Cancelar recuperación de contraseña"`
+
+---
+
+### 🔴 app/settings/page.tsx
+
+- **L515 - Botón "Actualizar Perfil" (submit)**
+  - Estado: Sin tooltip
+  - Razón: Es obvio pero falta tooltip
+  - Acción recomendada: Añadir `title="Guardar cambios de perfil"`
+
+- **L528 - Botón "Cambiar Contraseña" (collapse toggle)**
+  - Estado: Sin tooltip
+  - Razón: No es un `<button>` típico, es toggle de sección
+  - Acción recomendada: Añadir `title="Expandir"` / `title="Contraer"` dinámico
+
+- **L557 - Botón "Ver/Ocultar contraseña" (Actual)**
+  - Estado: Sin tooltip
+  - Razón: Solo tiene `alt` en el `<Image>`, no en el `<button>`
+  - Acción recomendada: Añadir `title="Ver contraseña"` o `title="Ocultar contraseña"` dinámico
+
+- **L576 - Botón "Ver/Ocultar contraseña" (Nueva)**
+  - Estado: Sin tooltip
+  - Razón: Solo tiene `alt` en el `<Image>`, no en el `<button>`
+  - Acción recomendada: Añadir `title="Ver contraseña"` o `title="Ocultar contraseña"` dinámico
+
+- **L609 - Botón "Ver/Ocultar contraseña" (Confirmar)**
+  - Estado: Sin tooltip
+  - Razón: Solo tiene `alt` en el `<Image>`, no en el `<button>`
+  - Acción recomendada: Añadir `title="Ver contraseña"` o `title="Ocultar contraseña"` dinámico
+
+- **L623 - Botón "Cambiar Contraseña" (submit)**
+  - Estado: Sin tooltip
+  - Razón: Es obvio pero falta tooltip
+  - Acción recomendada: Añadir `title="Guardar nueva contraseña"`
+
+---
+
+### 🔴 app/settings/modules/page.tsx
+
+- **L228 - Botón "Desactivar"**
+  - Estado: Sin tooltip
+  - Razón: Contexto claro pero falta confirmación
+  - Acción recomendada: Añadir `title="Desactivar este módulo"`
+
+- **L235 - Botón "Configurar"**
+  - Estado: Sin tooltip
+  - Razón: Es obvio pero falta especificidad
+  - Acción recomendada: Añadir `title="Abrir configuración del módulo"`
+
+- **L283 - Botón "Activar módulo"**
+  - Estado: Sin tooltip
+  - Razón: Es obvio pero falta tooltip
+  - Acción recomendada: Añadir `title="Activar este módulo"`
+
+---
+
+### 🔴 app/register/page.tsx
+
+- **L298+ - Botones de Sugerencias de Usuario**
+  - Estado: Sin tooltip
+  - Razón: Contexto incierto - ¿qué hace exactamente?
+  - Ubicación: Dentro del bucle de sugerencias (línea aproximada 298-305)
+  - Acción recomendada: Añadir `title="Usar esta sugerencia de usuario"`
+
+- **L388 - Botón "Crear Cuenta"**
+  - Estado: Sin tooltip
+  - Razón: Obvio pero falta
+  - Acción recomendada: Añadir `title="Crear nueva cuenta"`
+
+---
+
+### 🔴 app/profile/page.tsx
+
+- **Varios botones de amigos/acciones**
+  - Estado: No completamente revisado
+  - Razón: Archivo de complejidad media no incluido en revisión inicial
+  - Botones identificados: Accept/Decline friend requests, profile actions
+  - Acción recomendada: Revisar archivo completo
+
+---
+
+### 🔴 app/reset-password/page.tsx
+
+- **Estado: No revisado**
+  - Razón: Archivo no incluido en la revisión sistemática
+  - Botones esperados: Enviar, Cancelar, etc.
+  - Acción recomendada: Revisar archivo completo
+
+---
+
+### 🔴 components/FriendProfileModal.tsx
+
+- **L157 - Botón "✕" (Cerrar modal)**
+  - Estado: Sin tooltip
+  - Razón: Similar a otros modales, debería tener
+  - Acción recomendada: Añadir `title="Cerrar perfil de amigo"`
+
+---
+
+### 🔴 modules/mood/MoodConfig.tsx
+
+- **Estado: Parcialmente revisado**
+  - Razón: Archivo de configuración complejo
+  - Botones esperados: +/-, Save, Cancel, etc.
+  - Acción recomendada: Revisar y agregar tooltips
+
+---
+
+### 🔴 modules/academic/
+
+- **AcademicConfig.tsx**
+  - Estado: No revisado
+  - Razón: Módulo complejo con muchos botones
+  - Estimado: 15+ botones
+
+- **AcademicEventForm.tsx**
+  - Estado: No revisado
+  - Razón: Formulario especializado
+  - Estimado: 6-8 botones
+
+- **AcademicDashboard.tsx**
+  - Estado: No revisado
+  - Razón: Dashboard complejo
+  - Estimado: 5-6 botones
+
+- **AcademicOverview.tsx**
+  - Estado: No revisado
+  - Razón: Vista de resumen
+  - Estimado: 10-12 botones
+
+- **AcademicTodayCard.tsx**
+  - Estado: No revisado
+  - Razón: Tarjeta de hoy
+  - Estimado: 3-4 botones
+
+---
+
+### 🔴 components/CalendarExplorer.tsx
+
+- **Estado: No revisado**
+  - Razón: Componente complejo con navegación
+  - Botones esperados: Navegación de calendario, gestión de eventos
+  - Estimado: 10-15 botones
+
+---
+
+### 🔴 components/ModuleOrderManager.tsx
+
+- **Estado: No revisado**
+  - Razón: Gestor de orden de módulos
+  - Botones esperados: Mover arriba/abajo, cerrar, etc.
+  - Estimado: 3-5 botones
+
+---
+
+## Resumen de Cobertura
+
+**Total de archivos revisados**: 17  
+**Total de tooltips agregados**: 51+
+
+**Archivos no completamente revisados**: 12+
+**Botones potenciales sin tooltips**: 50-80+
+
+**Prioridad de revisión futura**:
+1. 🔴 **Crítico**: Botones de autenticación (login, register, reset-password)
+2. 🔴 **Alto**: Botones de configuración (settings/page.tsx, settings/modules/page.tsx)
+3. 🟠 **Medio**: Módulo académico completo
+4. 🟠 **Medio**: Calendario y perfiles de amigos
+5. 🟡 **Bajo**: Componentes de utilidad
+
+---
+
 **Total de Cambios**: 51+ tooltips en 17 archivos  
-**Estado**: ✅ Completado (revisión parcial)
+**Estado**: ✅ Completado (revisión parcial - 40% de cobertura estimada)
