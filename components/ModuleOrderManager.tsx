@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Reorder, useDragControls } from 'framer-motion';
 import type { Module } from '@types';
+import ModalOverlay from '@components/ModalOverlay';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 // Iconos para cada módulo
@@ -266,7 +267,8 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
           setShowUnsavedDialog(false);
           onClose();
         }}
-      />    </div>
+      />
+    </ModalOverlay>
   );
 }
 
