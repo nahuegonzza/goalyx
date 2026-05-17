@@ -815,7 +815,7 @@ export default function AcademicOverview() {
                     const subject = event.subject;
                     const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
                     const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                    const cardClassName = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                    const cardClassName = 'rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white';
                     const subjectBadgeStyles = resolvedSubjectColor ? {
                       backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                       color: getContrastTextColor(resolvedSubjectColor),
@@ -828,13 +828,13 @@ export default function AcademicOverview() {
                               <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
                                 {getExamLabel(event)}
                               </span>
-                              <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
+                              <span className="text-slate-300">{formatDateLabel(event.sourceDate)}</span>
                               <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
                                 {event.completed ? 'Completado' : 'Pendiente'}
                               </span>
                             </div>
-                            <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
+                            <h2 className="mt-4 text-xl font-semibold leading-snug text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
+                            <p className="mt-2 text-sm text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="flex flex-col gap-3 sm:items-end">
                             <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
@@ -937,7 +937,7 @@ export default function AcademicOverview() {
                             const subject = event.subject;
                             const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
                             const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                            const cardClassName = 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                            const cardClassName = 'rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white';
                             const subjectBadgeStyles = resolvedSubjectColor ? {
                               backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                               color: getContrastTextColor(resolvedSubjectColor),
@@ -951,13 +951,13 @@ export default function AcademicOverview() {
                                       <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
                                         {getExamLabel(event)}
                                       </span>
-                                      <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
+                                      <span className="text-slate-300">{formatDateLabel(event.sourceDate)}</span>
                                       <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
                                         {event.completed ? 'Completado' : 'Pendiente'}
                                       </span>
                                     </div>
-                                    <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
+                                    <h2 className="mt-4 text-xl font-semibold leading-snug text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
+                                    <p className="mt-2 text-sm text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                                   </div>
                                   <div className="flex flex-col gap-3 sm:items-end">
                                     <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
