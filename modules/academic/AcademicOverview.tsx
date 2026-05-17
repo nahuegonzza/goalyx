@@ -12,6 +12,7 @@ import ModalOverlay from '@components/ModalOverlay';
 import { usePreventScroll } from '@hooks/usePreventScroll';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
+import AcademicEventCard, { EventDisplayStyle } from './AcademicEventCard';
 import type { ModuleEntry } from '@types';
 
 type GroupByOption = 'none' | 'date' | 'subject';
@@ -436,6 +437,7 @@ export default function AcademicOverview() {
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [eventDisplayStyle, setEventDisplayStyle] = useState<EventDisplayStyle>('detailed');
   usePreventScroll(showFilterModal || showConfigModal || showEventForm);
   const [availableTaskTypes, setAvailableTaskTypes] = useState<AcademicTypeConfig[]>([]);
   const [academicConfigLoaded, setAcademicConfigLoaded] = useState(false);
@@ -672,6 +674,41 @@ export default function AcademicOverview() {
             >
               Filtrar
             </button>
+            <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
+              <button
+                onClick={() => setEventDisplayStyle('detailed')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'detailed'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista detallada"
+              >
+                ☰
+              </button>
+              <button
+                onClick={() => setEventDisplayStyle('compact')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'compact'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista compacta (2 por fila)"
+              >
+                ▦▦
+              </button>
+              <button
+                onClick={() => setEventDisplayStyle('list')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'list'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista lista"
+              >
+                ⋮
+              </button>
+            </div>
             <button
               onClick={() => setShowConfigModal(true)}
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -810,115 +847,21 @@ export default function AcademicOverview() {
                   No hay eventos académicos que coincidan con los filtros.
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {groupBy === 'none' && filteredEvents.map((event) => {
-                    const subject = event.subject;
-                    const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
-                    const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                    const cardClassName = 'rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white';
-                    const subjectBadgeStyles = resolvedSubjectColor ? {
-                      backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                      color: getContrastTextColor(resolvedSubjectColor),
-                    } : undefined;
-                    return (
-                      <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2 text-sm">
-                              <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
-                                {getExamLabel(event)}
-                              </span>
-                              <span className="text-slate-300">{formatDateLabel(event.sourceDate)}</span>
-                              <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
-                                {event.completed ? 'Completado' : 'Pendiente'}
-                              </span>
-                            </div>
-                            <h2 className="mt-4 text-xl font-semibold leading-snug text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                            <p className="mt-2 text-sm text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
-                          </div>
-                          <div className="flex flex-col gap-3 sm:items-end">
-                            <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
-                              {event.subject?.name || 'Sin materia'}
-                            </span>
-                            <div className="flex gap-2">
-                              {event.type === 'exam' ? (
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  min={0}
-                                  max={10}
-                                  defaultValue={event.grade !== undefined ? String(event.grade) : ''}
-                                  onBlur={async (e) => {
-                                    const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
-                                    if (raw === '') {
-                                      const updated = { ...event, grade: undefined, completed: false } as any;
-                                      await handleSaveEvent(updated as any);
-                                      return;
-                                    }
-                                    const parsed = Number(raw);
-                                    if (!Number.isNaN(parsed)) {
-                                      const clamped = Math.min(10, Math.max(0, parsed));
-                                      const updated = { ...event, grade: clamped, completed: true } as any;
-                                      await handleSaveEvent(updated as any);
-                                    }
-                                  }}
-                                  onKeyDown={async (e) => {
-                                    if (e.key === 'Enter') {
-                                      const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
-                                      if (raw === '') {
-                                        const updated = { ...event, grade: undefined, completed: false } as any;
-                                        await handleSaveEvent(updated as any);
-                                        (e.target as HTMLInputElement).blur();
-                                        return;
-                                      }
-                                      const parsed = Number(raw);
-                                      if (!Number.isNaN(parsed)) {
-                                        const clamped = Math.min(10, Math.max(0, parsed));
-                                        const updated = { ...event, grade: clamped, completed: true } as any;
-                                        await handleSaveEvent(updated as any);
-                                      }
-                                      (e.target as HTMLInputElement).blur();
-                                    }
-                                  }}
-                                  className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white dark:bg-slate-800"
-                                />
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleReady(event)}
-                                  className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                                  aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                                >
-                                  <Image
-                                    src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                                    alt={event.completed ? 'Deshacer' : 'Listo'}
-                                    width={18}
-                                    height={18}
-                                  />
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => handleEditEvent(event)}
-                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                aria-label="Editar"
-                              >
-                                <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteEvent(event)}
-                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                aria-label="Eliminar"
-                              >
-                                <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
+                <div className={eventDisplayStyle === 'detailed' ? 'space-y-6' : eventDisplayStyle === 'compact' ? 'grid gap-6 grid-cols-1 sm:grid-cols-2' : 'space-y-2'}>
+                  {groupBy === 'none' && filteredEvents.map((event) => (
+                    <AcademicEventCard
+                      key={`${event.id}-${event.sourceDate}`}
+                      event={event}
+                      style={eventDisplayStyle}
+                      onToggleComplete={() => handleToggleReady(event)}
+                      onEdit={() => handleEditEvent(event)}
+                      onDelete={() => handleDeleteEvent(event)}
+                      onGradeChange={async (grade) => {
+                        const updated = { ...event, grade, completed: grade !== undefined } as any;
+                        await handleSaveEvent(updated);
+                      }}
+                    />
+                  ))}
 
                   {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
                     <section key={groupLabel} className="space-y-4">
@@ -932,117 +875,21 @@ export default function AcademicOverview() {
                         </button>
                       </div>
                       {!collapsedGroups[groupLabel] && (
-                        <div className="space-y-4">
-                          {groupItems.map((event) => {
-                            const subject = event.subject;
-                            const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
-                            const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                            const cardClassName = 'rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white';
-                            const subjectBadgeStyles = resolvedSubjectColor ? {
-                              backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                              color: getContrastTextColor(resolvedSubjectColor),
-                              borderColor: hexToRgba(resolvedSubjectColor, 0.3) ?? 'transparent',
-                            } : undefined;
-                            return (
-                              <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                                      <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
-                                        {getExamLabel(event)}
-                                      </span>
-                                      <span className="text-slate-300">{formatDateLabel(event.sourceDate)}</span>
-                                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
-                                        {event.completed ? 'Completado' : 'Pendiente'}
-                                      </span>
-                                    </div>
-                                    <h2 className="mt-4 text-xl font-semibold leading-snug text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                                    <p className="mt-2 text-sm text-slate-300 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
-                                  </div>
-                                  <div className="flex flex-col gap-3 sm:items-end">
-                                    <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
-                                      {event.subject?.name || 'Sin materia'}
-                                    </span>
-                                    <div className="flex gap-2">
-                                      {event.type === 'exam' ? (
-                                        <input
-                                          type="number"
-                                          step="0.1"
-                                          min={0}
-                                          max={10}
-                                          defaultValue={event.grade !== undefined ? String(event.grade) : ''}
-                                          onBlur={async (e) => {
-                                            const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
-                                            if (raw === '') {
-                                              const updated = { ...event, grade: undefined, completed: false } as any;
-                                              await handleSaveEvent(updated as any);
-                                              return;
-                                            }
-                                            const parsed = Number(raw);
-                                            if (!Number.isNaN(parsed)) {
-                                              const clamped = Math.min(10, Math.max(0, parsed));
-                                              const updated = { ...event, grade: clamped, completed: true } as any;
-                                              await handleSaveEvent(updated as any);
-                                            }
-                                          }}
-                                          onKeyDown={async (e) => {
-                                            if (e.key === 'Enter') {
-                                              const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
-                                              if (raw === '') {
-                                                const updated = { ...event, grade: undefined, completed: false } as any;
-                                                await handleSaveEvent(updated as any);
-                                                (e.target as HTMLInputElement).blur();
-                                                return;
-                                              }
-                                              const parsed = Number(raw);
-                                              if (!Number.isNaN(parsed)) {
-                                                const clamped = Math.min(10, Math.max(0, parsed));
-                                                const updated = { ...event, grade: clamped, completed: true } as any;
-                                                await handleSaveEvent(updated as any);
-                                              }
-                                              (e.target as HTMLInputElement).blur();
-                                            }
-                                          }}
-                                          className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white dark:bg-slate-800"
-                                        />
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleToggleReady(event)}
-                                          className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                                          aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                                        >
-                                          <Image
-                                            src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                                            alt={event.completed ? 'Deshacer' : 'Listo'}
-                                            width={18}
-                                            height={18}
-                                          />
-                                        </button>
-                                      )}
-
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEditEvent(event)}
-                                        className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                        aria-label="Editar"
-                                      >
-                                        <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleDeleteEvent(event)}
-                                        className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                        aria-label="Eliminar"
-                                      >
-                                        <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </article>
-                            );
-                          })}
+                        <div className={eventDisplayStyle === 'detailed' ? 'space-y-4' : eventDisplayStyle === 'compact' ? 'grid gap-4 grid-cols-1 sm:grid-cols-2' : 'space-y-2'}>
+                          {groupItems.map((event) => (
+                            <AcademicEventCard
+                              key={`${event.id}-${event.sourceDate}`}
+                              event={event}
+                              style={eventDisplayStyle}
+                              onToggleComplete={() => handleToggleReady(event)}
+                              onEdit={() => handleEditEvent(event)}
+                              onDelete={() => handleDeleteEvent(event)}
+                              onGradeChange={async (grade) => {
+                                const updated = { ...event, grade, completed: grade !== undefined } as any;
+                                await handleSaveEvent(updated);
+                              }}
+                            />
+                          ))}
                         </div>
                       )}
                     </section>
