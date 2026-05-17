@@ -3,15 +3,6 @@ import { useEffect } from 'react';
 let scrollLockCount = 0;
 let originalOverflow = '';
 let originalPaddingRight = '';
-let listenersAttached = false;
-
-const handleWheel = (e: WheelEvent) => {
-  e.preventDefault();
-};
-
-const handleTouchMove = (e: TouchEvent) => {
-  e.preventDefault();
-};
 
 const attachScrollLock = () => {
   if (typeof document === 'undefined') return;
@@ -24,10 +15,6 @@ const attachScrollLock = () => {
     if (scrollbarWidth > 0) {
       document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
-
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    listenersAttached = true;
   }
   scrollLockCount += 1;
 };
@@ -40,19 +27,12 @@ const releaseScrollLock = () => {
   if (scrollLockCount === 0) {
     document.body.style.overflow = originalOverflow;
     document.body.style.paddingRight = originalPaddingRight;
-
-    if (listenersAttached) {
-      document.removeEventListener('wheel', handleWheel);
-      document.removeEventListener('touchmove', handleTouchMove);
-      listenersAttached = false;
-    }
   }
 };
 
 /**
- * Hook que previene el scroll del body y cualquier interacción con el fondo
- * cuando un modal está abierto. Se restaura automáticamente cuando se desmonta.
- * Bloquea scroll por rueda y touch.
+ * Hook que previene el scroll del body cuando un modal está abierto.
+ * Se restaura automáticamente cuando se desmonta y permite scroll interno en el modal.
  */
 export function usePreventScroll(isOpen: boolean = false) {
   useEffect(() => {
