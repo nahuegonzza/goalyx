@@ -54,7 +54,7 @@ const releaseScrollLock = () => {
  * cuando un modal está abierto. Se restaura automáticamente cuando se desmonta.
  * Bloquea scroll por rueda y touch.
  */
-export function usePreventScroll(isOpen: boolean = true) {
+export function usePreventScroll(isOpen: boolean = false) {
   useEffect(() => {
     if (!isOpen || typeof document === 'undefined') return;
 

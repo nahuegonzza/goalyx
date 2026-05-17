@@ -70,7 +70,7 @@ function formatShortDate(dateLike?: string | Date | null) {
 }
 
 export default function FriendProfileModal({ friendId, onClose, initialDisplayName, initialUsername }: FriendProfileModalProps) {
-  usePreventScroll();
+  usePreventScroll(true);
   const [friendData, setFriendData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

@@ -12,7 +12,7 @@ interface GoalCreateModalProps {
 }
 
 export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreateModalProps) {
-  usePreventScroll();
+  usePreventScroll(true);
   const [isDirty, setIsDirty] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
