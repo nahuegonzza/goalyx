@@ -7,6 +7,7 @@ import type { AcademicSubject, AcademicModuleConfig, AcademicTypeConfig } from "
 import { getAcademicExamTypes, getAcademicTaskTypes } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
+import ModalOverlay from '@components/ModalOverlay';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface AcademicConfigProps {

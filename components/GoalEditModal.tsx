@@ -76,6 +76,6 @@ export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModa
         />
 
       </div>
-    </div>
+    </ModalOverlay>
   );
 }
