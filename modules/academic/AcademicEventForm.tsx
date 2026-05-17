@@ -17,7 +17,7 @@ function ValidationModal({ open, title = 'Datos obligatorios', description = 'Po
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
       <div className="w-full max-w-md rounded-[28px] bg-white dark:bg-slate-900 p-6 shadow-2xl shadow-slate-900/20">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h3>
         <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
@@ -193,7 +193,7 @@ export function AcademicEventForm({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">

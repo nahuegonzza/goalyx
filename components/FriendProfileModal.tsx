@@ -147,7 +147,7 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
   }, [friendData?.email]);
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 pointer-events-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 pointer-events-auto">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all pointer-events-auto">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>

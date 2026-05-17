@@ -22,7 +22,7 @@ export default function InfoModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md p-4 pointer-events-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md p-4 pointer-events-auto">
       <div className="w-full max-w-md rounded-[28px] bg-white dark:bg-slate-900 p-6 shadow-2xl shadow-slate-900/20 pointer-events-auto">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h3>
         <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
