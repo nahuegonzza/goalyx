@@ -166,13 +166,14 @@ const getContrastTextColor = (color: string) => {
 const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+  const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
   const subjectBadgeStyles = resolvedSubjectColor ? {
     backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
     color: getContrastTextColor(resolvedSubjectColor),
   } : undefined;
 
   return (
-    <article className="rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white">
+    <article style={cardBorderStyle} className="rounded-3xl border border-slate-200 bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-white">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -271,13 +272,14 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
 const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+  const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
   const subjectBadgeStyles = resolvedSubjectColor ? {
     backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
     color: getContrastTextColor(resolvedSubjectColor),
   } : undefined;
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-white">
+    <article style={cardBorderStyle} className="rounded-2xl border border-slate-200 bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-white">
       <div className="flex flex-col gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 text-xs">
@@ -372,13 +374,14 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
 const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+  const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
   const subjectBadgeStyles = resolvedSubjectColor ? {
     backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
     color: getContrastTextColor(resolvedSubjectColor),
   } : undefined;
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-[#0f172a] px-3 py-2 shadow-sm text-white">
+    <article style={cardBorderStyle} className="rounded-lg border border-slate-200 bg-[#0f172a] px-3 py-2 shadow-sm text-white">
       <div className="flex items-center gap-2 justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-xs">
