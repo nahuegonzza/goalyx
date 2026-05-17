@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Reorder, useDragControls } from 'framer-motion';
 import type { Module } from '@types';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 // Iconos para cada módulo
@@ -96,6 +97,8 @@ type ModuleOrderManagerProps = {
 };
 
 export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: ModuleOrderManagerProps) {
+  usePreventScroll(true);
+
   const [orderedItems, setOrderedItems] = useState<ModuleOrderItem[]>([]);
   const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);

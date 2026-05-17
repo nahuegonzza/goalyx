@@ -6,6 +6,7 @@ import { Reorder, useDragControls } from 'framer-motion';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 
 interface MoodState {
   id: string;
@@ -169,6 +170,8 @@ function MoodStateReorderItem({
 }
 
 export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose }) => {
+  usePreventScroll(true);
+
   const [states, setStates] = useState<MoodState[]>(
     (config.states as MoodState[]) || defaultStates
   );

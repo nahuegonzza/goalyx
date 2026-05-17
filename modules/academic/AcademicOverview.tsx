@@ -9,6 +9,7 @@ import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration
 import { AcademicEventForm } from './AcademicEventForm';
 import ConfirmationModal from '@components/ConfirmationModal';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
 import type { ModuleEntry } from '@types';
@@ -443,6 +444,7 @@ export default function AcademicOverview() {
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  usePreventScroll(showFilterModal || showConfigModal || showEventForm);
   const [availableTaskTypes, setAvailableTaskTypes] = useState<AcademicTypeConfig[]>([]);
   const [academicConfigLoaded, setAcademicConfigLoaded] = useState(false);
 

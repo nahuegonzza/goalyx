@@ -6,6 +6,7 @@ import { getLocalDateString } from '@lib/dateHelpers';
 import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority, AcademicTaskDuration } from './academicHelpers';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 
 interface ValidationModalProps {
   open: boolean;
@@ -54,6 +55,7 @@ export function AcademicEventForm({
   onSave,
   isSaving = false,
 }: AcademicEventFormProps) {
+  usePreventScroll(isOpen);
   const [eventType, setEventType] = useState<AcademicEventType>('task');
   const [examType, setExamType] = useState<AcademicExamType>('parcial');
   const [priority, setPriority] = useState<AcademicTaskPriority>('media');

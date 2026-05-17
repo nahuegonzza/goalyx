@@ -8,6 +8,7 @@ import { getAcademicExamTypes, getAcademicTaskTypes } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface AcademicConfigProps {
@@ -112,6 +113,7 @@ export function AcademicConfig({
   onSave,
   onClose,
 }: AcademicConfigProps) {
+  usePreventScroll(true);
   const [subjects, setSubjects] = useState<AcademicSubject[]>([]);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"subjects" | "scoring">("subjects");

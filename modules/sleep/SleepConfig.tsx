@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 import ModalOverlay from '@components/ModalOverlay';
+import { usePreventScroll } from '@hooks/usePreventScroll';
 
 interface SleepConfigProps {
   config: Record<string, unknown>;
@@ -11,6 +12,7 @@ interface SleepConfigProps {
 }
 
 export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClose }) => {
+  usePreventScroll(true);
   const [idealHours, setIdealHours] = useState(config.idealHours as number || 8);
   const [maxPoints, setMaxPoints] = useState(config.maxPoints as number || 2);
   const [toleranceMinutes, setToleranceMinutes] = useState(config.toleranceMinutes as number || 30);
