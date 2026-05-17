@@ -1,25 +1,56 @@
 'use client';
 
-import { usePreventScroll } from '@hooks/usePreventScroll';
-import type { PropsWithChildren } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalOverlayProps {
-  open?: boolean;
+  children: ReactNode;
+  variant?: 'center' | 'end';
+  blur?: 'sm' | 'md';
+  opacity?: '50' | '60';
   className?: string;
 }
 
 export default function ModalOverlay({
-  open = true,
-  className = 'flex items-center justify-center bg-black/50 backdrop-blur-md p-4',
   children,
-}: PropsWithChildren<ModalOverlayProps>) {
-  usePreventScroll(open);
+  variant = 'center',
+  blur = 'sm',
+  opacity = '60',
+  className = '',
+}: ModalOverlayProps) {
+  const [mounted, setMounted] = useState(false);
 
-  if (!open) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  return (
-    <div className={`fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] ${className} pointer-events-auto`}>
+  const overlayClassName = useMemo(() => {
+    const alignment = variant === 'end'
+      ? 'items-end sm:items-center justify-center'
+      : 'items-center justify-center';
+
+    const blurClass = blur === 'md' ? 'backdrop-blur-md' : 'backdrop-blur-sm';
+    const opacityClass = opacity === '50' ? 'bg-black/50' : 'bg-black/60';
+
+    return [
+      'fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999]',
+      'pointer-events-auto',
+      alignment,
+      opacityClass,
+      blurClass,
+      'p-0 sm:p-4',
+      className,
+    ].filter(Boolean).join(' ');
+  }, [variant, blur, opacity, className]);
+
+  if (!mounted || typeof document === 'undefined') {
+    return null;
+  }
+
+  return createPortal(
+    <div className={overlayClassName}>
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 }

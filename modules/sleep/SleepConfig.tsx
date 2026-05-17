@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
+import ModalOverlay from '@components/ModalOverlay';
 
 interface SleepConfigProps {
   config: Record<string, unknown>;
@@ -55,7 +56,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+    <ModalOverlay variant="end" opacity="60" blur="sm">
       {/* Modal: En móvil se pega abajo como un "Action Sheet" */}
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
         
@@ -279,6 +280,6 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
           }}
         />
       </div>
-    </div>
+    </ModalOverlay>
   );
 };

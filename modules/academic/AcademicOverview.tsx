@@ -8,6 +8,7 @@ import { getColorOption } from '@lib/goalIconsColors';
 import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority, getAcademicTaskTypes, AcademicTypeConfig } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
 import ConfirmationModal from '@components/ConfirmationModal';
+import ModalOverlay from '@components/ModalOverlay';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
 import type { ModuleEntry } from '@types';
@@ -179,7 +180,7 @@ function AcademicFilterModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+    <ModalOverlay variant="end" opacity="60" blur="sm">
       <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Filtrar eventos</h2>
@@ -342,7 +343,7 @@ function AcademicFilterModal({
           </div>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }
 
@@ -1083,7 +1084,7 @@ export default function AcademicOverview() {
       />
 
       {showConfigModal && (
-        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50">
+        <ModalOverlay opacity="50" blur="sm">
           <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-slate-950">
             <AcademicConfig
               config={{}}
@@ -1093,7 +1094,7 @@ export default function AcademicOverview() {
               onClose={() => setShowConfigModal(false)}
             />
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );
