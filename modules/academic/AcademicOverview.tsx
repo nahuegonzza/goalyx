@@ -827,6 +827,41 @@ export default function AcademicOverview() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos ({filteredEvents.length})</p>
+              <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
+              <button
+                onClick={() => setEventDisplayStyle('list')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'list'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista lista"
+              >
+                ⋮
+              </button>
+              <button
+                onClick={() => setEventDisplayStyle('compact')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'compact'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista compacta (2 por fila)"
+              >
+                ▦▦
+              </button>
+              <button
+                onClick={() => setEventDisplayStyle('detailed')}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  eventDisplayStyle === 'detailed'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+                title="Vista detallada"
+              >
+                ☰
+              </button>
+            </div>
             </div>
           </div>
             <div className="mt-4">

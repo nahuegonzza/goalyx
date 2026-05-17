@@ -196,6 +196,7 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
             {event.type === 'exam' ? (
               <input
                 type="number"
+                placeholder="Nota"
                 step="0.1"
                 min={0}
                 max={10}
