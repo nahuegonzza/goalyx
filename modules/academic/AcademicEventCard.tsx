@@ -173,7 +173,7 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-3xl border border-slate-200 bg-white dark:bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-slate-900 dark:text-white">
+    <article style={cardBorderStyle} className="min-w-0 rounded-3xl border border-slate-200 bg-white dark:bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-slate-900 dark:text-white">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -280,7 +280,7 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-2xl border border-slate-200 bg-white dark:bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-slate-900 dark:text-white">
+    <article style={cardBorderStyle} className="min-w-0 rounded-2xl border border-slate-200 bg-white dark:bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-slate-900 dark:text-white">
       <div className="flex flex-col gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 text-xs">
@@ -382,7 +382,7 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="rounded-lg border border-slate-200 bg-white dark:bg-[#0f172a] px-3 py-2 shadow-sm text-slate-900 dark:text-white">
+    <article style={cardBorderStyle} className="min-w-0 rounded-lg border border-slate-200 bg-white dark:bg-[#0f172a] px-3 py-2 shadow-sm text-slate-900 dark:text-white">
       <div className="flex items-center gap-2 justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-xs">

@@ -177,7 +177,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] xl:items-stretch">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 flex flex-col h-full">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 min-w-0 flex flex-col h-full">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-base font-semibold text-slate-900 dark:text-white">Eventos para hoy</p>

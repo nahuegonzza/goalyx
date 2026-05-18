@@ -150,7 +150,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
   const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
 
-  const cardClassName = 'group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950';
+  const cardClassName = 'group min-w-0 relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950';
 
   const iconStyles = resolvedSubjectColor ? {
     backgroundColor: hexToRgba(resolvedSubjectColor, 0.20),
@@ -174,7 +174,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                 {subject?.name ?? 'Sin materia'}
               </p>
             </div>
-            <h3 className="max-w-full truncate text-lg font-bold leading-tight text-slate-900 dark:text-white">
+            <h3 className="max-w-full whitespace-nowrap overflow-hidden truncate text-lg font-bold leading-tight text-slate-900 dark:text-white">
               {event.title}
             </h3>
           </div>
@@ -256,7 +256,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
 
       {/* Descripción */}
       <div className="mt-4 min-w-0">
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 break-words overflow-hidden">
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 break-all overflow-hidden">
           {event.description || 'Sin descripción adicional'}
         </p>
       </div>
