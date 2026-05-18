@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
 import { getAcademicExamTypeLabelByType } from './academicHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
+import AcademicEventDetailsModal from './AcademicEventDetailsModal';
 
 const normalizeHex = (hex: string) => {
   let cleaned = hex.trim().replace('#', '');
@@ -83,6 +84,7 @@ interface AcademicTodayCardProps {
 
 export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEvent, onEdit, onDelete, isEditing = false }: AcademicTodayCardProps) {
   const [gradeInput, setGradeInput] = useState<string>(event.grade !== undefined ? String(event.grade) : '');
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     setGradeInput(event.grade !== undefined ? String(event.grade) : '');
@@ -158,9 +160,10 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
   } : undefined;
 
   return (
-    <div style={cardStyles} className={cardClassName}>
-      {/* Header: Icono, Título y Check */}
-      <div className="flex items-start justify-between gap-4">
+    <>
+      <div style={cardStyles} onClick={() => setShowDetails(true)} className={`${cardClassName} cursor-pointer`}>
+        {/* Header: Icono, Título y Check */}
+        <div className="flex items-start justify-between gap-4">
         <div className="flex gap-4 min-w-0">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300" style={iconStyles}>
             {icon}
@@ -190,6 +193,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                 min="0"
                 max="10"
                 value={gradeInput}
+                onClick={(e) => e.stopPropagation()}
                 onChange={(e) => setGradeInput(e.target.value)}
                 onBlur={async (e) => {
                   if (!isEditing || !onUpdateEvent) return;
@@ -240,7 +244,10 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
           ) : (
             <button
               type="button"
-              onClick={() => isEditing && onToggleComplete(event)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isEditing) onToggleComplete(event);
+              }}
               disabled={!isEditing}
               className={`relative h-6 w-11 rounded-full transition-colors ${
                 event.completed
@@ -292,7 +299,11 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
         <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-900">
           {onEdit && (
             <button
-              onClick={() => { if (isEditing) onEdit(event); }}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isEditing) onEdit(event);
+              }}
               disabled={!isEditing}
               className={`rounded-xl px-4 py-2 text-xs font-bold transition ${isEditing ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900' : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'}`}
             >
@@ -301,7 +312,11 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
           )}
           {onDelete && (
             <button
-              onClick={() => { if (isEditing) onDelete(event); }}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isEditing) onDelete(event);
+              }}
               disabled={!isEditing}
               className={`rounded-xl px-4 py-2 text-xs font-bold transition ${isEditing ? 'text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'}`}
             >
@@ -311,5 +326,14 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
         </div>
       )}
     </div>
+      {showDetails && (
+        <AcademicEventDetailsModal
+          open={showDetails}
+          event={event}
+          subject={subject}
+          onClose={() => setShowDetails(false)}
+        />
+      )}
+    </>
   );
 }

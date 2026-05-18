@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { getColorOption } from '@lib/goalIconsColors';
 import { AcademicEvent } from './academicHelpers';
+import AcademicEventDetailsModal from './AcademicEventDetailsModal';
 
 export type EventDisplayStyle = 'detailed' | 'compact' | 'list';
 
@@ -164,6 +166,7 @@ const getContrastTextColor = (color: string) => {
 
 // Detailed Style - Original large card
 const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
+  const [showDetails, setShowDetails] = useState(false);
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
   const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
@@ -173,7 +176,12 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="min-w-0 rounded-3xl border border-slate-200 bg-white dark:bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-slate-900 dark:text-white">
+    <>
+      <article
+        style={cardBorderStyle}
+        onClick={() => setShowDetails(true)}
+        className="min-w-0 rounded-3xl border border-slate-200 bg-white dark:bg-[#0f172a] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl text-slate-900 dark:text-white cursor-pointer"
+      >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -201,6 +209,7 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
                 min={0}
                 max={10}
                 defaultValue={event.grade !== undefined ? String(event.grade) : ''}
+                onClick={(e) => e.stopPropagation()}
                 onBlur={async (e) => {
                   const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
                   if (raw === '') {
@@ -234,7 +243,10 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
             ) : (
               <button
                 type="button"
-                onClick={() => onToggleComplete?.()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleComplete?.();
+                }}
                 className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
                 aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
               >
@@ -248,7 +260,10 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
             )}
             <button
               type="button"
-              onClick={() => onEdit?.()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
               className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
               aria-label="Editar"
             >
@@ -256,7 +271,10 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
             </button>
             <button
               type="button"
-              onClick={() => onDelete?.()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
               className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
               aria-label="Eliminar"
             >
@@ -266,11 +284,21 @@ const DetailedCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange
         </div>
       </div>
     </article>
+      {showDetails && (
+        <AcademicEventDetailsModal
+          open={showDetails}
+          event={event}
+          subject={subject}
+          onClose={() => setShowDetails(false)}
+        />
+      )}
+    </>
   );
 };
 
 // Compact Style - 2 per row, no description, smaller text
 const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
+  const [showDetails, setShowDetails] = useState(false);
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
   const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
@@ -280,7 +308,12 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="min-w-0 rounded-2xl border border-slate-200 bg-white dark:bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-slate-900 dark:text-white">
+    <>
+      <article
+        style={cardBorderStyle}
+        onClick={() => setShowDetails(true)}
+        className="min-w-0 rounded-2xl border border-slate-200 bg-white dark:bg-[#0f172a] p-4 shadow-sm transition hover:shadow-lg text-slate-900 dark:text-white cursor-pointer"
+      >
       <div className="flex flex-col gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 text-xs">
@@ -303,6 +336,7 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
                 min={0}
                 max={10}
                 defaultValue={event.grade !== undefined ? String(event.grade) : ''}
+                onClick={(e) => e.stopPropagation()}
                 onBlur={async (e) => {
                   const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
                   if (raw === '') {
@@ -336,7 +370,10 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
             ) : (
               <button
                 type="button"
-                onClick={() => onToggleComplete?.()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleComplete?.();
+                }}
                 className="rounded p-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
                 aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
               >
@@ -350,7 +387,10 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
             )}
             <button
               type="button"
-              onClick={() => onEdit?.()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
               className="rounded p-1 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
               aria-label="Editar"
             >
@@ -358,7 +398,10 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
             </button>
             <button
               type="button"
-              onClick={() => onDelete?.()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
               className="rounded p-1 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
               aria-label="Eliminar"
             >
@@ -368,11 +411,21 @@ const CompactCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange 
         </div>
       </div>
     </article>
+      {showDetails && (
+        <AcademicEventDetailsModal
+          open={showDetails}
+          event={event}
+          subject={subject}
+          onClose={() => setShowDetails(false)}
+        />
+      )}
+    </>
   );
 };
 
 // List Style - Very compact, minimal info
 const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: AcademicEventCardProps) => {
+  const [showDetails, setShowDetails] = useState(false);
   const subject = event.subject;
   const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
   const cardBorderStyle = resolvedSubjectColor ? { borderColor: resolvedSubjectColor } : undefined;
@@ -382,14 +435,19 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
   } : undefined;
 
   return (
-    <article style={cardBorderStyle} className="min-w-0 rounded-lg border border-slate-200 bg-white dark:bg-[#0f172a] px-3 py-2 shadow-sm text-slate-900 dark:text-white">
+    <>
+      <article
+        style={cardBorderStyle}
+        onClick={() => setShowDetails(true)}
+        className="min-w-0 rounded-lg border border-slate-200 bg-white dark:bg-[#0f172a] px-3 py-2 shadow-sm text-slate-900 dark:text-white cursor-pointer"
+      >
       <div className="flex items-center gap-2 justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-xs">
             <span className={`rounded-full px-1.5 py-0.5 font-semibold uppercase tracking-[0.1em] ${getExamBadgeStyle(event)}`}>
               {event.type === 'exam' ? event.examType?.charAt(0).toUpperCase() : 'T'}
             </span>
-            <h3 className="text-xs font-semibold text-slate-900 dark:text-white truncate max-w-[150px]">{event.title}</h3>
+            <h3 className="text-xs font-semibold text-slate-900 dark:text-white truncate max-w-[500px]">{event.title}</h3>
             <span className="text-slate-500 dark:text-slate-500 text-xs flex-shrink-0">{formatDateLabel(event.sourceDate).split(',')[0]}</span>
           </div>
         </div>
@@ -401,6 +459,7 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
               min={0}
               max={10}
               defaultValue={event.grade !== undefined ? String(event.grade) : ''}
+              onClick={(e) => e.stopPropagation()}
               onBlur={async (e) => {
                 const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
                 if (raw === '') {
@@ -434,7 +493,10 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
           ) : (
             <button
               type="button"
-              onClick={() => onToggleComplete?.()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleComplete?.();
+              }}
               className="rounded p-0.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
               aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
             >
@@ -448,7 +510,10 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
           )}
           <button
             type="button"
-            onClick={() => onEdit?.()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.();
+            }}
             className="rounded p-0.5 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
             aria-label="Editar"
           >
@@ -456,7 +521,10 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
           </button>
           <button
             type="button"
-            onClick={() => onDelete?.()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.();
+            }}
             className="rounded p-0.5 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
             aria-label="Eliminar"
           >
@@ -465,6 +533,15 @@ const ListCard = ({ event, onToggleComplete, onEdit, onDelete, onGradeChange }: 
         </div>
       </div>
     </article>
+      {showDetails && (
+        <AcademicEventDetailsModal
+          open={showDetails}
+          event={event}
+          subject={subject}
+          onClose={() => setShowDetails(false)}
+        />
+      )}
+    </>
   );
 };
 

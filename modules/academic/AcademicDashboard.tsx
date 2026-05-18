@@ -7,7 +7,8 @@ import type { ModuleState } from '@types';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicTodayCard } from './AcademicTodayCard';
 import { AcademicEventForm } from './AcademicEventForm';
-import type { AcademicEvent } from './academicHelpers';
+import AcademicEventDetailsModal from './AcademicEventDetailsModal';
+import type { AcademicEvent, AcademicSubject } from './academicHelpers';
 import { academicModule } from './module';
 import ConfirmationModal from '@components/ConfirmationModal';
 
@@ -38,6 +39,8 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
   const [showUpcomingEvents, setShowUpcomingEvents] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<AcademicEvent | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<AcademicSubject | null>(null);
   const [message, setMessage] = useState('');
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
@@ -251,7 +254,15 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                     const subject = subjects.find((item) => item.id === event.subjectId);
                     const eventCardStyle = subject?.color ? { borderColor: getColorOption(subject.color).bgColor } : undefined;
                     return (
-                      <div key={event.id} style={eventCardStyle} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                      <div
+                        key={event.id}
+                        style={eventCardStyle}
+                        onClick={() => {
+                          setSelectedEvent(event);
+                          setSelectedSubject(subject ?? null);
+                        }}
+                        className="cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950"
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -262,7 +273,11 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                           </div>
                           {event.type === 'task' && (
                             <button
-                              onClick={() => { if (!sectionDisabled) toggleEventCompleted(event); }}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!sectionDisabled) toggleEventCompleted(event);
+                              }}
                               disabled={sectionDisabled}
                               className={`ml-3 rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'}`}
                             >
@@ -284,7 +299,15 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                     const subject = subjects.find((item) => item.id === event.subjectId);
                     const eventCardStyle = subject?.color ? { borderColor: getColorOption(subject.color).bgColor } : undefined;
                     return (
-                      <div key={event.id} style={eventCardStyle} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                      <div
+                        key={event.id}
+                        style={eventCardStyle}
+                        onClick={() => {
+                          setSelectedEvent(event);
+                          setSelectedSubject(subject ?? null);
+                        }}
+                        className="cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950"
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -296,7 +319,11 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                           <div className="ml-3 flex gap-2">
                             {event.type === 'task' && (
                               <button
-                                onClick={() => { if (!sectionDisabled) toggleEventCompleted(event); }}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!sectionDisabled) toggleEventCompleted(event);
+                                }}
                                 disabled={sectionDisabled}
                                 className={`rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'}`}
                               >
@@ -304,7 +331,11 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                               </button>
                             )}
                             <button
-                              onClick={() => { if (!sectionDisabled) discardEvent(event); }}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!sectionDisabled) discardEvent(event);
+                              }}
                               disabled={sectionDisabled}
                               className={`rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'}`}
                             >
@@ -327,6 +358,17 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
           ) : null}
         </div>
       </div>
+      {selectedEvent && (
+        <AcademicEventDetailsModal
+          open
+          event={selectedEvent}
+          subject={selectedSubject ?? undefined}
+          onClose={() => {
+            setSelectedEvent(null);
+            setSelectedSubject(null);
+          }}
+        />
+      )}
     </section>
   );
 }
