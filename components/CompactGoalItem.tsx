@@ -7,11 +7,10 @@ import { getGoalIcon, COLOR_OPTIONS, getBackgroundColors } from '@lib/goalIconsC
 interface CompactGoalItemProps {
   goal: Goal;
   entry?: GoalEntryWithGoal;
-  isLoading?: boolean;
   onChange: (goal: Goal, value: boolean | number) => void;
 }
 
-export default function CompactGoalItem({ goal, entry, isLoading = false, onChange }: CompactGoalItemProps) {
+export default function CompactGoalItem({ goal, entry, onChange }: CompactGoalItemProps) {
   const colors = getBackgroundColors(goal.color);
   const icon = getGoalIcon(goal.icon);
   const currentValue = goal.type === 'BOOLEAN' ? entry?.valueBoolean ?? false : entry?.valueFloat ?? 0;
@@ -133,11 +132,7 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
             </button>
           </div>
         )}
-        {isLoading && (
-          <span className="text-xs text-slate-500 dark:text-slate-400 animate-pulse">
-            ...
-          </span>
-        )}
+        {/* Loading indicator removed per UX change */}
       </div>
     </div>
   );

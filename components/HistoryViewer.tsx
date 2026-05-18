@@ -319,7 +319,6 @@ export default function HistoryViewer() {
                 key={goal.id}
                 goal={goal}
                 entry={goalEntriesMap.get(goal.id)}
-                isLoading={savingGoalIds.includes(goal.id)}
                 onChange={handleSaveEntry}
               />
             ))}
