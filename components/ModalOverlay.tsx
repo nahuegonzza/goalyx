@@ -33,7 +33,7 @@ export default function ModalOverlay({
     const opacityClass = opacity === '50' ? 'bg-black/50' : 'bg-black/60';
 
     return [
-      'fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999]',
+      'fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen z-40',
       'flex',
       'pointer-events-auto',
       alignment,
