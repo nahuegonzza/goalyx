@@ -674,41 +674,6 @@ export default function AcademicOverview() {
             >
               Filtrar
             </button>
-            <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
-              <button
-                onClick={() => setEventDisplayStyle('list')}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
-                  eventDisplayStyle === 'list'
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
-                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
-                }`}
-                title="Vista lista"
-              >
-                ⋮
-              </button>
-              <button
-                onClick={() => setEventDisplayStyle('compact')}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
-                  eventDisplayStyle === 'compact'
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
-                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
-                }`}
-                title="Vista compacta (2 por fila)"
-              >
-                ▦▦
-              </button>
-              <button
-                onClick={() => setEventDisplayStyle('detailed')}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
-                  eventDisplayStyle === 'detailed'
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
-                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
-                }`}
-                title="Vista detallada"
-              >
-                ☰
-              </button>
-            </div>
             <button
               onClick={() => setShowConfigModal(true)}
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -824,10 +789,9 @@ export default function AcademicOverview() {
         />
 
         <section className="mt-4 rounded-3xl bg-slate-50 p-1 dark:bg-slate-950">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos ({filteredEvents.length})</p>
-              <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos ({filteredEvents.length})</p>
+            <div className="flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
               <button
                 onClick={() => setEventDisplayStyle('list')}
                 className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
@@ -862,9 +826,8 @@ export default function AcademicOverview() {
                 ☰
               </button>
             </div>
-            </div>
           </div>
-            <div className="mt-4">
+          <div className="mt-4">
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((item) => (
