@@ -520,9 +520,6 @@ export default function CalendarExplorer() {
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
-            <div className="text-sm text-slate-500 dark:text-slate-400">
-              {mode === 'annual' ? `Año ${displayLabel}` : `${MODE_LABELS[mode]} · ${displayLabel}`}
-            </div>
             <div className="flex flex-wrap items-center gap-2">
               {mode === 'annual' && (
                 <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">

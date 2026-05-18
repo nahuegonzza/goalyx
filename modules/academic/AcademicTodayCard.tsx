@@ -161,11 +161,11 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
     <div style={cardStyles} className={cardClassName}>
       {/* Header: Icono, Título y Check */}
       <div className="flex items-start justify-between gap-4">
-        <div className="flex gap-4">
+        <div className="flex gap-4 min-w-0">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300" style={iconStyles}>
             {icon}
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className={`rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentPriorityStyle}`}>
                 {badgeText}
@@ -255,8 +255,8 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
       </div>
 
       {/* Descripción */}
-      <div className="mt-4">
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 break-words">
+      <div className="mt-4 min-w-0">
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 break-words overflow-hidden">
           {event.description || 'Sin descripción adicional'}
         </p>
       </div>
