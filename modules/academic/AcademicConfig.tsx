@@ -550,6 +550,17 @@ export function AcademicConfig({
           >
             Puntuación
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("page")}
+            className={`px-4 py-2 text-sm font-semibold transition-colors ${
+              activeTab === "page"
+                ? "border-b-2 border-emerald-600 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300"
+            }`}
+          >
+            Página
+          </button>
         </div>
 
         {/* Tab: Subjects */}
@@ -755,6 +766,115 @@ export function AcademicConfig({
                   <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">Completa el tipo pendiente antes de crear uno nuevo o guardar.</p>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "page" && (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white">Página predeterminada</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  Selecciona la vista y los filtros iniciales que se aplicarán cuando abras la gestión universitaria.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Vista</span>
+                  <select
+                    value={defaultView}
+                    onChange={(e) => setDefaultView(e.target.value as EventDisplayStyle)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="detailed">Detallada</option>
+                    <option value="compact">Compacta</option>
+                    <option value="list">Lista</option>
+                  </select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Orden predeterminado</span>
+                  <select
+                    value={defaultSortBy}
+                    onChange={(e) => setDefaultSortBy(e.target.value as SortOption)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="priority">Prioridad / examen</option>
+                    <option value="dateAsc">Fecha ascendente</option>
+                    <option value="dateDesc">Fecha descendente</option>
+                    <option value="subject">Materia</option>
+                  </select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Agrupar</span>
+                  <select
+                    value={defaultGroupBy}
+                    onChange={(e) => setDefaultGroupBy(e.target.value as GroupByOption)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="none">Sin orden</option>
+                    <option value="date">Por fecha</option>
+                    <option value="subject">Por materia</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Filtros predeterminados</h4>
+              <AcademicFilterControls
+                search={defaultSearch}
+                groupBy={defaultGroupBy}
+                sortBy={defaultSortBy}
+                eventTypeFilter={defaultEventTypeFilter}
+                statusFilter={defaultStatusFilter}
+                subjectFilter={defaultSubjectFilter}
+                priorityFilter={defaultPriorityFilter}
+                durationFilter={defaultDurationFilter}
+                dateFrom={defaultDateFrom}
+                dateTo={defaultDateTo}
+                subjects={subjects}
+                availableTaskTypes={taskTypes}
+                onChange={(field, value) => {
+                  switch (field) {
+                    case 'search':
+                      setDefaultSearch(value);
+                      break;
+                    case 'groupBy':
+                      setDefaultGroupBy(value as GroupByOption);
+                      break;
+                    case 'sortBy':
+                      setDefaultSortBy(value as SortOption);
+                      break;
+                    case 'eventTypeFilter':
+                      setDefaultEventTypeFilter(value as EventTypeFilter);
+                      break;
+                    case 'statusFilter':
+                      setDefaultStatusFilter(value as StatusFilter);
+                      break;
+                    case 'subjectFilter':
+                      setDefaultSubjectFilter(value);
+                      break;
+                    case 'priorityFilter':
+                      setDefaultPriorityFilter(value as PriorityFilter);
+                      break;
+                    case 'durationFilter':
+                      setDefaultDurationFilter(value as DurationFilter);
+                      break;
+                    case 'dateFrom':
+                      setDefaultDateFrom(value);
+                      break;
+                    case 'dateTo':
+                      setDefaultDateTo(value);
+                      break;
+                    default:
+                      break;
+                  }
+                }}
+              />
             </div>
           </div>
         )}
