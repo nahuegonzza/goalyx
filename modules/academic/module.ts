@@ -24,6 +24,7 @@ const defaultConfig: AcademicModuleConfig = {
   defaultSubjectFilter: 'all',
   defaultPriorityFilter: 'all',
   defaultDurationFilter: 'all',
+  defaultDatePreset: 'all',
   defaultDateFrom: '',
   defaultDateTo: '',
 };

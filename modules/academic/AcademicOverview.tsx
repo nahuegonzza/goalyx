@@ -341,6 +341,11 @@ export default function AcademicOverview() {
   }, [academicModuleId]);
 
   useEffect(() => {
+    if (!moduleConfig) return;
+    applyModuleConfig(moduleConfig);
+  }, [moduleConfig]);
+
+  useEffect(() => {
     if (!academicModuleId) return;
     (async () => {
       try {
@@ -355,25 +360,7 @@ export default function AcademicOverview() {
         const config = mod.config as Record<string, unknown> | undefined;
         setModuleConfig(config);
         setAvailableTaskTypes(getAcademicTaskTypes(config));
-
-        setEventDisplayStyle((config?.defaultView as EventDisplayStyle) ?? 'detailed');
-        setSearch((config?.defaultSearch as string) ?? '');
-        setGroupBy((config?.defaultGroupBy as GroupByOption) ?? 'none');
-        setSortBy((config?.defaultSortBy as SortOption) ?? 'priority');
-        setEventTypeFilter((config?.defaultEventTypeFilter as EventTypeFilter) ?? 'all');
-        setStatusFilter((config?.defaultStatusFilter as StatusFilter) ?? 'all');
-        setSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
-        setPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
-        setDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
-        const preset = config?.defaultDatePreset as string | undefined;
-        if (preset && preset !== 'custom') {
-          const r = getPresetRange(preset);
-          setDateFrom(r.from);
-          setDateTo(r.to);
-        } else {
-          setDateFrom((config?.defaultDateFrom as string) ?? '');
-          setDateTo((config?.defaultDateTo as string) ?? '');
-        }
+        applyModuleConfig(config);
       } catch (err) {
         // ignore
       } finally {
@@ -476,6 +463,29 @@ export default function AcademicOverview() {
       return { from: formatKey(from), to: formatKey(to) };
     }
     return { from: '', to: '' };
+  };
+
+  const applyModuleConfig = (config?: Record<string, unknown>) => {
+    if (!config) return;
+    setEventDisplayStyle((config?.defaultView as EventDisplayStyle) ?? 'detailed');
+    setSearch((config?.defaultSearch as string) ?? '');
+    setGroupBy((config?.defaultGroupBy as GroupByOption) ?? 'none');
+    setSortBy((config?.defaultSortBy as SortOption) ?? 'priority');
+    setEventTypeFilter((config?.defaultEventTypeFilter as EventTypeFilter) ?? 'all');
+    setStatusFilter((config?.defaultStatusFilter as StatusFilter) ?? 'all');
+    setSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
+    setPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
+    setDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
+
+    const preset = config?.defaultDatePreset as string | undefined;
+    if (preset && preset !== 'custom') {
+      const r = getPresetRange(preset);
+      setDateFrom(r.from);
+      setDateTo(r.to);
+    } else {
+      setDateFrom((config?.defaultDateFrom as string) ?? '');
+      setDateTo((config?.defaultDateTo as string) ?? '');
+    }
   };
 
   useEffect(() => {
