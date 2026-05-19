@@ -128,6 +128,7 @@ export function AcademicConfig({
   const [defaultPriorityFilter, setDefaultPriorityFilter] = useState<PriorityFilter>('all');
   const [defaultDurationFilter, setDefaultDurationFilter] = useState<DurationFilter>('all');
   const [defaultDateFrom, setDefaultDateFrom] = useState('');
+  const [defaultDatePreset, setDefaultDatePreset] = useState<'all'|'today'|'last7'|'last30'|'custom'>('all');
   const [defaultDateTo, setDefaultDateTo] = useState('');
   const [error, setError] = useState('');
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
@@ -169,6 +170,7 @@ export function AcademicConfig({
     defaultPriorityFilter !== ((config?.defaultPriorityFilter as PriorityFilter) ?? 'all') ||
     defaultDurationFilter !== ((config?.defaultDurationFilter as DurationFilter) ?? 'all') ||
     defaultDateFrom !== ((config?.defaultDateFrom as string) ?? '') ||
+    defaultDatePreset !== ((config?.defaultDatePreset as string) ?? 'all') ||
     defaultDateTo !== ((config?.defaultDateTo as string) ?? '');
 
   useEffect(() => {
@@ -187,6 +189,7 @@ export function AcademicConfig({
     setDefaultSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
     setDefaultPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
     setDefaultDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
+    setDefaultDatePreset((config?.defaultDatePreset as 'all'|'today'|'last7'|'last30'|'custom') ?? 'all');
     setDefaultDateFrom((config?.defaultDateFrom as string) ?? '');
     setDefaultDateTo((config?.defaultDateTo as string) ?? '');
   }, [config]);
@@ -404,6 +407,7 @@ export function AcademicConfig({
         defaultSubjectFilter,
         defaultPriorityFilter,
         defaultDurationFilter,
+        defaultDatePreset,
         defaultDateFrom,
         defaultDateTo,
       };
@@ -781,21 +785,50 @@ export function AcademicConfig({
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <label className="space-y-2">
+                <div>
                   <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Vista</span>
-                  <select
-                    value={defaultView}
-                    onChange={(e) => setDefaultView(e.target.value as EventDisplayStyle)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="detailed">Detallada</option>
-                    <option value="compact">Compacta</option>
-                    <option value="list">Lista</option>
-                  </select>
-                </label>
+                  <div className="mt-2 flex gap-1 border border-slate-300 rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setDefaultView('list')}
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                        defaultView === 'list'
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                          : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                      }`}
+                      title="Vista lista"
+                    >
+                      ⋮
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDefaultView('compact')}
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                        defaultView === 'compact'
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                          : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                      }`}
+                      title="Vista compacta"
+                    >
+                      ▦▦
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDefaultView('detailed')}
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                        defaultView === 'detailed'
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200'
+                          : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                      }`}
+                      title="Vista detallada"
+                    >
+                      ☰
+                    </button>
+                  </div>
+                </div>
 
                 <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Orden predeterminado</span>
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Orden</span>
                   <select
                     value={defaultSortBy}
                     onChange={(e) => setDefaultSortBy(e.target.value as SortOption)}
@@ -825,56 +858,55 @@ export function AcademicConfig({
 
             <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
               <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Filtros predeterminados</h4>
-              <AcademicFilterControls
-                search={defaultSearch}
-                groupBy={defaultGroupBy}
-                sortBy={defaultSortBy}
-                eventTypeFilter={defaultEventTypeFilter}
-                statusFilter={defaultStatusFilter}
-                subjectFilter={defaultSubjectFilter}
-                priorityFilter={defaultPriorityFilter}
-                durationFilter={defaultDurationFilter}
-                dateFrom={defaultDateFrom}
-                dateTo={defaultDateTo}
-                subjects={subjects}
-                availableTaskTypes={taskTypes}
-                onChange={(field, value) => {
-                  switch (field) {
-                    case 'search':
-                      setDefaultSearch(value);
-                      break;
-                    case 'groupBy':
-                      setDefaultGroupBy(value as GroupByOption);
-                      break;
-                    case 'sortBy':
-                      setDefaultSortBy(value as SortOption);
-                      break;
-                    case 'eventTypeFilter':
-                      setDefaultEventTypeFilter(value as EventTypeFilter);
-                      break;
-                    case 'statusFilter':
-                      setDefaultStatusFilter(value as StatusFilter);
-                      break;
-                    case 'subjectFilter':
-                      setDefaultSubjectFilter(value);
-                      break;
-                    case 'priorityFilter':
-                      setDefaultPriorityFilter(value as PriorityFilter);
-                      break;
-                    case 'durationFilter':
-                      setDefaultDurationFilter(value as DurationFilter);
-                      break;
-                    case 'dateFrom':
-                      setDefaultDateFrom(value);
-                      break;
-                    case 'dateTo':
-                      setDefaultDateTo(value);
-                      break;
-                    default:
-                      break;
-                  }
-                }}
-              />
+              <div className="grid gap-4 sm:grid-cols-3 mt-3">
+                <label className="space-y-1">
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Estado</span>
+                  <select
+                    value={defaultStatusFilter}
+                    onChange={(e) => setDefaultStatusFilter(e.target.value as StatusFilter)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="completed">Completados</option>
+                  </select>
+                </label>
+
+                <label className="space-y-1">
+                  <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Rango de fechas</span>
+                  <select
+                    value={defaultDatePreset}
+                    onChange={(e) => setDefaultDatePreset(e.target.value as any)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="all">Todo</option>
+                    <option value="today">Día actual</option>
+                    <option value="last7">Última semana</option>
+                    <option value="last30">Último mes</option>
+                    <option value="custom">Personalizado</option>
+                  </select>
+                </label>
+
+                {defaultDatePreset === 'custom' ? (
+                  <div className="space-y-1">
+                    <span className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Fechas (desde / hasta)</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="date"
+                        value={defaultDateFrom}
+                        onChange={(e) => setDefaultDateFrom(e.target.value)}
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                      <input
+                        type="date"
+                        value={defaultDateTo}
+                        onChange={(e) => setDefaultDateTo(e.target.value)}
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         )}

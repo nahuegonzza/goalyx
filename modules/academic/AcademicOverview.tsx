@@ -365,8 +365,15 @@ export default function AcademicOverview() {
         setSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
         setPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
         setDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
-        setDateFrom((config?.defaultDateFrom as string) ?? '');
-        setDateTo((config?.defaultDateTo as string) ?? '');
+        const preset = config?.defaultDatePreset as string | undefined;
+        if (preset && preset !== 'custom') {
+          const r = getPresetRange(preset);
+          setDateFrom(r.from);
+          setDateTo(r.to);
+        } else {
+          setDateFrom((config?.defaultDateFrom as string) ?? '');
+          setDateTo((config?.defaultDateTo as string) ?? '');
+        }
       } catch (err) {
         // ignore
       } finally {
@@ -448,6 +455,27 @@ export default function AcademicOverview() {
     const formatKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
     return { from: formatKey(monday), to: formatKey(sunday) };
+  };
+
+  const getPresetRange = (preset?: string) => {
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const formatKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    if (!preset || preset === 'all') return { from: '', to: '' };
+    const today = new Date();
+    if (preset === 'today') return { from: formatKey(today), to: formatKey(today) };
+    if (preset === 'last7') {
+      const to = new Date(today);
+      const from = new Date(today);
+      from.setDate(today.getDate() - 6);
+      return { from: formatKey(from), to: formatKey(to) };
+    }
+    if (preset === 'last30') {
+      const to = new Date(today);
+      const from = new Date(today);
+      from.setDate(today.getDate() - 29);
+      return { from: formatKey(from), to: formatKey(to) };
+    }
+    return { from: '', to: '' };
   };
 
   useEffect(() => {
