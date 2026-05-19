@@ -352,7 +352,7 @@ export default function AcademicOverview() {
         const res = await fetch('/api/modules', { credentials: 'include' });
         if (!res.ok) return;
         const modules = await res.json();
-        const academicModule = modules.find((m: any) => m.name === 'academic' || m.moduleName === 'academic');
+        const academicModule = modules.find((m: any) => m.slug === 'academic' || m.moduleName === 'academic');
         if (!academicModule) return;
         const res2 = await fetch(`/api/modules/${academicModule.id}`, { credentials: 'include' });
         if (!res2.ok) return;
