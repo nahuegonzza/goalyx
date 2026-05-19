@@ -5,6 +5,13 @@ export type AcademicExamType = 'parcial' | 'final' | 'recuperatorio' | 'exposici
 export type AcademicTaskPriority = 'alta' | 'media' | 'baja';
 export type AcademicTaskDuration = 'corta' | 'media' | 'extensa' | 'lectura' | 'escritura' | 'codigo' | 'practica';
 
+export type GroupByOption = 'none' | 'date' | 'subject';
+export type SortOption = 'default' | 'dateAsc' | 'dateDesc' | 'subject' | 'priority';
+export type StatusFilter = 'all' | 'completed' | 'pending';
+export type EventTypeFilter = 'all' | 'exam' | 'task';
+export type PriorityFilter = 'all' | AcademicTaskPriority;
+export type DurationFilter = 'all' | AcademicTaskDuration;
+
 export const DEFAULT_ACADEMIC_EXAM_TYPES: AcademicTypeConfig[] = [
   { id: 'exam-parcial', key: 'parcial', label: 'Parcial', points: 3, color: '#0ea5e9' },
   { id: 'exam-final', key: 'final', label: 'Final', points: 4, color: '#22c55e' },

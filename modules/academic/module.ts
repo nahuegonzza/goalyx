@@ -15,6 +15,17 @@ import {
 const defaultConfig: AcademicModuleConfig = {
   examTypes: DEFAULT_ACADEMIC_EXAM_TYPES,
   taskTypes: DEFAULT_ACADEMIC_TASK_TYPES,
+  defaultView: 'detailed',
+  defaultSearch: '',
+  defaultGroupBy: 'none',
+  defaultSortBy: 'priority',
+  defaultEventTypeFilter: 'all',
+  defaultStatusFilter: 'all',
+  defaultSubjectFilter: 'all',
+  defaultPriorityFilter: 'all',
+  defaultDurationFilter: 'all',
+  defaultDateFrom: '',
+  defaultDateTo: '',
 };
 
 function getEventScore(event: AcademicEvent, config: Record<string, unknown>, subject?: any): number {

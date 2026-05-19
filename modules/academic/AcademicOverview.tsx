@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
-import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority, getAcademicTaskTypes, AcademicTypeConfig } from './academicHelpers';
+import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority, getAcademicTaskTypes, AcademicTypeConfig, GroupByOption, SortOption, EventTypeFilter, StatusFilter, PriorityFilter, DurationFilter } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
 import ConfirmationModal from '@components/ConfirmationModal';
 import ModalOverlay from '@components/ModalOverlay';
@@ -13,19 +13,8 @@ import { usePreventScroll } from '@hooks/usePreventScroll';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
 import AcademicEventCard, { EventDisplayStyle } from './AcademicEventCard';
+import AcademicFilterControls from './AcademicFilterControls';
 import type { ModuleEntry } from '@types';
-
-type GroupByOption = 'none' | 'date' | 'subject';
-
-type SortOption = 'default' | 'dateAsc' | 'dateDesc' | 'subject' | 'priority';
-
-type StatusFilter = 'all' | 'completed' | 'pending';
-
-type EventTypeFilter = 'all' | 'exam' | 'task';
-
-type PriorityFilter = 'all' | AcademicTaskPriority;
-
-type DurationFilter = 'all' | AcademicTaskDuration;
 
 const formatDateLabel = (dateString: string) => {
   const date = parseLocalDate(dateString);
@@ -194,138 +183,21 @@ function AcademicFilterModal({
           </button>
         </div>
 
-        <div className="space-y-5">
-          <div>
-            <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">Buscar</label>
-            <input
-              value={search}
-              onChange={(e) => onChange('search', e.target.value)}
-              placeholder="Título, descripción o materia"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-            />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
-              <select
-                value={groupBy}
-                onChange={(e) => onChange('groupBy', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="none">Sin orden</option>
-                <option value="date">Agrupar por fecha</option>
-                <option value="subject">Agrupar por materia</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
-              <select
-                value={sortBy}
-                onChange={(e) => onChange('sortBy', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="default">Sin orden</option>
-                <option value="dateAsc">Fecha ascendente</option>
-                <option value="dateDesc">Fecha descendente</option>
-                <option value="subject">Materia</option>
-                <option value="priority">Prioridad / examen</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
-              <select
-                value={eventTypeFilter}
-                onChange={(e) => onChange('eventTypeFilter', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todos</option>
-                <option value="exam">Exámenes</option>
-                <option value="task">Tareas</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Prioridad</span>
-              <select
-                value={priorityFilter}
-                onChange={(e) => onChange('priorityFilter', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todas</option>
-                <option value="alta">Alta</option>
-                <option value="media">Media</option>
-                <option value="baja">Baja</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="space-y-1 min-w-0 lg:col-span-2">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(e) => onChange('dateFrom', e.target.value)}
-                  className="w-full min-w-[12rem] rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                />
-                <input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => onChange('dateTo', e.target.value)}
-                  className="w-full min-w-[12rem] rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                />
-              </div>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
-              <select
-                value={statusFilter}
-                onChange={(e) => onChange('statusFilter', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todos</option>
-                <option value="pending">Pendientes</option>
-                <option value="completed">Completados</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
-              <select
-                value={subjectFilter}
-                onChange={(e) => onChange('subjectFilter', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todas</option>
-                {subjects.map((subject) => (
-                  <option key={subject.id} value={subject.id}>{subject.name}</option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo de tarea</span>
-              <select
-                value={durationFilter}
-                onChange={(e) => onChange('durationFilter', e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todas</option>
-                {availableTaskTypes && availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => (
-                  <option key={t.key} value={t.key}>{t.label}</option>
-                )) : (
-                  <>
-                    <option value="corta">Corta</option>
-                    <option value="media">Media</option>
-                    <option value="extensa">Extensa</option>
-                    <option value="lectura">Lectura</option>
-                    <option value="escritura">Escritura</option>
-                    <option value="codigo">Código</option>
-                    <option value="practica">Práctica</option>
-                  </>
-                )}
-              </select>
-            </label>
-          </div>
+        <AcademicFilterControls
+          search={search}
+          groupBy={groupBy}
+          sortBy={sortBy}
+          eventTypeFilter={eventTypeFilter}
+          statusFilter={statusFilter}
+          subjectFilter={subjectFilter}
+          priorityFilter={priorityFilter}
+          durationFilter={durationFilter}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          subjects={subjects}
+          availableTaskTypes={availableTaskTypes}
+          onChange={onChange}
+        />
 
           <div className="flex flex-wrap justify-end gap-2">
             <button
@@ -438,7 +310,7 @@ export default function AcademicOverview() {
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [eventDisplayStyle, setEventDisplayStyle] = useState<EventDisplayStyle>('detailed');
-  usePreventScroll(showFilterModal || showConfigModal || showEventForm);
+  const [moduleConfig, setModuleConfig] = useState<Record<string, unknown> | undefined>(undefined);
   const [availableTaskTypes, setAvailableTaskTypes] = useState<AcademicTypeConfig[]>([]);
   const [academicConfigLoaded, setAcademicConfigLoaded] = useState(false);
 
@@ -470,6 +342,7 @@ export default function AcademicOverview() {
   }, [academicModuleId]);
 
   useEffect(() => {
+    if (!academicModuleId) return;
     (async () => {
       try {
         const res = await fetch('/api/modules', { credentials: 'include' });
@@ -481,14 +354,27 @@ export default function AcademicOverview() {
         if (!res2.ok) return;
         const mod = await res2.json();
         const config = mod.config as Record<string, unknown> | undefined;
+        setModuleConfig(config);
         setAvailableTaskTypes(getAcademicTaskTypes(config));
+
+        setEventDisplayStyle((config?.defaultView as EventDisplayStyle) ?? 'detailed');
+        setSearch((config?.defaultSearch as string) ?? '');
+        setGroupBy((config?.defaultGroupBy as GroupByOption) ?? 'none');
+        setSortBy((config?.defaultSortBy as SortOption) ?? 'priority');
+        setEventTypeFilter((config?.defaultEventTypeFilter as EventTypeFilter) ?? 'all');
+        setStatusFilter((config?.defaultStatusFilter as StatusFilter) ?? 'all');
+        setSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
+        setPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
+        setDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
+        setDateFrom((config?.defaultDateFrom as string) ?? '');
+        setDateTo((config?.defaultDateTo as string) ?? '');
       } catch (err) {
         // ignore
       } finally {
         setAcademicConfigLoaded(true);
       }
     })();
-  }, []);
+  }, [academicModuleId]);
 
   const handleOpenNewEvent = () => {
     setEditingEvent(null);
@@ -529,6 +415,26 @@ export default function AcademicOverview() {
   const handleToggleReady = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
     await loadAcademicEntries();
+  };
+
+  const handleSaveAcademicModuleConfig = async (newConfig: Record<string, unknown>) => {
+    if (!academicModuleId) return false;
+    try {
+      const res = await fetch(`/api/modules/${academicModuleId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: newConfig }),
+      });
+
+      if (!res.ok) return false;
+
+      const mod = await res.json();
+      setModuleConfig(mod.config as Record<string, unknown> | undefined);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const getWeekBounds = () => {
@@ -920,10 +826,10 @@ export default function AcademicOverview() {
         <ModalOverlay opacity="50" blur="sm">
           <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-slate-950">
             <AcademicConfig
-              config={{}}
+              config={moduleConfig}
               moduleId={academicModuleId}
               moduleName="academic"
-              onSave={async () => true}
+              onSave={handleSaveAcademicModuleConfig}
               onClose={() => setShowConfigModal(false)}
             />
           </div>

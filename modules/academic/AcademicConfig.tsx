@@ -3,14 +3,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Reorder, useDragControls } from 'framer-motion';
 import { getLocalDateString } from "@lib/dateHelpers";
-import type { AcademicSubject, AcademicModuleConfig, AcademicTypeConfig } from "./academicHelpers";
+import type { AcademicSubject, AcademicModuleConfig, AcademicTypeConfig, GroupByOption, SortOption, EventTypeFilter, StatusFilter, PriorityFilter, DurationFilter } from "./academicHelpers";
 import { getAcademicExamTypes, getAcademicTaskTypes } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 import ModalOverlay from '@components/ModalOverlay';
 import { usePreventScroll } from '@hooks/usePreventScroll';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
-
+import AcademicFilterControls from './AcademicFilterControls';
+import type { EventDisplayStyle } from './AcademicEventCard';
 interface AcademicConfigProps {
   config?: AcademicModuleConfig;
   moduleId?: string;
@@ -116,7 +117,18 @@ export function AcademicConfig({
   usePreventScroll(true);
   const [subjects, setSubjects] = useState<AcademicSubject[]>([]);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"subjects" | "scoring">("subjects");
+  const [activeTab, setActiveTab] = useState<"subjects" | "scoring" | "page">("subjects");
+  const [defaultView, setDefaultView] = useState<EventDisplayStyle>("detailed");
+  const [defaultSearch, setDefaultSearch] = useState('');
+  const [defaultGroupBy, setDefaultGroupBy] = useState<GroupByOption>('none');
+  const [defaultSortBy, setDefaultSortBy] = useState<SortOption>('priority');
+  const [defaultEventTypeFilter, setDefaultEventTypeFilter] = useState<EventTypeFilter>('all');
+  const [defaultStatusFilter, setDefaultStatusFilter] = useState<StatusFilter>('all');
+  const [defaultSubjectFilter, setDefaultSubjectFilter] = useState('all');
+  const [defaultPriorityFilter, setDefaultPriorityFilter] = useState<PriorityFilter>('all');
+  const [defaultDurationFilter, setDefaultDurationFilter] = useState<DurationFilter>('all');
+  const [defaultDateFrom, setDefaultDateFrom] = useState('');
+  const [defaultDateTo, setDefaultDateTo] = useState('');
   const [error, setError] = useState('');
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   
@@ -146,13 +158,38 @@ export function AcademicConfig({
   const isDirty =
     JSON.stringify(subjects) !== JSON.stringify(initialSubjects) ||
     JSON.stringify(examTypes) !== JSON.stringify(initialExamTypes) ||
-    JSON.stringify(taskTypes) !== JSON.stringify(initialTaskTypes);
+    JSON.stringify(taskTypes) !== JSON.stringify(initialTaskTypes) ||
+    defaultView !== ((config?.defaultView as EventDisplayStyle) ?? 'detailed') ||
+    defaultSearch !== ((config?.defaultSearch as string) ?? '') ||
+    defaultGroupBy !== ((config?.defaultGroupBy as GroupByOption) ?? 'none') ||
+    defaultSortBy !== ((config?.defaultSortBy as SortOption) ?? 'priority') ||
+    defaultEventTypeFilter !== ((config?.defaultEventTypeFilter as EventTypeFilter) ?? 'all') ||
+    defaultStatusFilter !== ((config?.defaultStatusFilter as StatusFilter) ?? 'all') ||
+    defaultSubjectFilter !== ((config?.defaultSubjectFilter as string) ?? 'all') ||
+    defaultPriorityFilter !== ((config?.defaultPriorityFilter as PriorityFilter) ?? 'all') ||
+    defaultDurationFilter !== ((config?.defaultDurationFilter as DurationFilter) ?? 'all') ||
+    defaultDateFrom !== ((config?.defaultDateFrom as string) ?? '') ||
+    defaultDateTo !== ((config?.defaultDateTo as string) ?? '');
 
   useEffect(() => {
     if (academicModule.subjects && academicModule.subjects.length > 0) {
       setSubjects(academicModule.subjects);
     }
   }, [academicModule.subjects]);
+
+  useEffect(() => {
+    setDefaultView((config?.defaultView as EventDisplayStyle) ?? 'detailed');
+    setDefaultSearch((config?.defaultSearch as string) ?? '');
+    setDefaultGroupBy((config?.defaultGroupBy as GroupByOption) ?? 'none');
+    setDefaultSortBy((config?.defaultSortBy as SortOption) ?? 'priority');
+    setDefaultEventTypeFilter((config?.defaultEventTypeFilter as EventTypeFilter) ?? 'all');
+    setDefaultStatusFilter((config?.defaultStatusFilter as StatusFilter) ?? 'all');
+    setDefaultSubjectFilter((config?.defaultSubjectFilter as string) ?? 'all');
+    setDefaultPriorityFilter((config?.defaultPriorityFilter as PriorityFilter) ?? 'all');
+    setDefaultDurationFilter((config?.defaultDurationFilter as DurationFilter) ?? 'all');
+    setDefaultDateFrom((config?.defaultDateFrom as string) ?? '');
+    setDefaultDateTo((config?.defaultDateTo as string) ?? '');
+  }, [config]);
 
   useEffect(() => {
     setExamTypes(initialExamTypes);
@@ -358,6 +395,17 @@ export function AcademicConfig({
         ...legacyConfig,
         examTypes,
         taskTypes,
+        defaultView,
+        defaultSearch,
+        defaultGroupBy,
+        defaultSortBy,
+        defaultEventTypeFilter,
+        defaultStatusFilter,
+        defaultSubjectFilter,
+        defaultPriorityFilter,
+        defaultDurationFilter,
+        defaultDateFrom,
+        defaultDateTo,
       };
 
       // Primero guardar las materias si hay módulo ID
