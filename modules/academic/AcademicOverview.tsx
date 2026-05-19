@@ -215,7 +215,6 @@ function AcademicFilterModal({
               Buscar
             </button>
           </div>
-        </div>
       </div>
     </ModalOverlay>
   );
