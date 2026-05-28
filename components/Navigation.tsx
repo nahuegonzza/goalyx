@@ -29,6 +29,10 @@ export default function Navigation() {
     if (typeof window === 'undefined') return false;
     return window.localStorage.getItem(ACADEMIC_ACTIVE_STORAGE_KEY) === 'true';
   });
+  const [gymModuleActive, setGymModuleActive] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem('goalyxGymModuleActive') === 'true';
+  });
 
   useEffect(() => {
     if (session?.user) {
@@ -58,9 +62,13 @@ export default function Navigation() {
     }
 
     if (typeof window !== 'undefined') {
-      const storedValue = window.localStorage.getItem(ACADEMIC_ACTIVE_STORAGE_KEY);
-      if (storedValue !== null) {
-        setAcademicModuleActive(storedValue === 'true');
+      const storedAcademicValue = window.localStorage.getItem(ACADEMIC_ACTIVE_STORAGE_KEY);
+      const storedGymValue = window.localStorage.getItem('goalyxGymModuleActive');
+      if (storedAcademicValue !== null) {
+        setAcademicModuleActive(storedAcademicValue === 'true');
+      }
+      if (storedGymValue !== null) {
+        setGymModuleActive(storedGymValue === 'true');
       }
     }
 
@@ -112,10 +120,14 @@ export default function Navigation() {
 
   const [homeItem, ...otherItems] = navItems;
   const academicNavItem = { href: '/academic', icon: '/module_icons/academic_icon.png', label: 'Académico' };
-  const leftItems = academicModuleActive
-    ? [academicNavItem, otherItems[1], otherItems[0]]
-    : [otherItems[1], otherItems[0]];
+  const gymNavItem = { href: '/gym', icon: '/navbar_icons/flag_icon.png', label: 'Gimnasio' };
+  const extraModuleItems = [
+    ...(academicModuleActive ? [academicNavItem] : []),
+    ...(gymModuleActive ? [gymNavItem] : [])
+  ];
+  const leftItems = [...extraModuleItems, otherItems[1], otherItems[0]];
   const rightItems = otherItems.slice(2); // analytics, profile
+  const rightPlaceholders = extraModuleItems.length;
 
   return (
     <>
@@ -146,12 +158,14 @@ export default function Navigation() {
                 <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={getIconClasses(item.href)} />
               </Link>
             ))}
-            {academicModuleActive && (
+            {extraModuleItems.length > 0 && (
               <>
                 <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
-                <Link href={academicNavItem.href} className={getLinkClasses(academicNavItem.href)} title={academicNavItem.label}>
-                  <Image src={academicNavItem.icon} alt={academicNavItem.label} width={24} height={24} unoptimized className={getIconClasses(academicNavItem.href)} />
-                </Link>
+                {extraModuleItems.map((item) => (
+                  <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
+                    <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={getIconClasses(item.href)} />
+                  </Link>
+                ))}
               </>
             )}
             <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
@@ -231,9 +245,9 @@ export default function Navigation() {
                 <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
-            {academicModuleActive && (
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl opacity-0 pointer-events-none" aria-hidden="true" />
-            )}
+            {Array.from({ length: rightPlaceholders }).map((_, index) => (
+              <div key={`placeholder-${index}`} className="flex h-12 w-12 items-center justify-center rounded-2xl opacity-0 pointer-events-none" aria-hidden="true" />
+            ))}
           </div>
         </div>
       </nav>
