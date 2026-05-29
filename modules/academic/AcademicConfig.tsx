@@ -211,6 +211,7 @@ export function AcademicConfig({
     );
   };
 
+  
   const handleAddSubject = () => {
     const nextSubject: AcademicSubject = {
       id: crypto.randomUUID(),
