@@ -84,7 +84,7 @@ function parseSubscription(subscription: unknown) {
   return subscription;
 }
 
-export async function POST(request: Request) {
+async function handleNotificationSendRequest(request: Request) {
   const notificationSecret = process.env.NOTIFICATIONS_SECRET;
   const url = new URL(request.url);
   const providedSecret = request.headers.get('x-notifications-secret') ?? url.searchParams.get('secret');
@@ -148,4 +148,12 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ sent, failed });
+}
+
+export async function POST(request: Request) {
+  return handleNotificationSendRequest(request);
+}
+
+export async function GET(request: Request) {
+  return handleNotificationSendRequest(request);
 }
