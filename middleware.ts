@@ -23,18 +23,13 @@ let res = NextResponse.next()
     }
   )
 
-  const protectedRoutes = ['/', '/goals', '/analytics', '/calendar', '/history', '/settings']
   const pathname = req.nextUrl.pathname
-
-  const isProtected = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  )
 
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
-  if (isProtected && !session) {
+  if (!session) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
@@ -42,5 +37,5 @@ let res = NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/', '/goals/:path*', '/analytics/:path*', '/calendar/:path*', '/history/:path*', '/settings/:path*'],
+  matcher: ['/((?!api|_next|static|favicon\.ico|login|register|reset-password).*)'],
 }
