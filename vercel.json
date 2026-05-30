@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/notifications/send?secret=REPLACE_WITH_NOTIFICATIONS_SECRET",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}
