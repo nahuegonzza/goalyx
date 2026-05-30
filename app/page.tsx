@@ -4,6 +4,8 @@ import { prisma } from '@lib/prisma';
 import Navigation from '@components/Navigation';
 import GoalTracker from '@components/GoalTracker';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const { user } = await getServerSupabaseUser();
 
