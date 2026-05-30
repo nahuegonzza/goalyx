@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
+import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import Image from 'next/image';
 
 function getLoginErrorMessage(defaultMessage: string, fallbackMessage: string) {
@@ -19,6 +20,7 @@ function getLoginErrorMessage(defaultMessage: string, fallbackMessage: string) {
 }
 
 export default function LoginPage() {
+  const { session, loading: sessionLoading } = useSupabaseSession();
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,6 +30,26 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (!sessionLoading && session) {
+      router.replace('/');
+    }
+  }, [router, session, sessionLoading]);
+
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 pt-0 pb-0 -mt-20 sm:mt-0">
+        <div className="max-w-md w-full bg-slate-900 rounded-lg shadow-lg p-8 border border-slate-800 text-center text-white">
+          Cargando...
+        </div>
+      </div>
+    );
+  }
+
+  if (session) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
