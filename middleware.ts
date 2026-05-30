@@ -37,5 +37,8 @@ let res = NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|static|favicon\.ico|login|register|reset-password).*)'],
+  matcher: [
+    '/',
+    '/((?!api|_next|static|favicon\.ico|icons|navbar_icons|module_icons|image-no-background-500x500\.png|site\.webmanifest|manifest\.json|robots\.txt|browserconfig\.xml|apple-touch-icon\.png|mstile-150x150\.png|login|register|reset-password).*)',
+  ],
 }
