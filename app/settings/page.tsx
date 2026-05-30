@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '@components/Navigation';
 import ThemeToggle from '@components/ThemeToggle';
 import InfoModal from '@components/InfoModal';
+import NotificationPreferences from '@components/NotificationPreferences';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
@@ -429,6 +430,8 @@ export default function SettingsPage() {
               <ThemeToggle />
             </div>
           </div>
+
+          <NotificationPreferences />
 
           <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950 overflow-hidden">
             <button

@@ -4,19 +4,19 @@ import { useEffect } from 'react';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return;
     }
 
-    (async () => {
+    const registerServiceWorker = async () => {
       try {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map((registration) => registration.unregister()));
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+        await navigator.serviceWorker.register('/sw.js');
       } catch (error) {
+        console.error('Service worker registration failed:', error);
       }
-    })();
+    };
+
+    registerServiceWorker();
   }, []);
 
   return null;
